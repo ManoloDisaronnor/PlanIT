@@ -1,0 +1,47 @@
+#information-dialog {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(15, 15, 30, 0.9);
+    padding: 15px 30px;
+    border-radius: 5px;
+    color: white;
+    border-radius: 5px;
+    border: 1px solid rgba(124, 124, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(121, 121, 197, 0.3);
+    animation: slideIn 0.5s forwards, slideOut 0.5s 4.5s forwards;
+    z-index: 999;
+}
+
+#information-dialog span {
+    margin-left: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.information-dialog-icon {
+    margin-left: 10px;
+}
+
+.error-icon {
+    color: red !important;
+}
+
+.error-text {
+    color: red !important;
+}
+
+@keyframes slideIn {
+    from { top: -100px; opacity: 0; }
+    to { top: 20px; opacity: 1; }
+}
+
+@keyframes slideOut {
+    from { top: 20px; opacity: 1; }
+    to { top: -100px; opacity: 0; }
+}

@@ -1,0 +1,12 @@
+GET http://localhost:3000/api/mensajes/1
+
+###
+POST http://localhost:3000/api/mensajes/enviarmensaje
+Content-Type: application/json
+
+{
+    "id": null,
+    "id_grupo": 1,
+    "id_usuario": 5,
+    "mensaje": "BBB"
+}

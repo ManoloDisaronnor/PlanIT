@@ -1,0 +1,162 @@
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+#configuration-steps {
+    width: 100dvw;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    background-color: #0f0f1e;
+}
+
+#stepper {
+    display: flex;
+    width: 100%;
+    height: 200px;
+}
+
+#steps {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.steps-step {
+    position: absolute;
+    transform: translateX(90%);
+    opacity: 0;
+    pointer-events: none;
+    width: 100%;
+    transition: all 0.5s ease;
+}
+
+.last-step {
+    transform: translateX(-90%);
+    opacity: 0;
+}
+
+.active-step {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: all;
+}
+
+.step {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+.step::before,
+.step::after {
+    position: absolute;
+    content: "";
+    border-bottom: 3px solid #27274479;
+    width: 100%;
+    z-index: 2;
+    transition: border-color 0.5s ease;
+}
+
+.step::before {
+    left: -50%;
+}
+.step::after {
+    left: 50%;
+}
+
+.step:first-child::before {
+    display: none;
+}
+
+.step:last-child::after {
+    display: none;
+}
+
+.stepdetails {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: #0f0f1e;
+    width: 60px;
+    height: 60px;
+    z-index: 4;
+    padding: 0 20px;
+}
+
+.step-detail {
+    position: absolute;
+    top: 63%;
+    color: white;
+    font-size: 15px;
+    font-weight: 400;
+    padding: 10px 0;
+    transition: border-bottom 0.5s ease;
+}
+
+.step-disabled * {
+    cursor: not-allowed;
+}
+
+.step-disabled span {
+    color: #4e4e77;
+}
+
+.step-active::before,
+.step-active::after {
+    border-color: white;
+}
+
+.step-was-activated::before {
+    border-color: white;
+    transition: border-color 0.5s ease;
+}
+
+.step-active .step-detail {
+    font-weight: 500;
+    border-bottom: 3px solid #7c7cff;
+}
+
+@media (max-width: 768px) {
+    span {
+        font-size: 12px !important;
+    }
+
+    .stepdetails {
+        padding: 0px !important;
+    }
+
+    .icon {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-height: 825px) {
+    #stepper {
+        height: 135px;
+    }
+
+    span {
+        font-size: 10px !important;
+    }
+
+    .stepdetails {
+        padding: 0px !important;
+    }
+
+    .icon {
+        width: 40px;
+        height: 40px;
+    }
+}

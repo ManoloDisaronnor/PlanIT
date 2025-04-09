@@ -1,0 +1,82 @@
+<div class="profile-form-container">
+    <section>
+        <div class="form-header">
+            <h2>¡Completa tu perfil!</h2>
+        </div>
+        <form [formGroup]="profileFormGroup" class="profile-form" (submit)="handleSubmit($event)">
+            <div class="profile-container">
+                <div (click)="toggleMenu($event)" class="preview-image-container">
+                    <img class="preview-image"
+                        [src]="previewImage != '' ? previewImage : 'images/defaultProfilePicture.png'"
+                        alt="Preview Image">
+                </div>
+                <div class="preview-image-actions">
+                    <lucide-icon (click)="toggleMenu($event)" size="16" class="clickable" name="pencil"></lucide-icon>
+                </div>
+            </div>
+            <div #menuContainer [ngClass]="{ 'mostrar_acciones_imagen-container-active' : showImageActionsMenu }"
+                class="mostrar_acciones_imagen-container">
+                <div class="menu-action-image">
+                    <div class="menu-action-icon">
+                        <lucide-icon name="image-up" color="white"></lucide-icon>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*" (change)="handleImageChange($event)">
+                    <label for="fileInput" class="custom-file-label"><span>Subir Imagen</span></label>
+                </div>
+                <div class="menu-action-image" (click)="startCamara()">
+                    <div class="menu-action-icon">
+                        <lucide-icon name="camera" color="white"></lucide-icon>
+                    </div>
+                    <span>Tomar una foto</span>
+                </div>
+                <div class="menu-action-image-delete" (click)="handleDeleteImage()">
+                    <div class="menu-action-icon">
+                        <lucide-icon name="image-off" color="#ff0000"></lucide-icon>
+                    </div>
+                    <span class="span-delete">Eliminar imagen</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <div [ngClass]="{ 'input-container-error' : usernameError}" class="input-container">
+                        <input [ngClass]="{ 'error' : usernameError}" type="text" placeholder=""
+                            formControlName="username" autocomplete="new-password">
+                        <label for="username">Nombre de usuario</label>
+                        <span [ngClass]="{ 'errorborder' : usernameError }" class="input-border"></span>
+                    </div>
+                    <div [ngClass]="{ 'icon-wrapper-error' : usernameError}" class="icon-wrapper">
+                        <lucide-icon *ngIf="usernameError" name="info" size="20px" class="error-icon"
+                            (mouseenter)="showHelperText('username')" (mouseleave)="hideHelperText()">
+                        </lucide-icon>
+                        <span *ngIf="helperTextVisible === 'username'" class="helper-text">
+                            {{ usernameError }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <div class="input-container">
+                        <textarea #aboutmeTextarea placeholder="" formControlName="aboutme"></textarea>
+                        <label for="aboutme">Descripción sobre tí</label>
+                        <span class="input-border"></span>
+                    </div>
+                </div>
+            </div>
+
+            <button
+                [disabled]="this.profileFormGroup.controls.username.invalid || !this.usernameInUse || this.loadingUsernameAvailability"
+                type="submit" class="profile-btn">
+                @if (loadingSubmit) {
+                <app-loadinganimation [type]="'button'"></app-loadinganimation>
+                } @else {
+                Continuar
+                }
+            </button>
+        </form>
+    </section>
+</div>
+
+
+<app-infodialog *ngIf="generalError" [type]="'error'" [message]="generalError"></app-infodialog>

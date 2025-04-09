@@ -1,0 +1,41 @@
+<div class="camara">
+    <div class="webcam-video-container">
+        <div [ngClass]="{'webcam-video': true}">
+            @if (!forceWebcamRecreation) {
+            <webcam [trigger]="$trigger" (imageCapture)="snapshot($event)"
+                [videoOptions]="isMobileDevice() ? { facingMode: facingMode } : { deviceId: currentDeviceId || undefined }"
+                [allowCameraSwitch]="false" [imageQuality]="0.7" (initError)="handleInitError($event)">
+            </webcam>
+            }
+        </div>
+
+        <div class="loading-overlay" *ngIf="isLoadingCamera || isSwitchingCamera">
+            <app-loadinganimation [type]="'fullscreen'"></app-loadinganimation>
+        </div>
+
+        <div class="camera-controls">
+            <button [disabled]="isSwitchingCamera || isLoadingCamera" (click)="switchCamera()"
+                class="switch-camera-button" [ngClass]="{'disabled': isSwitchingCamera || isLoadingCamera}">
+                <div class="button-content">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"></path>
+                        <path d="M10 9l-3 3 3 3"></path>
+                        <path d="M14 9l3 3-3 3"></path>
+                    </svg>
+                </div>
+            </button>
+            <button [disabled]="isSwitchingCamera || isLoadingCamera" (click)="captureImage()" class="capture-button"
+                [ngClass]="{'disabled': isSwitchingCamera || isLoadingCamera}"></button>
+            <button [disabled]="isSwitchingCamera || isLoadingCamera" (click)="closeCamera()"
+                class="close-camera-button" [ngClass]="{'disabled': isSwitchingCamera || isLoadingCamera}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+    <app-infodialog *ngIf="generalError" [type]="'error'" [message]="generalError"></app-infodialog>
+</div>

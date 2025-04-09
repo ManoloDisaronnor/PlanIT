@@ -1,0 +1,4 @@
+<div id="information-dialog">
+    <lucide-icon name="{{ type === 'error' ? 'circle-x' : 'info' }}" size="20px" [ngClass]="{ 'error-icon' : type === 'error' }" class="information-dialog-icon"></lucide-icon>
+    <span [ngClass]="{ 'error-text' : type === 'error' }">{{ message }}</span>
+</div>

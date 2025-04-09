@@ -1,0 +1,168 @@
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.camara {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+.webcam-video-container {
+    position: relative;
+    width: 90%;
+    max-width: 1200px;
+    max-height: 80vh;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.webcam-video {
+    width: 100%;
+    height: 100%;
+}
+
+::ng-deep .webcam-wrapper {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+::ng-deep .webcam-wrapper video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain;
+}
+
+.camera-controls {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 30px;
+}
+
+.capture-button {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: white;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.capture-button:hover {
+    transform: scale(1.05);
+}
+
+.capture-button:active {
+    transform: scale(0.95);
+    opacity: 0.85;
+}
+
+.switch-camera-button, .close-camera-button {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: white;
+    position: relative;
+}
+
+.switch-camera-button:hover, .close-camera-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.switch-camera-button:active, .close-camera-button:active {
+    transform: scale(0.95);
+    opacity: 0.85;
+}
+
+.switch-camera-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.switch-camera-button.disabled:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: none;
+}
+
+.button-content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.capture-button.disabled, .switch-camera-button.disabled, .close-camera-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.capture-button.disabled:hover, .switch-camera-button.disabled:hover, .close-camera-button.disabled:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: none;
+}
+
+@media (max-width: 1200px) {
+    .webcam-video-container {
+        max-width: 750px;
+    }
+}
+
+@media (max-width: 768px) {
+    .webcam-video-container {
+        max-width: 90%;
+        max-height: 70vh;
+    }
+    
+    .capture-button {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .switch-camera-button, .close-camera-button {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .camera-controls {
+        gap: 20px;
+    }
+}

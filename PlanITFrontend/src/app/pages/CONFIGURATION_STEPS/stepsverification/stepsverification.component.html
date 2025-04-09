@@ -1,0 +1,17 @@
+<div class="stepsverification-container">
+    @if (emailVerified) {
+    <h1>Tu correo ha sido verificado correctamente. Redirigiendo al siguiente paso</h1>
+    } @else {
+    <h1>Comprueba tu correo para verificar tu cuenta en la aplicacion</h1>
+    }
+    <div class="video-container">
+        <canvas #lottieCanvas style="width: 300px; height: 300px;"></canvas>
+    </div>
+    <div class="stepsverification-buttons">
+        @if (!emailVerified) {
+        <span>Reenviar correo de verificacion en {{ counter }} segundos</span>
+        <button [disabled]="this.counter !== 0" (click)="resendEmail()">Reenviar correo</button>
+        }
+        <button (click)="this.verified(this.emailVerified)" [disabled]="!emailVerified">Continuar</button>
+    </div>
+</div>

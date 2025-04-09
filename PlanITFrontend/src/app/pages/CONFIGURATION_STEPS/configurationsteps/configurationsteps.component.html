@@ -1,0 +1,63 @@
+<div id="configuration-steps">
+    <section id="stepper">
+        <!-- El contenido del stepper se mantiene igual -->
+        <div [ngClass]="{ 'step-active' : currentStep === 1, 'step-disabled' : currentStep > 3 }" class="step" (click)="changeStep(1)">
+            <div class="stepdetails">
+                <div class="icon">
+                    <ng-lottie *ngIf="lottieVisible" [options]="lottieOptionsArray[1]" width="100"
+                        height="100"></ng-lottie>
+                </div>
+                <span class="step-detail">Verificar</span>
+            </div>
+        </div>
+        <div [ngClass]="{ 'step-active' : currentStep === 2, 'step-disabled' : !emailVerified || currentStep > 3, 'step-was-activated' : currentStep > 2}"
+            class="step" (click)="emailVerified && changeStep(2)">
+            <div class="stepdetails">
+                <div class="icon">
+                    <ng-lottie *ngIf="lottieVisible" [options]="lottieOptionsArray[2]" width="100"
+                        height="100"></ng-lottie>
+                </div>
+                <span class="step-detail">Información</span>
+            </div>
+        </div>
+        <div [ngClass]="{ 'step-active' : currentStep === 3, 'step-disabled' : !emailVerified || this.userConfigurationSteps.name === '' || currentStep > 3, 'step-was-activated' : currentStep > 3}"
+            class="step">
+            <div class="stepdetails" (click)="this.userConfigurationSteps.name !== '' && changeStep(3)">
+                <div class="icon">
+                    <ng-lottie *ngIf="lottieVisible" [options]="lottieOptionsArray[3]" width="100"
+                        height="100"></ng-lottie>
+                </div>
+                <span class="step-detail">Datos</span>
+            </div>
+        </div>
+        <div [ngClass]="{ 'step-active' : currentStep === 4, 'step-disabled' : !emailVerified || this.userConfigurationSteps.username === '' }"
+            class="step">
+            <div class="stepdetails" (click)="this.userConfigurationSteps.username !== '' && changeStep(4)">
+                <div class="icon">
+                    <ng-lottie *ngIf="lottieVisible" [options]="lottieOptionsArray[4]" width="100"
+                        height="100"></ng-lottie>
+                </div>
+                <span class="step-detail">Completo</span>
+            </div>
+        </div>
+    </section>
+    <section id="steps">
+        <div [ngClass]="{ 'active-step' : currentStep === 1, 'last-step' : currentStep > 1 }" class="steps-step">
+            <app-stepsverification (userVerified)="verificationCompleted($event)"></app-stepsverification>
+        </div>
+        <div [ngClass]="{ 'active-step' : currentStep === 2, 'last-step' : currentStep > 2 }" class="steps-step">
+            <app-stepspersonalinformation
+                (userInformation)="recievedUserInformation($event)"></app-stepspersonalinformation>
+        </div>
+        <div [ngClass]="{ 'active-step' : currentStep === 3, 'last-step' : currentStep > 3 }" class="steps-step">
+            <app-stepsprofile (continue)="recievedUserProfile($event)" (openCamara)="toggleCamera()" [uid]="userSignUp?.uid"></app-stepsprofile>
+        </div>
+        <div [ngClass]="{ 'active-step' : currentStep === 4, 'last-step' : currentStep > 4 }" class="steps-step">
+            <app-stepsallset></app-stepsallset>
+        </div>
+    </section>
+    <app-camara *ngIf="showCamera" (imageCaptured)="handleImageCaptured($event)" (close)="showCamera = false">
+    </app-camara>
+
+    <app-infodialog *ngIf="generalError" [type]="'error'" [message]="generalError"></app-infodialog>
+</div>

@@ -1,0 +1,449 @@
+#forms-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.arrows {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background-color: #181830;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 5px;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.arrow-left {
+    left: calc(50% - 350px);
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.arrow-right {
+    right: calc(50% - 350px);
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.arrow-final {
+    display: none;
+}
+
+section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 500px;
+    background: rgba(15, 15, 30, 0.9);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid rgba(124, 124, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(121, 121, 197, 0.3);
+    position: absolute;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.4s ease;
+    flex-shrink: 0;
+    color: white;
+    pointer-events: none;
+}
+
+.active-form {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: all;
+}
+
+.last-form {
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+.form-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.lottie-animation {
+    width: 350px;
+}
+
+.personalinformation-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+}
+
+.form-group {
+    width: 100%;
+}
+
+.form-group input {
+    width: 95%;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.input-container {
+    position: relative;
+}
+
+.input-container {
+    width: 100%;
+}
+
+.input-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.form-group input:focus, .form-group select:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.form-group label {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a0a0d8;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus ~ label,
+.form-group input:not(:placeholder-shown) ~ label {
+    top: -10px;
+    left: 8px;
+    font-size: 0.8rem;
+    color: #7c7cff;
+}
+
+.input-border {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #7c7cff, #a05cff);
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus ~ .input-border, .form-group select:focus ~ .input-border {
+    width: 100%;
+}
+
+.personalinformation-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #7c7cff, #a05cff);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+}
+
+.personalinformation-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(124, 124, 255, 0.3);
+}
+
+.personalinformation-btn:disabled {
+    background: linear-gradient(135deg, rgba(124, 124, 255, 0.5), rgba(160, 92, 255, 0.5)) !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+    position: relative;
+}
+
+.personalinformation-btn:disabled::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent 25%, 
+        rgba(255, 255, 255, 0.1) 50%, 
+        transparent 75%
+    );
+    background-size: 200% 100%;
+    animation: loadingShine 1.5s infinite;
+    border-radius: 8px;
+}
+
+
+.error,
+.error:focus {
+    background: rgba(255, 0, 0, 0.137) !important;
+}
+
+.errorborder {
+    background: linear-gradient(90deg, #ff0000, #ff0000) !important;
+}
+
+.error-icon {
+    color: #ff0000 !important;
+}
+
+.input-container-error {
+    width: 90%;
+}
+
+.icon-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 0;
+}
+
+.icon-wrapper-error {
+    width: 10%;
+}
+
+.helper-text {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    z-index: 10;
+    margin-top: 5px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.icon-wrapper:hover .helper-text {
+    opacity: 1;
+    visibility: visible;
+}
+
+input[type="date"] {
+    color-scheme: dark;
+}
+
+
+select {
+    width: 100%;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+select option {
+    background-color: #1e1e2d;
+    color: #fff;
+}
+
+#select-label {
+    position: absolute;
+    top: -15px;
+    left: 8px;
+    font-size: 0.8rem;
+    color: #7c7cff;
+    transform: translateY(-50%);
+}
+
+@media (max-width: 768px) {
+    section {
+        width: 325px;
+        padding: 15px 20px;
+        margin: 0;
+    }
+
+    .personalinformation-form {
+        gap: 1.5rem;
+    }
+
+    .arrows {
+        width: 30px;
+        height: 30px;
+        padding: 2px;
+    }
+
+    .arrow-left {
+        left: calc(50% - 235px);
+    }
+    
+    .arrow-right {
+        right: calc(50% - 235px);
+    }
+
+    .form-header {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+
+    .form-group input {
+        padding: 15px;
+    }
+
+    .personalinformation-btn {
+        padding: 10px;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    .input-container {
+        width: 95%;
+    }
+
+    .lottie-animation {
+        width: 250px;
+    }
+
+    .input-container-error {
+        width: 85%;
+    }
+    
+    .icon-wrapper-error {
+        width: 15%;
+    }
+    
+    .error-icon {
+        margin-left: 20px;
+    }
+
+    .form-group input:focus ~ .input-border {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    section {
+        width: 250px;
+    }
+
+    .arrow-left {
+        left: calc(50% - 190px);
+    }
+    
+    .arrow-right {
+        right: calc(50% - 190px);
+    }
+
+    .personalinformation-header h1 {
+        font-size: 1.2rem;
+    }
+
+    .form-group input {
+        padding: 10px;
+    }
+    
+    .lottie-animation {
+        width: 200px;
+    }
+    
+    .error-icon {
+        margin-left: 10px;
+    }
+}
+
+@media (max-height: 825px) and (min-width: 480px) {
+    section {
+        width: 325px;
+        padding: 15px 20px;
+        margin: 0;
+    }
+
+    .personalinformation-form {
+        gap: 1.5rem;
+    }
+
+    .arrows {
+        width: 30px;
+        height: 30px;
+        padding: 2px;
+    }
+
+    .arrow-left {
+        left: calc(50% - 235px);
+    }
+    
+    .arrow-right {
+        right: calc(50% - 235px);
+    }
+
+    .form-header {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+
+    .form-group input {
+        padding: 15px;
+    }
+
+    .personalinformation-btn {
+        padding: 10px;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    .input-container {
+        width: 95%;
+    }
+
+    .lottie-animation {
+        width: 250px;
+    }
+
+    .input-container-error {
+        width: 85%;
+    }
+    
+    .icon-wrapper-error {
+        width: 15%;
+    }
+    
+    .error-icon {
+        margin-left: 20px;
+    }
+
+    .form-group input:focus ~ .input-border {
+        width: 100%;
+    }
+}

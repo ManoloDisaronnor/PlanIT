@@ -1,0 +1,30 @@
+GET http://localhost:3000/api/usuarios
+
+###
+POST http://localhost:3000/api/usuarios/firebasesignup
+Content-Type: application/json
+
+{
+    "email": "rest@rest.com",
+    "password": "123456"
+}
+
+###
+POST http://localhost:3000/api/usuarios/setupconfiguration
+Content-Type: application/json
+
+{
+    "uid": "2",
+    "imageUrl": "esa mismo",
+    "name": "Manuel",
+    "surname": "Santos",
+    "username": "manolita",
+    "birthdate": "2005-03-17",
+    "phone": 602242761,
+    "aboutme": "Soy un maquina",
+    "address": "",
+    "gender": "H"
+}
+
+###
+GET http://localhost:3000/api/usuarios/checkusername/user

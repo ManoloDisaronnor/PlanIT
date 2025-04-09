@@ -1,0 +1,75 @@
+.auth-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000000;
+    perspective: 1000px;
+}
+
+.constellation-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    filter: blur(1.5px);
+    pointer-events: none;
+}
+
+.star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 1.2s ease-out;
+    filter: brightness(0.8);
+    pointer-events: auto;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    opacity: 0.7;
+}
+
+.star::before {
+    content: '';
+    position: absolute;
+    width: 300%;
+    height: 300%;
+    background: inherit;
+    border-radius: inherit;
+    filter: blur(6px);
+    opacity: 0;
+    left: -100%;
+    top: -100%;
+    transition: opacity 0.8s ease;
+}
+
+.star:hover {
+    filter: brightness(2.5);
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(2.5);
+    transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.star:hover::before {
+    opacity: 0.3;
+}
+
+.star.active {
+    animation: starGlow 1.2s ease-in-out infinite;
+}
+
+@keyframes starGlow {
+    0%, 100% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.3); }
+    50% { box-shadow: 0 0 30px rgba(255, 255, 255, 0.5); }
+}
+
+.connection {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(to right, 
+        rgba(255,255,255,0.1), 
+        rgba(255,255,255,0.25));
+    transform-origin: 0 50%;
+    pointer-events: none;
+    transition: opacity 0.8s ease;
+}

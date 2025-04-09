@@ -1,0 +1,144 @@
+<div id="forms-container">
+    <div [ngClass]="{ 'arrow-final' : currentStep === 1 }" class="arrows arrow-left"
+        (click)="changeStep(null, currentStep - 1)">
+        <lucide-icon name="chevron-left" size="28px" class="arrow-icon" color="#7c7cff"></lucide-icon>
+    </div>
+    <section [ngClass]="{ 'active-form' : currentStep === 1, 'last-form' : currentStep > 1 }">
+        <div class="form-header">
+            <h2>Nombre y apellidos</h2>
+            <canvas #lottieCanvas1 class="lottie-animation"></canvas>
+        </div>
+        <form [formGroup]="personalInformationFormGroup" class="personalinformation-form"
+            (submit)="changeStep($event, currentStep + 1)">
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <div [ngClass]="{ 'input-container-error' : nameError}" class="input-container">
+                        <input [ngClass]="{ 'error' : nameError}" type="text" placeholder="" formControlName="name"
+                            autocomplete="new-password">
+                        <label for="name">Nombre</label>
+                        <span [ngClass]="{ 'errorborder' : nameError }" class="input-border"></span>
+                    </div>
+                    <div [ngClass]="{ 'icon-wrapper-error' : nameError}" class="icon-wrapper">
+                        <lucide-icon *ngIf="nameError" name="info" size="20px" class="error-icon"
+                            (mouseenter)="showHelperText('name')" (mouseleave)="hideHelperText()">
+                        </lucide-icon>
+                        <span *ngIf="helperTextVisible === 'name'" class="helper-text">
+                            {{ nameError }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <div class="input-container">
+                        <input type="text" placeholder="" formControlName="surname" autocomplete="new-password">
+                        <label for="surname">Apellidos</label>
+                        <span class="input-border"></span>
+                    </div>
+                </div>
+            </div>
+
+            <button [disabled]="this.personalInformationFormGroup.controls.name.invalid" type="submit"
+                class="personalinformation-btn">
+                Continuar
+            </button>
+        </form>
+    </section>
+    <section [ngClass]="{ 'active-form' : currentStep === 2, 'last-form' : currentStep > 2 }">
+        <div class="form-header">
+            <h2>Cumpleaños</h2>
+            <canvas #lottieCanvas2 class="lottie-animation"></canvas>
+        </div>
+        <form [formGroup]="personalInformationFormGroup" class="personalinformation-form"
+            (submit)="changeStep($event, currentStep + 1)">
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <div [ngClass]="{ 'input-container-error' : birthdateError}" class="input-container">
+                        <input [ngClass]="{ 'error' : birthdateError}" type="date" placeholder=""
+                            formControlName="birthdate" autocomplete="new-password">
+                        <label for="birthdate">Cumpleaños</label>
+                        <span [ngClass]="{ 'errorborder' : birthdateError }" class="input-border"></span>
+                    </div>
+                    <div [ngClass]="{ 'icon-wrapper-error' : birthdateError}" class="icon-wrapper">
+                        <lucide-icon *ngIf="birthdateError" name="info" size="20px" class="error-icon"
+                            (mouseenter)="showHelperText('birthdate')" (mouseleave)="hideHelperText()">
+                        </lucide-icon>
+                        <span *ngIf="helperTextVisible === 'birthdate'" class="helper-text">
+                            {{ birthdateError }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <button [disabled]="this.personalInformationFormGroup.controls.birthdate.invalid" type="submit"
+                class="personalinformation-btn">
+                Continuar
+            </button>
+        </form>
+    </section>
+    <section [ngClass]="{ 'active-form' : currentStep === 3, 'last-form' : currentStep > 3 }">
+        <div class="form-header">
+            <h2>Género</h2>
+            <canvas #lottieCanvas3 class="lottie-animation"></canvas>
+        </div>
+        <form [formGroup]="personalInformationFormGroup" class="personalinformation-form"
+            (submit)="changeStep($event, currentStep + 1)">
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <div [ngClass]="{ 'input-container-error' : genderError}" class="input-container">
+                        <select [ngClass]="{ 'error' : genderError}" formControlName="gender">
+                            <option value="" disabled selected>Selecciona tu género</option>
+                            <option value="H">Hombre</option>
+                            <option value="M">Mujer</option>
+                            <option value="N">No especificar</option>
+                        </select>
+                        <label id="select-label" for="gender">Género</label>
+                        <span [ngClass]="{ 'errorborder' : genderError }" class="input-border"></span>
+                    </div>
+                    <div [ngClass]="{ 'icon-wrapper-error' : genderError}" class="icon-wrapper">
+                        <lucide-icon *ngIf="genderError" name="info" size="20px" class="error-icon"
+                            (mouseenter)="showHelperText('gender')" (mouseleave)="hideHelperText()">
+                        </lucide-icon>
+                        <span *ngIf="helperTextVisible === 'gender'" class="helper-text">
+                            {{ genderError }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <button [disabled]="this.personalInformationFormGroup.controls.gender.invalid" type="submit"
+                class="personalinformation-btn">
+                Continuar
+            </button>
+        </form>
+    </section>
+    <section [ngClass]="{ 'active-form' : currentStep === 4, 'last-form' : currentStep > 4 }">
+        <div class="form-header">
+            <h2>Dirección</h2>
+            <canvas #lottieCanvas4 class="lottie-animation"></canvas>
+        </div>
+        <form [formGroup]="personalInformationFormGroup" class="personalinformation-form"
+            (submit)="sendUserInformation($event)">
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <div class="input-container">
+                        <input type="text" placeholder="" formControlName="address" autocomplete="new-password">
+                        <label for="address">Dirección</label>
+                        <span class="input-border"></span>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="personalinformation-btn">
+                ¡Finalizar!
+            </button>
+        </form>
+    </section>
+    <div [ngClass]="{ 'arrow-final' : currentStep === 4 }" class="arrows arrow-right"
+        (click)="changeStep(null, currentStep + 1)">
+        <lucide-icon name="chevron-right" size="28px" class="arrow-icon" color="#7c7cff"></lucide-icon>
+    </div>
+</div>
+
+<app-infodialog *ngIf="generalInformation" [type]="'info'" [message]="generalInformation"></app-infodialog>
