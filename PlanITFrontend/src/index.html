@@ -7,15 +7,21 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="logoIcon.png">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
   <style>
     .app-loading {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       width: 100dvw;
       height: 100dvh;
       background-color: #0e0e1b;
       z-index: 9999;
+    }
+
+    .app-loading img {
+      max-width: 225px;
     }
 
     .loading-container {
@@ -103,10 +109,13 @@
       }
     }
   </style>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 
-<body>
+<body class="mat-typography">
   <div class="app-loading" id="app-loading">
+    <img src="logoPlanIT_optimized_.png" alt="Logo PlanIT">
     <div class="loading-container">
       <div class="dot"></div>
       <div class="dot"></div>

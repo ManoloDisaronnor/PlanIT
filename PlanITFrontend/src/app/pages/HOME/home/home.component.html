@@ -1,1 +1,14 @@
-<p>home works!</p>
+
+<div class="home-wrapper">
+    <section class="header">
+        <app-header (toggleLateralMenu)="toogleMenu($event)"></app-header>
+    </section>
+    <section class="content-wrapper">
+        <aside class="side-menu" [ngClass]="{ 'side-menu-expanded': menuExpanded }">
+            <app-menu [menuExpanded]="menuExpanded"></app-menu>
+        </aside>
+        <main class="main-content">
+            
+        </main>
+    </section>
+</div>

@@ -9,15 +9,12 @@ import { filter } from 'rxjs/operators';
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
-  // Título de la aplicación
   title = 'PlanITFrontend';
+  // NOTE TODA LA LOGICA DE LA CARGA ESTA EN EL SEVICIO, PERO ES NECESARIO TENERLO AQUI TAMBIEN PARA EL COMPONENTE NOTFOUND SI NO CARGA INFINITO
   constructor(private router: Router) { }
 
   ngOnInit() {
-    // Ocultar pantalla de carga inicial cuando el componente raíz esté listo
     this.hideLoadingScreen();
-
-    // Configurar lógica para mostrar/ocultar durante navegaciones
     this.router.events.pipe(
       filter(event =>
         event instanceof NavigationStart ||
@@ -29,7 +26,6 @@ export class AppComponent implements OnInit {
       if (event instanceof NavigationStart) {
         this.showLoadingScreen();
       } else {
-        // Pequeño retraso para asegurar que Angular ha renderizado
         setTimeout(() => {
           this.hideLoadingScreen();
         }, 100);

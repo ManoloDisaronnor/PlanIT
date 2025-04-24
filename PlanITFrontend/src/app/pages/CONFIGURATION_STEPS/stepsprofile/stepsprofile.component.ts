@@ -147,7 +147,7 @@ export class StepsprofileComponent {
   async checkUsernameAvailability(): Promise<boolean> {
     try {
       const username = this.profileFormGroup.controls.username.value;
-      const response = await fetch(`${apiUrl}usuarios/checkusername/${username}`, {
+      const response = await fetch(`${apiUrl}api/usuarios/checkusername/${username}`, {
         method: 'GET',
       });
       return response.ok
@@ -170,7 +170,7 @@ export class StepsprofileComponent {
           formData.append('profileImage', file);
 
           try {
-            const response = await fetch(`${apiUrl}usuarios/uploadprofilepicture`, {
+            const response = await fetch(`${apiUrl}api/usuarios/uploadprofilepicture`, {
               method: 'POST',
               credentials: 'include',
               body: formData,

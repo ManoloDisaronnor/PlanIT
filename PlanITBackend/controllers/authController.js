@@ -6,6 +6,7 @@ const models = initModels(sequelize);
 const axios = require("axios");
 
 const FIREBASE_API_KEY = process.env.FIREBASE_API_KEY;
+const DOMAIN = process.env.DOMINIO || "http://localhost:3000";
 const { OAuth2Client } = require('google-auth-library');
 
 const oAuth2Client = new OAuth2Client(
@@ -73,11 +74,24 @@ class AuthController {
             return res.json(Respuesta.exito({
                 uid: userRecord.uid,
                 email: userRecord.email,
-                emailVerified: userRecord.emailVerified
+                displayName: userRecord.displayName,
             }, "Inicio de sesión exitoso"));
 
         } catch (error) {
             return res.status(500).json(Respuesta.error(null, "Error al iniciar sesión: " + error.message, "ERROR_INICIO_SESION"));
+        }
+    }
+
+    async logout(req, res) {
+        try {
+            res.clearCookie('session', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict'
+            });
+            return res.json(Respuesta.exito(null, "Sesión cerrada correctamente"));
+        } catch (error) {
+            return res.status(500).json(Respuesta.error(null, "Error al cerrar sesión: " + error.message, "ERROR_CERRAR_SESION"));
         }
     }
 
@@ -221,10 +235,10 @@ class AuthController {
                 sameSite: 'strict'
             });
 
-            res.redirect(process.env.DOMINIO + '/home');
+            res.redirect(DOMAIN + '/google-auth-callback?token=' + tokens.id_token);
         } catch (error) {
             console.error('Google callback error:', error);
-            res.redirect(process.env.DOMINIO + '/auth/login');
+            res.redirect(DOMAIN + '/auth/login');
         }
     }
 

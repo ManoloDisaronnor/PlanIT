@@ -144,7 +144,7 @@
 
 @media (max-height: 825px) {
     #stepper {
-        height: 135px;
+        height: 100px;
     }
 
     span {

@@ -1,0 +1,37 @@
+<nav id="menu">
+    <section class="menu-items">
+        <a routerLink="/home/events">
+            <div [ngClass]="{ 'menu-option-notexp' : !menuExpanded }" class="menu-option"
+                routerLinkActive="menu-icon-active">
+                <span class="material-icons-outlined menu-icon">calendar_month</span>
+                <span [ngClass]="{ 'menu-text-notexp' : !menuExpanded }" class="menu-text">Eventos</span>
+            </div>
+        </a>
+        <a routerLink="/home/chats">
+            <div [ngClass]="{ 'menu-option-notexp' : !menuExpanded }" class="menu-option"
+                routerLinkActive="menu-icon-active">
+                <span class="material-icons-outlined menu-icon">chat</span>
+                <span [ngClass]="{ 'menu-text-notexp' : !menuExpanded }" class="menu-text">Grupos</span>
+            </div>
+        </a>
+    </section>
+    <section class="menu-items">
+        <a routerLink="/home/settings">
+            <div [ngClass]="{ 'menu-option-notexp' : !menuExpanded }" class="menu-option"
+                routerLinkActive="menu-icon-active">
+                <span class="material-icons-outlined menu-icon">settings</span>
+                <span [ngClass]="{ 'menu-text-notexp' : !menuExpanded }" class="menu-text">Ajustes</span>
+            </div>
+        </a>
+        <a routerLink="/home/profile">
+            <div [ngClass]="{ 'menu-option-notexp' : !menuExpanded }" class="menu-option"
+                routerLinkActive="menu-icon-active">
+                <div class="menu-profile">
+                    <img src="{{this.imageUrl ? this.apiUrl + this.imageUrl : 'images/defaultProfilePicture.png'}}"
+                        alt="Imagen de perfil" class="profile-picture">
+                </div>
+                <span [ngClass]="{ 'menu-text-notexp' : !menuExpanded }" class="menu-text">Mi perfil</span>
+            </div>
+        </a>
+    </section>
+</nav>

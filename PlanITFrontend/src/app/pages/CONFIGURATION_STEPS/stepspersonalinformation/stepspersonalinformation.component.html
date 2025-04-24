@@ -139,6 +139,5 @@
         (click)="changeStep(null, currentStep + 1)">
         <lucide-icon name="chevron-right" size="28px" class="arrow-icon" color="#7c7cff"></lucide-icon>
     </div>
+    <app-infodialog *ngIf="generalInformation" [type]="'info'" [message]="generalInformation"></app-infodialog>
 </div>
-
-<app-infodialog *ngIf="generalInformation" [type]="'info'" [message]="generalInformation"></app-infodialog>

@@ -28,7 +28,7 @@ export class AuthStatusService {
         }
 
         try {
-            const response = await fetch(`${apiUrl}auth/checkauthstatus`, {
+            const response = await fetch(`${apiUrl}api/auth/checkauthstatus`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {

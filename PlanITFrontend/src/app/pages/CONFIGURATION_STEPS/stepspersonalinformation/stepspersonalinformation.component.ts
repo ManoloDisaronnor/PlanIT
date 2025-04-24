@@ -101,6 +101,7 @@ export class StepspersonalinformationComponent {
     this.dotLottieInstance1 = new DotLottie({
       canvas: this.lottieCanvas1.nativeElement,
       autoplay: true,
+      speed: 0.9,
       loop: true,
       src: 'https://lottie.host/1723c888-0fec-411a-bb20-e604aaa44bbc/GzTawknW9B.lottie',
     });

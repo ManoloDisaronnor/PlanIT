@@ -8,13 +8,14 @@ import { noAuthGuard } from './guards/noauth.guard';
 import { configurationGuard } from './guards/firebaseaut.guard';
 import { homeGuard } from './guards/auth.guard';
 import { NotfoundComponent } from './components/notfound/notfound.component';
+import { GoogleAuthCallbackComponent } from './components/google-auth-callback/google-auth-callback.component';
 
 
 export const routes: Routes = [
     {
         path: 'auth',
         component: BackGroundAuthComponent,
-        canActivate: [noAuthGuard],
+        // canActivate: [noAuthGuard],
         children: [
             { path: 'login', component: LoginComponent },
             { path: 'signup', component: SignupComponent },
@@ -22,14 +23,18 @@ export const routes: Routes = [
         ]
     },
     {
+        path: 'google-auth-callback',
+        component: GoogleAuthCallbackComponent,
+    },
+    {
         path: 'configuration-steps',
         component: ConfigurationstepsComponent,
-        canActivate: [configurationGuard]
+        // canActivate: [configurationGuard]
     },
     {
         path: 'home',
         component: HomeComponent,
-        canActivate: [homeGuard]
+        // canActivate: [homeGuard]
     },
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: '**', component: NotfoundComponent }

@@ -3,7 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { CommonModule } from '@angular/common';
-import { iniciarSesion } from '../../../../../config/authUser';
+import { iniciarSesion, logOut } from '../../../../../config/authUser';
 import { apiUrl } from '../../../../../config/config';
 import { InfodialogComponent } from "../../../components/infodialog/infodialog.component";
 import { LoadinganimationComponent } from '../../../components/loadinganimation/loadinganimation.component';
@@ -28,7 +28,8 @@ export class SignupComponent {
 
   constructor(private router: Router) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    await logOut();
     this.signUpForm.valueChanges.subscribe(() => {
       this.handleFormChanges(this.emailError !== null, this.passwordError !== null);
     });
@@ -66,7 +67,7 @@ export class SignupComponent {
     setTimeout(() => {
       this.generalError = null;
     }
-      , 10000);
+      , 5000);
   }
 
   togglePasswordVisibility() {
@@ -82,7 +83,7 @@ export class SignupComponent {
     } else {
       this.loadingSignUp = true;
       try {
-        const response = await fetch(apiUrl + 'auth/firebasesignup', {
+        const response = await fetch(apiUrl + 'api/auth/firebasesignup', {
           method: 'POST',
           credentials: 'include',
           headers: {

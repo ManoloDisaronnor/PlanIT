@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { AnimationOptions, LottieComponent } from 'ngx-lottie';
 import { User } from 'firebase/auth';
-import { getCurrentUser } from '../../../../../config/authUser';
+import { getCurrentUser, setSessionStorage } from '../../../../../config/authUser';
 import { CommonModule } from '@angular/common';
 import { StepsverificationComponent } from '../stepsverification/stepsverification.component';
 import { StepspersonalinformationComponent } from '../stepspersonalinformation/stepspersonalinformation.component';
@@ -20,14 +20,14 @@ import { Router } from '@angular/router';
 })
 export class ConfigurationstepsComponent {
   currentStep = 1;
-  emailVerified: boolean = true;
+  emailVerified: boolean = false;
   lottieVisible: boolean = true;
   userConfigurationSteps = {
     uid: '',
     imageUrl: '',
-    name: 'a',
+    name: '',
     surname: '',
-    username: 'a',
+    username: '',
     birthdate: '',
     aboutme: '',
     address: '',
@@ -56,6 +56,7 @@ export class ConfigurationstepsComponent {
       this.userSignUp = user;
       this.emailVerified = user.emailVerified;
       this.userConfigurationSteps.uid = user.uid;
+      console.log(this.userConfigurationSteps.uid);
     }
     this.steps.forEach(step => {
       this.lottieOptionsArray[step.number] = {
@@ -71,6 +72,7 @@ export class ConfigurationstepsComponent {
       this.refreshLottie(stepNumber);
       this.currentStep = stepNumber;
       this.currentStep = stepNumber;
+      setSessionStorage(this.userConfigurationSteps.uid);
       setTimeout(() => {
         this.router.navigate(['/home']);
       }, 5000);
@@ -131,7 +133,7 @@ export class ConfigurationstepsComponent {
 
   async handleUploadUserConfigurationSteps() {
     try {
-      const response = await fetch(`${apiUrl}usuarios/setupconfiguration`, {
+      const response = await fetch(`${apiUrl}api/usuarios/setupconfiguration`, {
         method: 'POST',
         credentials: 'include',
         headers: {

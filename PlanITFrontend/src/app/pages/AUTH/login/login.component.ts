@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { DotLottie } from '@lottiefiles/dotlottie-web';
 import { LucideAngularModule } from 'lucide-angular';
 import { InfodialogComponent } from '../../../components/infodialog/infodialog.component';
 import { LoadinganimationComponent } from '../../../components/loadinganimation/loadinganimation.component';
 import { apiUrl } from '../../../../../config/config';
-import { iniciarSesion } from '../../../../../config/authUser';
+import { getCurrentUser, iniciarSesion, logOut, setSessionStorage } from '../../../../../config/authUser';
 
 @Component({
   selector: 'app-login',
@@ -29,9 +29,16 @@ export class LoginComponent {
   showPassword: boolean = false;
   private dotLottieInstance!: DotLottie;
 
-  constructor(private router: Router) { }
+  constructor(private route: ActivatedRoute) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    await logOut();
+    this.route.queryParams.subscribe(async params => {
+          const error = params['error'];
+          if (error) {
+            this.showFetchError(error);
+          }
+        });
     this.loginForm.valueChanges.subscribe(() => {
       this.handleFormChanges(this.emailError !== null, this.passwordError !== null);
     });
@@ -82,7 +89,7 @@ export class LoginComponent {
     setTimeout(() => {
       this.generalError = null;
     }
-      , 10000);
+      , 5000);
   }
 
   togglePasswordVisibility() {
@@ -105,7 +112,7 @@ export class LoginComponent {
     } else {
       this.loadingLogin = true;
       try {
-        const response = await fetch(`${apiUrl}auth/login`, {
+        const response = await fetch(`${apiUrl}api/auth/login`, {
           method: 'POST',
           credentials: 'include',
           headers: {
@@ -116,10 +123,22 @@ export class LoginComponent {
             password: this.loginForm.value.password
           })
         });
+
         const data = await response.json();
+
         if (response.ok) {
-          await iniciarSesion(data.datos.email, this.loginForm.controls.password.value!!);
-          this.router.navigate(['/home']);
+          try {
+            await iniciarSesion(data.datos.email, this.loginForm.controls.password.value!!);
+            const user = await getCurrentUser();
+
+            if (user) {
+              window.location.href = '/home';
+            } else {
+              this.showFetchError("Error de autenticación. Intente nuevamente.");
+            }
+          } catch (firebaseError: any) {
+            this.showFetchError(firebaseError.message);
+          }
         } else {
           this.showFetchError(data.mensaje);
           if (data.codError === 'EMAIL_NOT_FOUND') {
@@ -130,15 +149,16 @@ export class LoginComponent {
         }
       } catch (error: any) {
         this.showFetchError(error.message);
+      } finally {
+        this.loadingLogin = false;
       }
-      this.loadingLogin = false;
     }
   }
 
   async loginWithGoogle() {
     this.loadingGoogleLogin = true;
     try {
-      const response = await fetch(`${apiUrl}auth/google-auth-url`, {
+      const response = await fetch(`${apiUrl}api/auth/google-auth-url`, {
         method: 'GET',
         credentials: 'include'
       });
@@ -146,8 +166,6 @@ export class LoginComponent {
       const data = await response.json();
 
       if (response.ok) {
-        // Redirigir al usuario a la URL de autenticación de Google
-        console.log(data.url);
         window.location.href = data.url;
       } else {
         this.showFetchError(data.mensaje || 'Error al iniciar sesión con Google');

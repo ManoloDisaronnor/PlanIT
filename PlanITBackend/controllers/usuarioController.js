@@ -18,6 +18,18 @@ class UsuarioController {
         }
     }
 
+    async getUsuarioByUid(req, res) {
+        try {
+            const user = await Usuario.findOne({ where: { uid: req.params.uid } });
+            if (!user) {
+                return res.status(404).json(Respuesta.error(null, "Usuario no encontrado", "USER_NOT_FOUND"));
+            }
+            return res.json(Respuesta.exito(user, "Usuario recuperado"));
+        } catch (error) {
+            return res.status(500).json(Respuesta.error(null, "Error al recuperar el usuario" + error, "ERROR_AL_OBTENER_USUARIO"));
+        }
+    }
+
     async checkUsernameAvailability(req, res) {
         try {
             const username = req.params.username;
@@ -39,7 +51,7 @@ class UsuarioController {
             if (!req.file) {
                 return res.status(400).json(Respuesta.error(null, "No se ha subido ningún archivo", "NO_ARCHIVO_SUBIDO"));
             }
-            const fileUrl = `/uploads/profiles/${req.file.filename}`;
+            const fileUrl = `uploads/profiles/${req.file.filename}`;
 
             return res.json(Respuesta.exito({ fileUrl }, "Imagen subida correctamente"));
         } catch (error) {

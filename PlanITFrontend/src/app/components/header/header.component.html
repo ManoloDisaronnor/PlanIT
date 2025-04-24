@@ -1,0 +1,45 @@
+<div class="home-header">
+    <div [class.open]="navBarExpanded" class="open-close-menu" (click)="toggleNavBar()">
+        <div class="open-close-menu-icon"></div>
+        <div class="open-close-menu-icon"></div>
+        <div class="open-close-menu-icon"></div>
+    </div>
+    <div class="header-logo">
+        <img src="logoPlanIT_optimized_.png" alt="logo" class="logo" />
+        <h1 class="header-title">Planea sin limites</h1>
+    </div>
+    <div class="header-actions">
+        <div class="header-user" (click)="toggleUserMenu($event)">
+            <div class="header-name">
+                <span class="fullname">{{this.displayName ? this.displayName : 'Desconocido'}}</span>
+                <span class="username">{{this.userName ? this.userName : 'Desconocido'}}</span>
+            </div>
+            <div class="profile-picture-container">
+                <img src="{{this.userImageUrl ? this.apiUrl + this.userImageUrl : 'images/defaultProfilePicture.png'}}"
+                    alt="Imagen de perfil" class="profile-picture">
+            </div>
+        </div>
+        <div *ngIf="userMenuOpen" class="user-menu">
+            <div class="menu-item">
+                <span class="material-icons-outlined">manage_accounts</span>
+                <span>Mi perfil</span>
+            </div>
+            <div class="menu-item logout" (click)="logout($event)">
+                <span class="material-icons-outlined">logout</span>
+                <span>Cerrar sesión</span>
+            </div>
+        </div>
+        <hr>
+        <div class="header-buttons">
+            <div class="header-button">
+                <span class="material-icons-outlined icon">group</span>
+            </div>
+            <div class="header-button">
+                <span class="material-icons-outlined icon">info</span>
+            </div>
+            <div class="header-button">
+                <span class="material-icons-outlined icon">notifications</span>
+            </div>
+        </div>
+    </div>
+</div>
