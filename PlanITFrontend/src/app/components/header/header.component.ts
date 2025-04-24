@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
 })
 export class HeaderComponent {
   @Output() toggleLateralMenu: EventEmitter<boolean> = new EventEmitter<boolean>();
-  navBarExpanded: boolean;
+  navBarExpanded: boolean = false;
   userImageUrl: string | null = null;
   userName: string | null = null;
   displayName: string | null = null;
@@ -21,16 +21,6 @@ export class HeaderComponent {
   apiUrl: string = apiUrl;
   isMobileView: boolean = false;
   userMenuOpen: boolean = false;
-
-  constructor() {
-    const menuState = localStorage.getItem('menuState');
-    if (menuState) {
-      this.navBarExpanded = menuState === 'true';
-    } else {
-      localStorage.setItem('menuState', 'false');
-      this.navBarExpanded = false;
-    }
-  }
 
   async ngOnInit() {
 

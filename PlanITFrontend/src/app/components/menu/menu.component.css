@@ -87,32 +87,25 @@ a {
 }
 
 .menu-text {
-    font-size: 1.2rem;
+    opacity: 0;
+    font-size: 0;
     font-weight: 700;
     background: linear-gradient(45deg, #7c7cff, #a05cff);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-left: 4rem;
-    animation: show 0.2s ease-in-out;
+    animation: none;
 }
 
-.menu-text-notexp {
-    animation: hide 0.2s ease-in-out forwards;
-}
-
-@keyframes hide {
-    to {
-        font-size: 0;
-        opacity: 0;
-        display: none;
-    }
+.menu-option:not(.menu-option-notexp) .menu-text {
+    animation: show 0.2s ease-in-out forwards;
 }
 
 @keyframes show {
     to {
         position: relative;
-        font-size: 0.8rem;
+        font-size: 1.2rem;
         opacity: 1;
         display: inline-block;
     }
@@ -133,7 +126,7 @@ a {
     }
 
     .menu-text {
-        font-size: 1rem;
+        font-size: 1rem !important;
     }
 }
 
@@ -156,6 +149,6 @@ a {
     }
 
     .menu-text {
-        font-size: 1.2rem;
+        font-size: 1.2rem !important;
     }
 }

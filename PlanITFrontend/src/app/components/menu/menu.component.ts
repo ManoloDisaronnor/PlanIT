@@ -11,19 +11,9 @@ import { apiUrl } from '../../../../config/config';
   styleUrl: './menu.component.css'
 })
 export class MenuComponent {
-  @Input() menuExpanded: boolean;
+  @Input() menuExpanded: boolean = false;
   imageUrl: string | null = null;
   apiUrl: string = apiUrl;
-
-  constructor() {
-    const menuState = localStorage.getItem('menuState');
-    if (menuState) {
-      this.menuExpanded = menuState === 'true';
-    } else {
-      localStorage.setItem('menuState', 'false');
-      this.menuExpanded = false;
-    }
-  }
 
   async ngOnInit() {
     const user = sessionStorage.getItem('user');

@@ -15,7 +15,7 @@ export const routes: Routes = [
     {
         path: 'auth',
         component: BackGroundAuthComponent,
-        // canActivate: [noAuthGuard],
+        canActivate: [noAuthGuard],
         children: [
             { path: 'login', component: LoginComponent },
             { path: 'signup', component: SignupComponent },
@@ -29,12 +29,12 @@ export const routes: Routes = [
     {
         path: 'configuration-steps',
         component: ConfigurationstepsComponent,
-        // canActivate: [configurationGuard]
+        canActivate: [configurationGuard]
     },
     {
         path: 'home',
         component: HomeComponent,
-        // canActivate: [homeGuard]
+        canActivate: [homeGuard]
     },
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: '**', component: NotfoundComponent }

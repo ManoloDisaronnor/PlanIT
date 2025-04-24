@@ -10,17 +10,7 @@ import { HeaderComponent } from "../../../components/header/header.component";
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
-  menuExpanded: boolean;
-
-  constructor() {
-    const menuState = localStorage.getItem('menuState');
-    if (menuState) {
-      this.menuExpanded = menuState === 'true';
-    } else {
-      localStorage.setItem('menuState', 'false');
-      this.menuExpanded = false;
-    }
-  }
+  menuExpanded: boolean = false;
   
   toogleMenu(event: boolean) {
     this.menuExpanded = event;
