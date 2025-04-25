@@ -45,3 +45,9 @@
     from { top: 20px; opacity: 1; }
     to { top: -100px; opacity: 0; }
 }
+
+@media (max-width: 768px) {
+    #information-dialog {
+        width: 75%;
+    }
+}

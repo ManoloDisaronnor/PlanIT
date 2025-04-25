@@ -48,7 +48,7 @@ export class ConfigurationstepsComponent {
   showCamera: boolean = false;
   generalError: string | null = null;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   async ngOnInit() {
     const user = await getCurrentUser();
@@ -115,6 +115,14 @@ export class ConfigurationstepsComponent {
     this.changeStep(3);
   }
 
+  showInformation(error: string) {
+    this.generalError = error;
+    setTimeout(() => {
+      this.generalError = null;
+    }
+      , 5000);
+  }
+
   async recievedUserProfile(event: any) {
     this.userConfigurationSteps.username = event.username;
     this.userConfigurationSteps.aboutme = event.aboutme;
@@ -145,10 +153,10 @@ export class ConfigurationstepsComponent {
       if (response.ok) {
         this.changeStep(4);
       } else {
-        this.generalError = 'Error al configurar tu usuario: ' + data.mensaje;
+        this.showInformation(data.mensaje);
       }
     } catch (error: any) {
-      this.generalError = 'Error al configurar tu usuario: ' + error.message;
+      this.showInformation(error.message);
     }
   }
 }
