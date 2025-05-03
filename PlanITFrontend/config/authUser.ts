@@ -63,7 +63,7 @@ export function getCurrentUser(): Promise<User | null> {
 }
 
 export async function setSessionStorage(uid: string) {
-    const response = await fetch(`${apiUrl}api/usuarios/${uid}`, {
+    const response = await fetch(`${apiUrl}api/usuarios/getuser/${uid}`, {
         method: 'GET',
         credentials: 'include'
     });

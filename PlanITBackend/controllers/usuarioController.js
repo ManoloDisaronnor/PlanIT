@@ -3,18 +3,67 @@ const Respuesta = require("../utils/respuesta.js");
 const initModels = require("../models/init-models.js").initModels;
 // Crear la instancia de sequelize con la conexión a la base de datos
 const sequelize = require("../config/sequelize.js");
+const { Op } = require("sequelize");
+const { createNotification } = require("../services/socket-service.js");
 
 const models = initModels(sequelize);
 const Usuario = models.user;
+const Friends = models.friends;
 
 class UsuarioController {
 
     async getAllUsuarios(req, res) {
         try {
-            const usuarios = await Usuario.findAll();
+            const userUid = req.uid;
+            const limit = req.query.limit ? parseInt(req.query.limit) : 5;
+            const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+            const search = req.query.search || '';
+
+            // Subconsulta para encontrar todos los UIDs con los que el usuario tiene relación
+            // (ya sea como amigos o con solicitudes pendientes)
+            const relatedUserIds = await Friends.findAll({
+                attributes: ['user_send', 'user_requested'],
+                where: {
+                    [Op.or]: [
+                        { user_send: userUid },
+                        { user_requested: userUid }
+                    ]
+                },
+                raw: true
+            });
+
+            // Extraer todos los UIDs relacionados (eliminando duplicados)
+            const excludeUids = new Set();
+            relatedUserIds.forEach(relation => {
+                if (relation.user_send !== userUid) {
+                    excludeUids.add(relation.user_send);
+                }
+                if (relation.user_requested !== userUid) {
+                    excludeUids.add(relation.user_requested);
+                }
+            });
+
+            // Buscar usuarios que no sean el usuario actual y que no estén en la lista de excluidos
+            const usuarios = await Usuario.findAll({
+                where: {
+                    uid: {
+                        [Op.and]: [
+                            { [Op.ne]: userUid },
+                            { [Op.notIn]: Array.from(excludeUids) }
+                        ]
+                    },
+                    ...(search ? {
+                        username: { [Op.like]: `%${search}%` },
+                    } : {})
+                },
+                attributes: ['uid', 'username', 'name', 'imageUrl'],
+                limit: limit,
+                offset: offset,
+            });
+
             return res.json(Respuesta.exito(usuarios, "usuarios recuperados"));
         } catch (error) {
-            return res.status(500).json(Respuesta.error(null, "Error al recuperar los usuarios" + error, "ERROR_AL_OBTENER_USUARIOS"));
+            return res.status(500).json(Respuesta.error(null, "Error al recuperar los usuarios: " + error, "ERROR_AL_OBTENER_USUARIOS"));
         }
     }
 

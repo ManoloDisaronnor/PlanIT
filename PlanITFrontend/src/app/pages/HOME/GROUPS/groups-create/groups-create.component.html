@@ -1,0 +1,29 @@
+<div id="groups-create">
+    <section class="groups-create-header">
+        <div class="header-name">
+            <h1>Crear un nuevo grupo</h1>
+        </div>
+        <div class="header-close-icon" (click)="onCloseModal()">
+            <span class="material-icons-outlined close-icon">close</span>
+        </div>
+    </section>
+    <section class="groups-create-form">
+        <form [formGroup]="createGroupForm" (submit)="handleSubmit($event)">
+            <div class="form-group">
+                <div>
+                    <div class="profile-container">
+                        <div (click)="toggleMenu($event)" class="preview-image-container">
+                            <img class="preview-image"
+                                [src]="previewImage != '' ? previewImage : 'images/defaultProfilePicture.png'"
+                                alt="Preview Image">
+                        </div>
+                        <div class="preview-image-actions">
+                            <lucide-icon (click)="toggleMenu($event)" size="16" class="clickable" name="pencil"></lucide-icon>
+                        </div>
+                    </div>
+                </div>
+                <div></div>
+            </div>
+        </form>
+    </section>
+</div>

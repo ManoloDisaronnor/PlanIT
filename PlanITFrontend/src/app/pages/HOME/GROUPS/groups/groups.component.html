@@ -1,0 +1,24 @@
+<div id="groups">
+    <aside class="side-group-menu">
+        <div class="group-actions">
+            <input type="text" id="search-group" placeholder="Buscar" name="search-group" maxlength="35">
+            <div class="group-action" title="Crear grupo" (click)="toggleModal()">
+                <span class="material-icons-outlined">group_add</span>
+            </div>
+        </div>
+        <div class="group-list">
+
+        </div>
+    </aside>
+    <section class="chat-content">
+
+    </section>
+    <app-infodialog *ngIf="generalError" [type]="typeError" [message]="generalError"></app-infodialog>
+</div>
+<div class="group-create-container" *ngIf="showModal">
+    <div class="relative-container">
+        <div class="group-create-content">
+            <app-groups-create (closeModal)="toggleModal()"></app-groups-create>
+        </div>
+    </div>
+</div>

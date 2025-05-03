@@ -1,0 +1,94 @@
+<div id="friends">
+    <div class="friends-name">
+        <h2>SOCIAL</h2>
+    </div>
+    <div class="friends-container">
+        <div class="friends-header">
+            <input type="text" id="search-user" placeholder="Buscar usuarios" name="search-user" maxlength="35"
+                (change)="onSearchUserChange($event)" [value]="searchUser">
+            <button class="reload-btn" [disabled]="this.loadingFriendRequest" (click)="reloadComponent()"
+                title="Recargar">
+                <span class="material-icons-outlined">sync</span>
+            </button>
+        </div>
+        <div class="friends-content">
+            <div class="user-friends acordeon">
+                <div class="acordeon-header" (click)="toggleFriends()">
+                    <span class="material-icons-outlined acordeon-icon"
+                        [ngClass]="{ 'arrow-notexp' : !friendsExpanded }">keyboard_arrow_down</span>
+                    <p>Tus amigos</p>
+                </div>
+                <div class="acordeon-content" *ngIf="friendsExpanded">
+                    @if (friendsList.length <= 0) { <p class="no-data">No tienes amigos</p>
+                        }@else {
+                        <div class="user-item" *ngFor="let friend of friendsList">
+                            @if (friend.user_requested !== userUid) {
+                            <div class="user-info">
+                                <img src="{{friend.user_requested_user.imageUrl ? this.apiUrl + friend.user_requested_user.imageUrl : 'images/defaultProfilePicture.png'}}"
+                                    alt="Avatar">
+                                <div class="user-names">
+                                    <span class="real-name">{{ friend.user_requested_user.name + ' ' +
+                                        friend.user_requested_user.surname }}</span>
+                                    <span>{{ friend.user_requested_user.username }}</span>
+                                </div>
+                            </div>
+                            }@else {
+                            <div class="user-info">
+                                <img src="{{friend.user_send_user.imageUrl ? this.apiUrl + friend.user_send_user.imageUrl : 'images/defaultProfilePicture.png'}}"
+                                    alt="Avatar">
+                                <div class="user-names">
+                                    <span class="real-name">{{ friend.user_send_user.name + ' ' +
+                                        friend.user_send_user.surname }}</span>
+                                    <span>{{ friend.user_send_user.username }}</span>
+                                </div>
+                            </div>
+                            }
+                        </div>
+                        }
+                        @if (friendsLoading) {
+                        <div class="loading-indicator">
+                            <app-loadinganimation [type]="'button'"></app-loadinganimation>
+                        </div>
+                        }
+                </div>
+            </div>
+            <div class="all-users acordeon">
+                <div class="acordeon-header" (click)="toggleAllUsers()" (mouseover)="fetchAllUsers()">
+                    <span class="material-icons-outlined acordeon-icon"
+                        [ngClass]="{ 'arrow-notexp' : !allUsersExpanded }">keyboard_arrow_down</span>
+                    <p>Todos los usuarios</p>
+                </div>
+                <div class="acordeon-content" *ngIf="allUsersExpanded" (scroll)="onAllUsersScroll($event)">
+                    @if (allUsersList.length <= 0 && !allUsersLoading) { <p class="no-data">Vaya, no hemos
+                        encontrado usuarios</p>
+                        } @else {
+                        <div class="user-item" *ngFor="let user of allUsersList">
+                            <div class="user-info">
+                                <img src="{{user.imageUrl ? this.apiUrl + user.imageUrl : 'images/defaultProfilePicture.png'}}"
+                                    alt="Avatar">
+                                <span>{{ user.username }}</span>
+                            </div>
+                            <button class="add-friend" (click)="sendFriendRequest(user.uid)"
+                                [disabled]="user.requested || loadingFriendRequest === user.uid">
+                                @if (loadingFriendRequest === user.uid) {
+                                <app-loadinganimation [type]="'small'"></app-loadinganimation>
+                                } @else if (user.requested) {
+                                <span>Enviado</span>
+                                } @else {
+                                <span class="material-icons-outlined add-icon">person_add</span>
+                                <span>Añadir</span>
+                                }
+                            </button>
+                        </div>
+                        }
+                        @if (allUsersLoading) {
+                        <div class="loading-indicator">
+                            <app-loadinganimation [type]="'button'"></app-loadinganimation>
+                        </div>
+                        }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<app-infodialog *ngIf="generalError" [message]="generalError" [type]="'error'"></app-infodialog>

@@ -1,4 +1,4 @@
-GET http://localhost:3000/api/usuarios
+GET http://localhost:3000/api/usuarios/getuser/b1keLO6FjeOB11Sqsg0by0myx3h1
 
 ###
 POST http://localhost:3000/api/usuarios/firebasesignup

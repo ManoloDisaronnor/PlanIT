@@ -10,6 +10,7 @@ a {
     justify-content: space-between;
     height: 100%;
     width: 100%;
+    z-index: 4;
 }
 
 .menu-items {
@@ -51,13 +52,24 @@ a {
 .menu-option:hover .menu-icon:not(.menu-icon-active) {
     transform: translateY(-2px) rotate(-5deg);
     color: #a05cff;
-    transform: rotate(-5deg);
+}
+
+.menu-option-active {
+    background-color: #fff2f620;
+}
+
+.menu-option-active .menu-icon {
+    color: #a05cff;
 }
 
 .menu-option:hover .menu-profile:not(.menu-profile-active) {
     box-shadow: 0 0 5px #7c7cff, 0 0 10px #a05cff;
     transform: translateY(-2px) rotate(-5deg);
     transform: rotate(-5deg);
+}
+
+.menu-option-active .menu-profile {
+    box-shadow: 0 0 5px #7c7cff, 0 0 10px #a05cff;
 }
 
 .menu-icon {
@@ -114,15 +126,15 @@ a {
 @media (max-width: 992px) {
     .menu-icon {
         font-size: 2rem;
-        top: 1.2rem;
-        left: 1.2rem;
+        top: 1.1rem;
+        left: 1.1rem;
     }
 
     .menu-profile {
         width: 2rem;
         height: 2rem;
-        top: 1.2rem;
-        left: 1.2rem;
+        top: 1.1rem;
+        left: 1.1rem;
     }
 
     .menu-text {

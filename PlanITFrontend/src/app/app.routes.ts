@@ -9,6 +9,10 @@ import { configurationGuard } from './guards/firebaseaut.guard';
 import { homeGuard } from './guards/auth.guard';
 import { NotfoundComponent } from './components/notfound/notfound.component';
 import { GoogleAuthCallbackComponent } from './components/google-auth-callback/google-auth-callback.component';
+import { EventsComponent } from './pages/HOME/EVENTS/events/events.component';
+import { GroupsComponent } from './pages/HOME/GROUPS/groups/groups.component';
+import { SettingsComponent } from './pages/HOME/SETTINGS/settings/settings.component';
+import { ProfileComponent } from './pages/HOME/PROFILE/profile/profile.component';
 
 
 export const routes: Routes = [
@@ -34,7 +38,13 @@ export const routes: Routes = [
     {
         path: 'home',
         component: HomeComponent,
-        canActivate: [homeGuard]
+        canActivate: [homeGuard],
+        children: [
+            { path: 'events', component: EventsComponent, canActivate: [homeGuard] },
+            { path: 'groups', component: GroupsComponent, canActivate: [homeGuard] },
+            { path: 'settings', component: SettingsComponent, canActivate: [homeGuard] },
+            { path: 'profile', component: ProfileComponent, canActivate: [homeGuard] }
+        ]
     },
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: '**', component: NotfoundComponent }

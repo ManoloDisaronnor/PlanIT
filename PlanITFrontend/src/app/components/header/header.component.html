@@ -20,10 +20,12 @@
             </div>
         </div>
         <div *ngIf="userMenuOpen" class="user-menu">
-            <div class="menu-item">
-                <span class="material-icons-outlined">manage_accounts</span>
-                <span>Mi perfil</span>
-            </div>
+            <a routerLink="/home//profile">
+                <div class="menu-item">
+                    <span class="material-icons-outlined">manage_accounts</span>
+                    <span>Mi perfil</span>
+                </div>
+            </a>
             <div class="menu-item logout" (click)="logout($event)">
                 <span class="material-icons-outlined">logout</span>
                 <span>Cerrar sesión</span>
@@ -31,14 +33,15 @@
         </div>
         <hr>
         <div class="header-buttons">
-            <div class="header-button">
+            <div class="header-button" (click)="openFriendsMenu($event)">
                 <span class="material-icons-outlined icon">group</span>
             </div>
-            <div class="header-button">
+            <div class="header-button" (click)="openInformationMenu($event)">
                 <span class="material-icons-outlined icon">info</span>
             </div>
-            <div class="header-button">
-                <span class="material-icons-outlined icon">notifications</span>
+            <div class="header-button notification-button" (click)="openNotificationsMenu($event)">
+                <span class="material-icons-outlined icon" [ngClass]="{ 'new-notification' : notificationCount > 0 }">notifications</span>
+                <span *ngIf="notificationCount > 0" class="notification-badge">{{notificationCount}}</span>
             </div>
         </div>
     </div>

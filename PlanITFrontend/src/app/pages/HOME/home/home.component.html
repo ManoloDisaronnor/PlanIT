@@ -1,14 +1,22 @@
-
 <div class="home-wrapper">
     <section class="header">
-        <app-header (toggleLateralMenu)="toogleMenu($event)"></app-header>
+        <app-header [navBarExpanded]="menuExpanded" (toggleLateralMenu)="toogleMenu($event)" (toggleFriendsMenu)="toggleFriendsMenu($event)" (toggleInformationMenu)="toggleInformationMenu($event)" (toggleNotificationsMenu)="toggleNotificationsMenu($event)"></app-header>
     </section>
     <section class="content-wrapper">
         <aside class="side-menu" [ngClass]="{ 'side-menu-expanded': menuExpanded }">
-            <app-menu [menuExpanded]="menuExpanded"></app-menu>
+            <app-menu [menuExpanded]="menuExpanded" (toggleMenu)="toggleLateralMenu($event)"></app-menu>
         </aside>
         <main class="main-content">
-            
+            <router-outlet></router-outlet>
         </main>
     </section>
+    <div id="friends" class="opt-menu-home" [ngClass]="{ 'opt-menu-home-exp' : friendsMenuExpanded}" #friendsMenu>
+        <app-friends></app-friends>
+    </div>
+    <div id="information" *ngIf="informationMenuExpanded" #informationMenu>
+        <app-information></app-information>
+    </div>
+    <div id="notifications" class="opt-menu-home" [ngClass]="{ 'opt-menu-home-exp' : notificationsMenuExpanded}" #notificationsMenu>
+        <app-notifications (close)="toggleNotificationsMenu(!this.notificationsMenuExpanded)"></app-notifications>
+    </div>
 </div>

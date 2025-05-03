@@ -14,15 +14,17 @@ const grupoRoutes = require("./routes/grupoRoutes");
 const mensajeRoutes = require("./routes/mensajeRoutes");
 const usuarioRoutes = require("./routes/usuarioRoutes");
 const authRoutes = require("./routes/authRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
+const friendRoutes = require("./routes/friendsRoutes");
 
 const app = express();
 const http = require('http');
-const setupSocket = require('./services/socket-service');
+const { setupSocket } = require('./services/socket-service');
 
 // Habilitar CORS en modo desarrollo
 if (process.env.NODE_ENV === "development") {
     app.use(cors({
-        origin: "http://localhost:4200",
+        origin: ["http://localhost:4200", "http://192.168.1.37:4200"],
         credentials: true,
     }));
 }
@@ -38,6 +40,8 @@ app.use("/api/grupos", grupoRoutes);
 app.use("/api/mensajes", mensajeRoutes);
 app.use("/api/usuarios", usuarioRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/friends", friendRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Servir archivos estáticos
 app.use(express.static(path.join(__dirname, "public")));

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { getCurrentUser, setSessionStorage } from '../../../../config/authUser';
 import { apiUrl } from '../../../../config/config';
@@ -12,8 +12,14 @@ import { apiUrl } from '../../../../config/config';
 })
 export class MenuComponent {
   @Input() menuExpanded: boolean = false;
+  @Output() toggleMenu: EventEmitter<boolean> = new EventEmitter<boolean>();
   imageUrl: string | null = null;
   apiUrl: string = apiUrl;
+
+  toggleNavBar() {
+    this.menuExpanded = !this.menuExpanded;
+    this.toggleMenu.emit(this.menuExpanded);
+  }
 
   async ngOnInit() {
     const user = sessionStorage.getItem('user');

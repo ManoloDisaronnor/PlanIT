@@ -1,0 +1,113 @@
+<div class="notifications-container">
+    <div class="notifications-header">
+        <h2>Notificaciones</h2>
+        <span class="material-icons-outlined close-icon" (click)="closeNotifications()">close</span>
+    </div>
+
+    <div class="notifications-content" #notificationsContent>
+        <div class="notification-header-actions">
+            <button class="btn-header-action" (click)="refreshNotifications()" title="Recargar notificaciones"
+                [disabled]="isRefreshing">
+                <span class="material-icons-outlined icon-header-action">sync</span>
+            </button>
+            <button class="btn-header-action" (click)="markAllNotificationsAsRead($event)"
+                *ngIf="notifications.length > 0" [disabled]="unreadNotificationsCount <= 0"
+                title="Marcar todas como leídas">
+                <span class="material-icons-outlined icon-header-action">visibility</span>
+            </button>
+        </div>
+
+        <div *ngIf="isLoading" class="loading-spinner">
+            <app-loadinganimation [type]="'large'"></app-loadinganimation>
+        </div>
+
+        <div *ngIf="!isLoading && notifications.length === 0 && !isRefreshing" class="no-notifications">
+            <span class="material-icons-outlined">notifications_off</span>
+            <p>No tienes notificaciones</p>
+        </div>
+
+        <div *ngIf="!isLoading && notifications.length > 0" class="notifications-list">
+            <!-- Solicitudes de amistad -->
+            <div *ngFor="let notification of notifications" class="notification-item"
+                [ngClass]="{ 'unread-notification': !notification.readed }"
+                [attr.data-notification-id]="notification.id" (mousedown)="onMouseDown($event)"
+                (touchstart)="onTouchStart($event)" (touchmove)="onTouchMove($event)" (touchend)="onTouchEnd()"
+                (mouseover)="markNotificationAsRead(notification.id, notification.readed, $event)">
+
+                <div class="swipe-hint">
+                    <span class="material-icons-outlined">chevron_left</span>
+                    <span>Desliza para ocultar</span>
+                    <span class="material-icons-outlined">chevron_right</span>
+                </div>
+
+                <!-- Solicitud de amistad -->
+                <div *ngIf="notification.type === 'friendRequest'" class="notification-content">
+                    <div class="notification-avatar">
+                        <img [src]="notification.content.user_send === userUid ? (notification.content.user_requested_user.imageUrl ? apiUrl + notification.content.user_requested_user.imageUrl
+                            : 'images/defaultProfilePicture.png')
+                            : (notification.content.user_send_user.imageUrl ? apiUrl + notification.content.user_send_user.imageUrl
+                            : 'images/defaultProfilePicture.png')" alt="Foto de perfil" />
+                    </div>
+                    <div class="notification-details">
+                        <p class="notification-text">
+                            @if (notification.content.user_send === this.userUid && notification.content.accepted === 0
+                            )
+                            {
+                            Solicitud enviada a
+                            }
+                            <strong>{{ notification.content.user_send === this.userUid ?
+                                notification.content.user_requested_user.username :
+                                notification.content.user_send_user.username }}</strong>
+                            @if (notification.content.user_send !== this.userUid && notification.content.accepted === 0
+                            )
+                            {
+                            quiere ser tu amigo
+                            }
+                            @if (notification.content.accepted === 1 ) {
+                            ahora es tu amigo
+                            }
+                            @if (notification.content.accepted === -1 ) {
+                            ha rechazado tu solicitud de amistad
+                            }
+                        </p>
+                        <span class="notification-time">{{ getTimeAgo(notification.created_at) }}</span>
+                    </div>
+                    @if (notification.content.user_send !== this.userUid && notification.content.accepted === 0 ) {
+                    <div class="notification-actions">
+                        <button class="btn-accept action-btns"
+                            [disabled]="this.loadingRequest === notification.id ||this.loadingRequest === notification.content.id"
+                            (click)="acceptFriendRequest(notification.id, $event)">
+                            <span class="material-icons-outlined">check</span>
+                        </button>
+                        <button class="btn-reject action-btns"
+                            [disabled]="this.loadingRequest === notification.id ||this.loadingRequest === notification.content.id"
+                            (click)="rejectFriendRequest(notification.content.id, notification.id, $event)">
+                            <span class="material-icons-outlined">close</span>
+                        </button>
+                    </div>
+                    }
+                </div>
+
+                <!-- Solicitud para unirse a grupo -->
+                <div *ngIf="notification.type === 'groupJoinRequest'" class="notification-content">
+                    <div class="notification-avatar">
+                        <span class="material-icons-outlined group-icon">group</span>
+                    </div>
+                    <div class="notification-details">
+                        <p class="notification-text">
+                            <strong>{{ notification.content.user?.name || 'Usuario' }}</strong>
+                            quiere unirse al grupo
+                            <strong>{{ notification.content.group?.name || 'Grupo' }}</strong>
+                        </p>
+                        <span class="notification-time">{{ getTimeAgo(notification.created_at) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="isLoadingMore" class="loading-more">
+            <app-loadinganimation [type]="'large'"></app-loadinganimation>
+        </div>
+    </div>
+</div>
+<app-infodialog *ngIf="generalError" [type]="'error'" [message]="generalError"></app-infodialog>
