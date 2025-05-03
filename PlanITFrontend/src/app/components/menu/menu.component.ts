@@ -17,7 +17,9 @@ export class MenuComponent {
   apiUrl: string = apiUrl;
 
   toggleNavBar() {
-    this.menuExpanded = !this.menuExpanded;
+    if (this.menuExpanded) {
+      this.menuExpanded = false;
+    }
     this.toggleMenu.emit(this.menuExpanded);
   }
 

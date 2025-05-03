@@ -1,18 +1,23 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { apiUrl } from '../../../../../../config/config';
 import { LoadinganimationComponent } from '../../../../components/loadinganimation/loadinganimation.component';
 import { InfodialogComponent } from "../../../../components/infodialog/infodialog.component";
 import { getCurrentUser, setSessionStorage } from '../../../../../../config/authUser';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-friends',
-  imports: [CommonModule, LoadinganimationComponent, InfodialogComponent],
+  imports: [CommonModule, FormsModule, LoadinganimationComponent, InfodialogComponent],
   templateUrl: './friends.component.html',
   styleUrl: './friends.component.css'
 })
 export class FriendsComponent {
   searchUser: string = '';
+  private searchDebouncer = new Subject<string>();
+  private searchSubscription: Subscription;
 
   friendsExpanded: boolean = true;
   allUsersExpanded: boolean = false;
@@ -35,9 +40,40 @@ export class FriendsComponent {
   generalError: string | null = null;
   userUid: string | null = null;
 
+  constructor() {
+    // Configuración del debouncer para la búsqueda
+    this.searchSubscription = this.searchDebouncer.pipe(
+      debounceTime(500), // Espera 500ms después del último cambio
+      distinctUntilChanged() // Solo procesa si el valor ha cambiado
+    ).subscribe(searchTerm => {
+      console.log('Búsqueda actualizada (debounced):', searchTerm);
+
+      if (this.allUsersExpanded) {
+        this.allUsersOffset = 0;
+        this.allUsersList = [];
+        this.noMoreAllUsers = false;
+        this.fetchAllUsers(true);
+      }
+
+      if (this.friendsExpanded) {
+        this.friendsOffset = 0;
+        this.friendsList = [];
+        this.noMoreFriends = false;
+        this.fetchFriends(true);
+      }
+    });
+  }
+
   async ngOnInit() {
     await this.getUserId();
     await this.fetchFriends();
+  }
+
+  ngOnDestroy() {
+    // Es importante cancelar la suscripción para evitar memory leaks
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
+    }
   }
 
   async getUserId(): Promise<void> {
@@ -64,7 +100,7 @@ export class FriendsComponent {
     this.friendsLoading = true;
     try {
       // Ajusta la URL según tu backend
-      const response = await fetch(`${apiUrl}api/friends?limit=${this.friendsLimit}&offset=${this.friendsOffset}`, {
+      const response = await fetch(`${apiUrl}api/friends?limit=${this.friendsLimit}&offset=${this.friendsOffset}&search=${this.searchUser}`, {
         method: 'GET',
         credentials: 'include'
       });
@@ -141,16 +177,9 @@ export class FriendsComponent {
     }
   }
 
-  onSearchUserChange(event: any) {
-    this.searchUser = event.target.value;
-    console.log(this.searchUser);
-
-    if (this.allUsersExpanded) {
-      this.allUsersOffset = 0;
-      this.allUsersList = [];
-      this.noMoreAllUsers = false;
-      this.fetchAllUsers(true);
-    }
+  onSearchUserChange(): void {
+    // En lugar de hacer la búsqueda inmediatamente, la enviamos al Subject
+    this.searchDebouncer.next(this.searchUser);
   }
 
   toggleFriends() {
@@ -159,6 +188,11 @@ export class FriendsComponent {
 
   toggleAllUsers() {
     this.allUsersExpanded = !this.allUsersExpanded;
+
+    // Si se abre la sección de todos los usuarios, cargar los datos
+    if (this.allUsersExpanded && this.allUsersList.length === 0) {
+      this.fetchAllUsers(true);
+    }
   }
 
   showFetchError(message: string) {

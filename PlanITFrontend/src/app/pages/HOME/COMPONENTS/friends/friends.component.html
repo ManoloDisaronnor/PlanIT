@@ -5,7 +5,7 @@
     <div class="friends-container">
         <div class="friends-header">
             <input type="text" id="search-user" placeholder="Buscar usuarios" name="search-user" maxlength="35"
-                (change)="onSearchUserChange($event)" [value]="searchUser">
+                [(ngModel)]="searchUser" (input)="onSearchUserChange()">
             <button class="reload-btn" [disabled]="this.loadingFriendRequest" (click)="reloadComponent()"
                 title="Recargar">
                 <span class="material-icons-outlined">sync</span>
@@ -53,7 +53,7 @@
                 </div>
             </div>
             <div class="all-users acordeon">
-                <div class="acordeon-header" (click)="toggleAllUsers()" (mouseover)="fetchAllUsers()">
+                <div class="acordeon-header" (click)="toggleAllUsers()">
                     <span class="material-icons-outlined acordeon-icon"
                         [ngClass]="{ 'arrow-notexp' : !allUsersExpanded }">keyboard_arrow_down</span>
                     <p>Todos los usuarios</p>

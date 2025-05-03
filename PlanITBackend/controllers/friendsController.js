@@ -19,7 +19,8 @@ class FriendsController {
             const userUid = req.uid;
             const limit = req.query.limit ? parseInt(req.query.limit) : 5;
             const offset = req.query.offset ? parseInt(req.query.offset) : 0;
-            const search = req.query.search || '';
+            const searchText = req.query.search || '';
+            const search = searchText.toLowerCase();
 
             if (!userUid) {
                 return res.status(400).json(Respuesta.error(null, "Usuario desconocido", "UID_REQUIRED"));
@@ -32,14 +33,19 @@ class FriendsController {
                         { [Op.or]: [{ user_send: userUid }, { user_requested: userUid }] },
                         { accepted: 1 }
                     ],
-
                 },
                 include: [
                     {
                         model: Usuario,
                         as: 'user_send_user',
                         ...(search ? {
-                            username: { [Op.like]: `%${search}%` },
+                            where: {
+                                [Op.or]: [
+                                    { name: { [Op.like]: `%${search}%` } },
+                                    { surname: { [Op.like]: `%${search}%` } },
+                                    { username: { [Op.like]: `%${search}%` } }
+                                ]
+                            }
                         } : {}),
                         attributes: ['name', 'surname', 'username', 'imageUrl']
                     },
@@ -47,7 +53,13 @@ class FriendsController {
                         model: Usuario,
                         as: 'user_requested_user',
                         ...(search ? {
-                            username: { [Op.like]: `%${search}%` },
+                            where: {
+                                [Op.or]: [
+                                    { name: { [Op.like]: `%${search}%` } },
+                                    { surname: { [Op.like]: `%${search}%` } },
+                                    { username: { [Op.like]: `%${search}%` } }
+                                ]
+                            }
                         } : {}),
                         attributes: ['name', 'surname', 'username', 'imageUrl']
                     }

@@ -17,7 +17,8 @@ class UsuarioController {
             const userUid = req.uid;
             const limit = req.query.limit ? parseInt(req.query.limit) : 5;
             const offset = req.query.offset ? parseInt(req.query.offset) : 0;
-            const search = req.query.search || '';
+            const searchText = req.query.search || '';
+            const search = searchText.toLowerCase();
 
             // Subconsulta para encontrar todos los UIDs con los que el usuario tiene relación
             // (ya sea como amigos o con solicitudes pendientes)
@@ -52,8 +53,12 @@ class UsuarioController {
                             { [Op.notIn]: Array.from(excludeUids) }
                         ]
                     },
-                    ...(search ? {
-                        username: { [Op.like]: `%${search}%` },
+                    ...(search !== '' ? {
+                        [Op.or]: [
+                            { username: { [Op.like]: `%${search}%` } },
+                            { name: { [Op.like]: `%${search}%` } },
+                            { surname: { [Op.like]: `%${search}%` } }
+                        ]
                     } : {})
                 },
                 attributes: ['uid', 'username', 'name', 'imageUrl'],

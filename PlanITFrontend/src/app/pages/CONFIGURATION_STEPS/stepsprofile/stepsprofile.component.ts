@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core';
-import { firstValueFrom, Subject, Subscription } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { Subject, Subscription } from 'rxjs';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { apiUrl } from '../../../../../config/config';
 import { LucideAngularModule } from 'lucide-angular';
@@ -40,7 +39,7 @@ export class StepsprofileComponent {
 
   @ViewChild('menuContainer') menuContainer!: ElementRef;
 
-  constructor(private http: HttpClient) {
+  constructor() {
     this.debounceSubscription = this.usernameDebouncer.pipe(
       debounceTime(500),
       distinctUntilChanged()
