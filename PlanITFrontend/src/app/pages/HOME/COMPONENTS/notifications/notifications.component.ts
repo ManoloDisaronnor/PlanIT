@@ -135,12 +135,34 @@ export class NotificationsComponent implements OnInit, OnDestroy, AfterViewInit 
     }
   }
 
+  // Método para verificar si se debe permitir el swipe en una notificación
+  private shouldAllowSwipe(notificationItem: HTMLElement): boolean {
+    if (!notificationItem) return false;
+
+    // Obtener el ID de la notificación
+    const notificationId = Number(notificationItem.getAttribute('data-notification-id'));
+    const notification = this.notifications.find(n => n.id === notificationId);
+
+    // No permitir swipe para solicitudes de amistad pendientes que requieren acción del usuario
+    if (notification &&
+      notification.type === 'friendRequest' &&
+      notification.content.user_send !== this.userUid &&
+      notification.content.accepted === 0) {
+      return false;
+    }
+
+    return true;
+  }
+
   // Eventos para el deslizamiento
   onTouchStart(event: TouchEvent): void {
     if (this.animating) return;
 
     const item = event.currentTarget as HTMLElement;
     if (!item) return;
+
+    // Verificar si debemos permitir el swipe
+    if (!this.shouldAllowSwipe(item)) return;
 
     this.activeSwipeItem = item;
     this.startX = event.touches[0].clientX;
@@ -149,8 +171,6 @@ export class NotificationsComponent implements OnInit, OnDestroy, AfterViewInit 
     this.currentY = this.startY; // Capturamos la posición Y actual
     this.swipeDirection = null;
     this.isScrolling = false; // Reseteamos el estado de scroll
-
-    // No establecemos estilo de transición todavía, esperamos a determinar el gesto
   }
 
   onTouchMove(event: TouchEvent): void {
@@ -220,6 +240,9 @@ export class NotificationsComponent implements OnInit, OnDestroy, AfterViewInit 
 
     const item = event.currentTarget as HTMLElement;
     if (!item) return;
+
+    // Verificar si debemos permitir el swipe
+    if (!this.shouldAllowSwipe(item)) return;
 
     this.activeSwipeItem = item;
     this.startX = event.clientX;
@@ -334,6 +357,12 @@ export class NotificationsComponent implements OnInit, OnDestroy, AfterViewInit 
     const notificationId = Number(notificationItem.getAttribute('data-notification-id'));
     this.animating = true;
 
+    // Comprobar si es una solicitud de amistad pendiente y rechazarla automáticamente
+    const notification = this.notifications.find(n => n.id === notificationId);
+    const isFriendRequest = notification &&
+      notification.type === 'friendRequest' &&
+      notification.content.accepted === 0;
+
     // Animación de deslizamiento fuera de la pantalla
     const finalX = this.swipeDirection === 'left' ? -window.innerWidth : window.innerWidth;
 
@@ -342,9 +371,17 @@ export class NotificationsComponent implements OnInit, OnDestroy, AfterViewInit 
     this.renderer.setStyle(notificationItem, 'opacity', '0');
 
     // Esperar a que termine la animación y luego eliminar
-    setTimeout(() => {
+    setTimeout(async () => {
+      if (isFriendRequest && notification) {
+        // Si es una solicitud de amistad pendiente, rechazarla automáticamente antes de ocultarla
+        if (notification.content.user_send !== this.userUid) {
+          await this.rejectFriendRequest(notification.content.id, notificationId, new Event('swipe'));
+        }
+      }
+
       // Llamar al servicio para ocultar la notificación
       this.deleteNotification(notificationId);
+
       // Resetear estado
       this.activeSwipeItem = null;
       this.animating = false;

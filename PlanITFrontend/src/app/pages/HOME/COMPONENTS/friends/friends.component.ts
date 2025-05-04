@@ -129,8 +129,8 @@ export class FriendsComponent {
     }
   }
 
-  async fetchAllUsers(reset: boolean = false, reloaded: boolean = false): Promise<void> {
-    if (this.allUsersLoading || this.noMoreAllUsers && !reloaded) return;
+  async fetchAllUsers(reset: boolean = false): Promise<void> {
+    if (this.allUsersLoading || this.noMoreAllUsers) return;
 
     this.allUsersLoading = true;
     try {

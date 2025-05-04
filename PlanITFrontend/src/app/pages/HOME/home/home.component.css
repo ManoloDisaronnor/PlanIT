@@ -16,7 +16,7 @@
     flex-shrink: 0;
     /*TODO CAMBIAR EL Z-INDEX O ALGO PARA HACER QUE EL MENU USER QUE SE DESPLIEGA DEL HEADER PUEDA SALIR POR ENCIMA DEL MENU */
     z-index: 2;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .content-wrapper {
