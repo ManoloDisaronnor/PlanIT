@@ -2,8 +2,7 @@ const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('groups', {
     id: {
-      autoIncrement: true,
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(28),
       allowNull: false,
       primaryKey: true
     },
@@ -16,7 +15,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     },
     imageUrl: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.STRING(100),
       allowNull: true
     }
   }, {

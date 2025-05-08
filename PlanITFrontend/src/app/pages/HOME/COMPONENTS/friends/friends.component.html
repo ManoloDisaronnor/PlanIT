@@ -18,7 +18,7 @@
                         [ngClass]="{ 'arrow-notexp' : !friendsExpanded }">keyboard_arrow_down</span>
                     <p>Tus amigos</p>
                 </div>
-                <div class="acordeon-content" *ngIf="friendsExpanded">
+                <div class="acordeon-content" *ngIf="friendsExpanded" (scroll)="onScroll($event)">
                     @if (friendsList.length <= 0) { <p class="no-data">No tienes amigos</p>
                         }@else {
                         <div class="user-item" *ngFor="let friend of friendsList">

@@ -41,12 +41,10 @@ export class FriendsComponent {
   userUid: string | null = null;
 
   constructor() {
-    // Configuración del debouncer para la búsqueda
     this.searchSubscription = this.searchDebouncer.pipe(
-      debounceTime(500), // Espera 500ms después del último cambio
-      distinctUntilChanged() // Solo procesa si el valor ha cambiado
+      debounceTime(500),
+      distinctUntilChanged()
     ).subscribe(searchTerm => {
-      console.log('Búsqueda actualizada (debounced):', searchTerm);
 
       if (this.allUsersExpanded) {
         this.allUsersOffset = 0;
@@ -70,7 +68,6 @@ export class FriendsComponent {
   }
 
   ngOnDestroy() {
-    // Es importante cancelar la suscripción para evitar memory leaks
     if (this.searchSubscription) {
       this.searchSubscription.unsubscribe();
     }
@@ -99,7 +96,6 @@ export class FriendsComponent {
 
     this.friendsLoading = true;
     try {
-      // Ajusta la URL según tu backend
       const response = await fetch(`${apiUrl}api/friends?limit=${this.friendsLimit}&offset=${this.friendsOffset}&search=${this.searchUser}`, {
         method: 'GET',
         credentials: 'include'
@@ -108,7 +104,6 @@ export class FriendsComponent {
       const data = await response.json();
       if (response.ok) {
         const newFriends = data.datos;
-        console.log('Amigos:', newFriends);
 
         if (reset) {
           this.friendsList = newFriends;
@@ -167,9 +162,17 @@ export class FriendsComponent {
     await this.fetchFriends(false, true);
   }
 
+  onScroll(event: any): void {
+    const element = event.target;
+    const atBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 1;
+
+    if (atBottom && !this.friendsLoading && !this.noMoreFriends) {
+      this.fetchFriends();
+    }
+  }
+
   onAllUsersScroll(event: any): void {
     const element = event.target;
-    // Verifica si el scroll está cerca del final del contenedor
     const atBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 1;
 
     if (atBottom && !this.allUsersLoading && !this.noMoreAllUsers) {
@@ -178,7 +181,6 @@ export class FriendsComponent {
   }
 
   onSearchUserChange(): void {
-    // En lugar de hacer la búsqueda inmediatamente, la enviamos al Subject
     this.searchDebouncer.next(this.searchUser);
   }
 
@@ -188,8 +190,6 @@ export class FriendsComponent {
 
   toggleAllUsers() {
     this.allUsersExpanded = !this.allUsersExpanded;
-
-    // Si se abre la sección de todos los usuarios, cargar los datos
     if (this.allUsersExpanded && this.allUsersList.length === 0) {
       this.fetchAllUsers(true);
     }

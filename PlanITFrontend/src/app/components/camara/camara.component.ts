@@ -1,4 +1,4 @@
-import { Component, EventEmitter, NgZone, Output, OnInit, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, NgZone, Output, OnInit, OnDestroy, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { WebcamImage, WebcamInitError, WebcamModule } from 'ngx-webcam';
 import { Observable, Subject } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -16,6 +16,8 @@ import { LoadinganimationComponent } from '../loadinganimation/loadinganimation.
 export class CamaraComponent implements OnInit, OnDestroy {
   @Output() imageCaptured = new EventEmitter<string>();
   @Output() close = new EventEmitter<void>();
+  @ViewChild('videoElement') videoElement?: ElementRef<HTMLVideoElement>;
+  @ViewChild('webcamElement') webcamElement?: ElementRef<HTMLElement>;
 
   generalError: string | null = null;
   stream: MediaStream | null = null;
@@ -31,7 +33,17 @@ export class CamaraComponent implements OnInit, OnDestroy {
   forceWebcamRecreation: boolean = false;
   lastUsedFacingMode: string = 'user';
   private errorTimeoutId: any = null;
-  private previousSessionData: { facingMode: string, deviceId: string | null } | null = null;
+  private previousSessionData: { facingMode: string, deviceId: string | null, zoomLevel?: number } | null = null;
+
+  zoomLevel: number = 1;
+  maxZoom: number = 5;
+  minZoom: number = 1;
+  initialDistance: number = 0;
+  isMobileZooming: boolean = false;
+  nativeZoomSupported: boolean = false;
+  currentVideoTrack: MediaStreamTrack | null = null;
+  webcamVideo: HTMLVideoElement | null = null;
+  zoomSpeed: number = 0.2;
 
   constructor(private zone: NgZone) { }
 
@@ -40,22 +52,40 @@ export class CamaraComponent implements OnInit, OnDestroy {
       const savedData = localStorage.getItem('camaraConfig');
       if (savedData) {
         this.previousSessionData = JSON.parse(savedData);
-        this.facingMode = this.previousSessionData!!.facingMode;
-        this.lastUsedFacingMode = this.previousSessionData!!.facingMode;
-        this.currentDeviceId = this.previousSessionData!!.deviceId;
+        this.facingMode = this.previousSessionData?.facingMode || 'user';
+        this.lastUsedFacingMode = this.previousSessionData?.facingMode || 'user';
+        this.currentDeviceId = this.previousSessionData?.deviceId || null;
+        this.zoomLevel = this.previousSessionData?.zoomLevel || 1;
       }
     } catch (e) {
       console.warn('Error al recuperar configuración anterior:', e);
     }
 
-    this.silentInitialization();
+    this.checkMediaDevicesSupport();
+  }
+
+  checkMediaDevicesSupport() {
+    if (!navigator.mediaDevices) {
+      this.setErrorWithTimeout('Tu navegador no soporta acceso a cámara', 5000);
+      return;
+    }
+
+    if (typeof navigator.mediaDevices.getUserMedia !== 'function') {
+      this.setErrorWithTimeout('Tu navegador no soporta acceso a cámara (getUserMedia no disponible)', 5000);
+      return;
+    }
+
+    setTimeout(() => {
+      this.silentInitialization();
+    }, 500);
   }
 
   ngOnDestroy() {
     try {
       const configToSave = {
         facingMode: this.facingMode,
-        deviceId: this.currentDeviceId
+        deviceId: this.currentDeviceId,
+        zoomLevel: this.zoomLevel
       };
       localStorage.setItem('camaraConfig', JSON.stringify(configToSave));
     } catch (e) {
@@ -84,7 +114,6 @@ export class CamaraComponent implements OnInit, OnDestroy {
       }, 1000);
 
     } catch (error) {
-      console.warn('Error durante la inicialización silenciosa:', error);
       setTimeout(() => {
         showErrors = true;
         this.zone.run(() => {
@@ -106,14 +135,20 @@ export class CamaraComponent implements OnInit, OnDestroy {
 
   async enumerateVideoDevices(showErrors: boolean = true): Promise<MediaDeviceInfo[]> {
     try {
+      if (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== 'function') {
+        throw new Error('API de MediaDevices no disponible en este navegador');
+      }
+
       if (!this.permissionGranted) {
         const tempStream = await navigator.mediaDevices.getUserMedia({ video: true });
         tempStream.getTracks().forEach(track => track.stop());
         this.permissionGranted = true;
       }
+
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = devices.filter(device => device.kind === 'videoinput');
       this.videoDevices = videoDevices;
+
       if (this.currentDeviceId && videoDevices.length > 0) {
         const deviceIndex = videoDevices.findIndex(device => device.deviceId === this.currentDeviceId);
         if (deviceIndex !== -1) {
@@ -128,7 +163,6 @@ export class CamaraComponent implements OnInit, OnDestroy {
       }
       return videoDevices;
     } catch (error) {
-      console.error('Error al enumerar dispositivos:', error);
       if (showErrors) {
         this.setErrorWithTimeout('No se pudieron detectar dispositivos de video.', 3000);
       }
@@ -138,16 +172,17 @@ export class CamaraComponent implements OnInit, OnDestroy {
 
   async switchCamera() {
     if (this.isSwitchingCamera) {
-      console.log('Ya se está cambiando la cámara, ignorando solicitud...');
       return;
     }
     this.isSwitchingCamera = true;
     this.isLoadingCamera = true;
     this.generalError = null;
+
+    this.zoomLevel = 1;
+
     try {
       if (this.stream) {
         this.stream.getTracks().forEach((track: MediaStreamTrack) => {
-          console.log('Deteniendo track:', track.label);
           track.stop();
         });
         this.stream = null;
@@ -181,7 +216,6 @@ export class CamaraComponent implements OnInit, OnDestroy {
         this.zone.run(() => { });
       }, 800);
     } catch (error) {
-      console.error('Error al cambiar la cámara:', error);
       this.setErrorWithTimeout('Error al cambiar de cámara: ' + (error instanceof Error ? error.message : String(error)), 3000);
       try {
         if (!this.stream) {
@@ -220,6 +254,10 @@ export class CamaraComponent implements OnInit, OnDestroy {
     }
 
     try {
+      if (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== 'function') {
+        throw new Error('API de MediaDevices no disponible en este navegador');
+      }
+
       let constraints: MediaStreamConstraints;
       if (this.isMobileDevice()) {
         constraints = {
@@ -255,11 +293,18 @@ export class CamaraComponent implements OnInit, OnDestroy {
         this.stream = null;
         await new Promise(resolve => setTimeout(resolve, 300));
       }
+
       this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+
       if (this.stream) {
         const track = this.stream.getVideoTracks()[0];
         if (track) {
+          this.currentVideoTrack = track;
           const settings = track.getSettings();
+
+          const capabilities = track.getCapabilities ? track.getCapabilities() : null;
+          this.nativeZoomSupported = !!(capabilities && 'zoom' in capabilities);
+
           if (!this.isMobileDevice() && settings.deviceId && settings.deviceId !== this.currentDeviceId) {
             this.currentDeviceId = settings.deviceId;
           }
@@ -274,9 +319,14 @@ export class CamaraComponent implements OnInit, OnDestroy {
         if (showErrors) {
           this.generalError = null;
         }
+
+        if (this.zoomLevel !== 1) {
+          setTimeout(() => {
+            this.applyZoom(this.zoomLevel);
+          }, 500);
+        }
       }
     } catch (error) {
-      console.error('Error al activar la cámara:', error);
       if (showErrors) {
         this.setErrorWithTimeout('No se pudo activar la cámara: ' + (error instanceof Error ? error.message : String(error)), 3000);
       }
@@ -304,13 +354,12 @@ export class CamaraComponent implements OnInit, OnDestroy {
     this.trigger.next();
   }
 
-  // Detector de móviles
   isMobileDevice(): boolean {
     const userAgent = navigator.userAgent.toLowerCase();
     return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
   }
+
   handleInitError(error: WebcamInitError): void {
-    console.error('Error de inicialización de webcam:', error);
     if (this.isMobileDevice()) {
       setTimeout(() => {
         this.switchCamera();
@@ -318,5 +367,138 @@ export class CamaraComponent implements OnInit, OnDestroy {
     } else {
       this.setErrorWithTimeout(`Error al inicializar la cámara: ${error.message}`, 3000);
     }
+  }
+
+  @HostListener('wheel', ['$event'])
+  onMouseWheel(event: WheelEvent) {
+    event.preventDefault();
+    const delta = Math.sign(event.deltaY) * -this.zoomSpeed;
+    this.adjustZoom(delta);
+  }
+
+  @HostListener('touchstart', ['$event'])
+  onTouchStart(event: TouchEvent) {
+    if (event.touches.length === 2) {
+      this.initialDistance = this.getTouchDistance(event);
+      this.isMobileZooming = true;
+      event.preventDefault();
+    }
+  }
+
+  @HostListener('touchmove', ['$event'])
+  onTouchMove(event: TouchEvent) {
+    if (this.isMobileZooming && event.touches.length === 2) {
+      event.preventDefault();
+
+      const currentDistance = this.getTouchDistance(event);
+
+      if (this.initialDistance > 0) {
+        // Aumentamos la respuesta al pellizco
+        const zoomFactor = Math.pow(currentDistance / this.initialDistance, 1.5);
+
+        const newZoom = this.zoomLevel * zoomFactor;
+        const clampedZoom = Math.max(this.minZoom, Math.min(this.maxZoom, newZoom));
+
+        if (clampedZoom !== this.zoomLevel) {
+          this.applyZoom(clampedZoom);
+        }
+
+        this.initialDistance = currentDistance;
+      }
+    }
+  }
+
+  @HostListener('touchend', ['$event'])
+  onTouchEnd() {
+    this.isMobileZooming = false;
+    this.initialDistance = 0;
+  }
+
+  zoomIn() {
+    this.adjustZoom(0.5);
+  }
+
+  zoomOut() {
+    this.adjustZoom(-0.5);
+  }
+
+  resetZoom() {
+    this.applyZoom(1);
+  }
+
+  private adjustZoom(delta: number) {
+    const newZoom = this.zoomLevel + delta;
+    const clampedZoom = Math.max(this.minZoom, Math.min(this.maxZoom, newZoom));
+    if (clampedZoom !== this.zoomLevel) {
+      this.applyZoom(clampedZoom);
+    }
+  }
+
+  private applyZoom(zoomLevel: number) {
+    this.zoomLevel = zoomLevel;
+
+    setTimeout(() => {
+      if (!this.webcamVideo) {
+        this.webcamVideo = document.querySelector('.webcam-wrapper video') as HTMLVideoElement;
+      }
+
+      if (this.webcamVideo) {
+        const shouldMirror = this.facingMode === 'user';
+        const scaleX = shouldMirror ? -this.zoomLevel : this.zoomLevel;
+
+        this.webcamVideo.style.transform = `scale(${scaleX}, ${this.zoomLevel})`;
+        this.webcamVideo.style.transition = 'transform 0.2s ease-out';
+      }
+
+      if (this.nativeZoomSupported && this.currentVideoTrack && 'applyConstraints' in this.currentVideoTrack) {
+        try {
+          const capabilities = this.currentVideoTrack.getCapabilities();
+          if (capabilities && 'zoom' in capabilities) {
+            const zoomCapability = capabilities.zoom as { min?: number, max?: number };
+            const minZoom = zoomCapability.min || 1;
+            const maxZoom = zoomCapability.max || 10;
+
+            const nativeZoomValue = minZoom + (zoomLevel - 1) * (maxZoom - minZoom) / (this.maxZoom - 1);
+
+            this.currentVideoTrack.applyConstraints({
+              advanced: [{ zoom: nativeZoomValue } as any]
+            }).catch(e => {
+              console.warn('No se pudo aplicar zoom nativo:', e);
+            });
+          }
+        } catch (e) {
+          console.warn('Error al aplicar zoom nativo:', e);
+        }
+      }
+
+      this.zone.run(() => { });
+    }, 100);
+  }
+
+  private getTouchDistance(event: TouchEvent): number {
+    const touch1 = event.touches[0];
+    const touch2 = event.touches[1];
+
+    return Math.sqrt(
+      Math.pow(touch2.clientX - touch1.clientX, 2) +
+      Math.pow(touch2.clientY - touch1.clientY, 2)
+    );
+  }
+
+  onInitSuccess() {
+    setTimeout(() => {
+      this.webcamVideo = document.querySelector('.webcam-wrapper video') as HTMLVideoElement;
+      if (this.webcamVideo) {
+        this.webcamVideo.style.objectFit = 'cover';
+
+        if (this.facingMode === 'user') {
+          this.webcamVideo.style.transform = 'scaleX(-1)';
+        }
+
+        if (this.zoomLevel !== 1) {
+          this.applyZoom(this.zoomLevel);
+        }
+      }
+    }, 500);
   }
 }

@@ -28,81 +28,125 @@
 
         <div *ngIf="!isLoading && notifications.length > 0" class="notifications-list">
             <!-- Solicitudes de amistad -->
-            <div *ngFor="let notification of notifications" class="notification-item"
-                [ngClass]="{ 'unread-notification': !notification.readed }"
-                [attr.data-notification-id]="notification.id" (mousedown)="onMouseDown($event)"
-                (touchstart)="onTouchStart($event)" (touchmove)="onTouchMove($event)" (touchend)="onTouchEnd()"
-                (mouseover)="markNotificationAsRead(notification.id, notification.readed, $event)">
+            <ng-container *ngFor="let notification of notifications">
+                <div class="notification-item" [ngClass]="{ 'unread-notification': !notification.readed }"
+                    [attr.data-notification-id]="notification.id" (mousedown)="onMouseDown($event)"
+                    (touchstart)="onTouchStart($event)" (touchmove)="onTouchMove($event)" (touchend)="onTouchEnd()"
+                    (mouseover)="markNotificationAsRead(notification.id, notification.readed, $event)"
+                    *ngIf="notification.visible">
 
-                <div class="swipe-hint">
-                    <span class="material-icons-outlined">chevron_left</span>
-                    <span>Desliza para ocultar</span>
-                    <span class="material-icons-outlined">chevron_right</span>
-                </div>
+                    <div class="swipe-hint">
+                        <span class="material-icons-outlined">chevron_left</span>
+                        <span>Desliza para ocultar</span>
+                        <span class="material-icons-outlined">chevron_right</span>
+                    </div>
 
-                <!-- Solicitud de amistad -->
-                <div *ngIf="notification.type === 'friendRequest'" class="notification-content">
-                    <div class="notification-avatar">
-                        <img [src]="notification.content.user_send === userUid ? (notification.content.user_requested_user.imageUrl ? apiUrl + notification.content.user_requested_user.imageUrl
+                    <!-- Solicitud de amistad -->
+                    <div *ngIf="notification.type === 'friendRequest'" class="notification-content">
+                        <div class="notification-avatar">
+                            <img [src]="notification.content.user_send === userUid ? (notification.content.user_requested_user.imageUrl ? apiUrl + notification.content.user_requested_user.imageUrl
                             : 'images/defaultProfilePicture.png')
                             : (notification.content.user_send_user.imageUrl ? apiUrl + notification.content.user_send_user.imageUrl
                             : 'images/defaultProfilePicture.png')" alt="Foto de perfil" />
+                        </div>
+                        <div class="notification-details">
+                            <p class="notification-text">
+                                @if (notification.content.user_send === this.userUid && notification.content.accepted
+                                === 0
+                                )
+                                {
+                                Solicitud enviada a
+                                }
+                                <strong>{{ notification.content.user_send === this.userUid ?
+                                    notification.content.user_requested_user.username :
+                                    notification.content.user_send_user.username }}</strong>
+                                @if (notification.content.user_send !== this.userUid && notification.content.accepted
+                                === 0
+                                )
+                                {
+                                quiere ser tu amigo
+                                }
+                                @if (notification.content.accepted === 1 ) {
+                                ahora es tu amigo
+                                }
+                                @if (notification.content.accepted === -1 ) {
+                                ha rechazado tu solicitud de amistad
+                                }
+                            </p>
+                            <span class="notification-time">{{ getTimeAgo(notification.created_at) }}</span>
+                        </div>
+                        @if (notification.content.user_send !== this.userUid && notification.content.accepted === 0 ) {
+                        <div class="notification-actions">
+                            <button class="btn-accept action-btns"
+                                [disabled]="this.loadingRequest === notification.id ||this.loadingRequest === notification.content.id"
+                                (click)="acceptFriendRequest(notification.id, $event)">
+                                <span class="material-icons-outlined">check</span>
+                            </button>
+                            <button class="btn-reject action-btns"
+                                [disabled]="this.loadingRequest === notification.id ||this.loadingRequest === notification.content.id"
+                                (click)="rejectFriendRequest(notification.content.id, notification.id, $event)">
+                                <span class="material-icons-outlined">close</span>
+                            </button>
+                        </div>
+                        }
                     </div>
-                    <div class="notification-details">
-                        <p class="notification-text">
-                            @if (notification.content.user_send === this.userUid && notification.content.accepted === 0
-                            )
-                            {
-                            Solicitud enviada a
-                            }
-                            <strong>{{ notification.content.user_send === this.userUid ?
-                                notification.content.user_requested_user.username :
-                                notification.content.user_send_user.username }}</strong>
-                            @if (notification.content.user_send !== this.userUid && notification.content.accepted === 0
-                            )
-                            {
-                            quiere ser tu amigo
-                            }
-                            @if (notification.content.accepted === 1 ) {
-                            ahora es tu amigo
-                            }
-                            @if (notification.content.accepted === -1 ) {
-                            ha rechazado tu solicitud de amistad
-                            }
-                        </p>
-                        <span class="notification-time">{{ getTimeAgo(notification.created_at) }}</span>
-                    </div>
-                    @if (notification.content.user_send !== this.userUid && notification.content.accepted === 0 ) {
-                    <div class="notification-actions">
-                        <button class="btn-accept action-btns"
-                            [disabled]="this.loadingRequest === notification.id ||this.loadingRequest === notification.content.id"
-                            (click)="acceptFriendRequest(notification.id, $event)">
-                            <span class="material-icons-outlined">check</span>
-                        </button>
-                        <button class="btn-reject action-btns"
-                            [disabled]="this.loadingRequest === notification.id ||this.loadingRequest === notification.content.id"
-                            (click)="rejectFriendRequest(notification.content.id, notification.id, $event)">
-                            <span class="material-icons-outlined">close</span>
-                        </button>
-                    </div>
-                    }
-                </div>
 
-                <!-- Solicitud para unirse a grupo -->
-                <div *ngIf="notification.type === 'groupJoinRequest'" class="notification-content">
-                    <div class="notification-avatar">
-                        <span class="material-icons-outlined group-icon">group</span>
-                    </div>
-                    <div class="notification-details">
-                        <p class="notification-text">
-                            <strong>{{ notification.content.user?.name || 'Usuario' }}</strong>
-                            quiere unirse al grupo
-                            <strong>{{ notification.content.group?.name || 'Grupo' }}</strong>
-                        </p>
-                        <span class="notification-time">{{ getTimeAgo(notification.created_at) }}</span>
+                    <!-- Solicitud para unirse a grupo -->
+                    <div *ngIf="notification.type === 'groupRequest'" class="notification-content">
+                        <div class="notification-avatar stacked-avatar">
+                            <!-- Avatar del grupo (principal) -->
+                            <img class="group-avatar" [src]="notification.content.group.imageUrl ? apiUrl + notification.content.group.imageUrl
+                            : 'images/defaultGroup.png'" alt="Foto de grupo" />
+
+                            <!-- Avatar del usuario que envía (secundario), solo visible cuando no es el usuario actual -->
+                            <img *ngIf="notification.content.user_send !== this.userUid" class="user-avatar" [src]="notification.content.user_send_user.imageUrl ? apiUrl + notification.content.user_send_user.imageUrl
+                            : 'images/defaultProfilePicture.png'" alt="Foto de usuario" />
+                        </div>
+
+                        <div class="notification-details">
+                            <!-- El resto del contenido sigue igual -->
+                            <p class="notification-text">
+                                @if (notification.content.user_send !== this.userUid && notification.content.joined ===
+                                0)
+                                {
+                                <strong>{{ notification.content.user_send_user.username }}</strong> te ha invitado a
+                                unirte
+                                a su
+                                grupo "<strong>{{
+                                    notification.content.group.name }}</strong>"
+                                }
+                                @if (notification.content.user_send === this.userUid) {
+                                Has creado el grupo "<strong>{{ notification.content.group.name }}</strong>"
+                                }
+                                @if (notification.content.user_send !== this.userUid && notification.content.joined ===
+                                1) {
+                                Te has unido al grupo "<strong>{{ notification.content.group.name }}</strong>"
+                                }
+                                @if (notification.content.joined === -1 ) {
+                                <strong>{{ notification.content.user_send_user.username }}</strong> no ha querido unirse
+                                a
+                                tu grupo
+                                }
+                            </p>
+                            <span class="notification-time">{{ getTimeAgo(notification.created_at) }}</span>
+                        </div>
+                        @if (notification.content.user_send !== this.userUid && notification.content.joined === 0 ) {
+                        <div class="notification-actions">
+                            <button class="btn-accept action-btns"
+                                [disabled]="this.loadingRequest === notification.id ||this.loadingRequest === notification.content.id"
+                                (click)="acceptGroupRequest(notification.id, $event)">
+                                <span class="material-icons-outlined">check</span>
+                            </button>
+                            <button class="btn-reject action-btns"
+                                [disabled]="this.loadingRequest === notification.id ||this.loadingRequest === notification.content.id"
+                                (click)="rejectFriendRequest(notification.content.id, notification.id, $event)">
+                                <span class="material-icons-outlined">close</span>
+                            </button>
+                        </div>
+                        }
                     </div>
                 </div>
-            </div>
+            </ng-container>
         </div>
 
         <div *ngIf="isLoadingMore" class="loading-more">

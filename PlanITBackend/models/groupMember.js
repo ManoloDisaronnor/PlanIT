@@ -1,19 +1,22 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('groupMember', {
+    id: {
+      type: DataTypes.STRING(28),
+      allowNull: false,
+      primaryKey: true
+    },
     user: {
       type: DataTypes.STRING(28),
       allowNull: false,
-      primaryKey: true,
       references: {
         model: 'user',
         key: 'uid'
       }
     },
     groups: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(28),
       allowNull: false,
-      primaryKey: true,
       references: {
         model: 'groups',
         key: 'id'
@@ -23,13 +26,17 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    fixed: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     joined: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    date: {
+    joined_at: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: true
     }
   }, {
     sequelize,
@@ -41,8 +48,14 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
+          { name: "id" },
+        ]
+      },
+      {
+        name: "FK1_user",
+        using: "BTREE",
+        fields: [
           { name: "user" },
-          { name: "groups" },
         ]
       },
       {

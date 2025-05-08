@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { CommonModule } from '@angular/common';
@@ -25,8 +25,6 @@ export class SignupComponent {
   helperTextVisible: string | null = null;
   loadingSignUp: boolean = false;
   showPassword: boolean = false;
-
-  constructor(private router: Router) { }
 
   async ngOnInit() {
     await logOut();
@@ -83,7 +81,7 @@ export class SignupComponent {
     } else {
       this.loadingSignUp = true;
       try {
-        const response = await fetch(apiUrl + 'api/auth/firebasesignup', {
+        const response = await fetch(apiUrl + 'auth/firebasesignup', {
           method: 'POST',
           credentials: 'include',
           headers: {
@@ -97,7 +95,7 @@ export class SignupComponent {
         const data = await response.json();
         if (response.ok) {
           await iniciarSesion(data.datos.email, this.signUpForm.controls.password.value!!);
-          this.router.navigate(['/configuration-steps']);
+          window.location.href = '/configuration-steps';
         } else {
           if (data.mensaje === 'Error al crear el usuarioError: The email address is already in use by another account.') {
             this.emailError = 'El correo electrónico ya está en uso';

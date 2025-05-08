@@ -64,7 +64,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
     padding: 0;
     margin-top: 1rem;
     width: 90%;
@@ -88,20 +87,32 @@
     font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.5);
     opacity: 0;
-    pointer-events: none; /* Para que no interfiera con los eventos */
+    pointer-events: none;
     transition: opacity 0.3s ease;
   }
   
   .notification-item {
+    position: relative;
     padding: 1rem;
     width: 95%;
     border-radius: 8px;
     position: relative;
     user-select: none;
-    touch-action: pan-y; /* Permitir scroll vertical pero capturar movimientos horizontales */
+    touch-action: pan-y;
     transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease;
     cursor: grab;
     overflow: hidden;
+  }
+
+  .notification-item::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: calc(100% - 75px);
+    height: 1px;
+    background-color: #22222e;
+
   }
 
   .notification-item:active .swipe-hint {
@@ -109,7 +120,7 @@
   }
 
   .notification-item.swiping-left {
-    background-color: rgba(244, 67, 54, 0.3); /* Rojo para indicar eliminación */
+    background-color: rgba(244, 67, 54, 0.3);
   }
   
   .notification-item.swiping-right {
@@ -320,6 +331,42 @@
     max-width: 1rem;
 }
 
+.stacked-avatar {
+  position: relative;
+  width: 45px;
+  min-width: 45px;
+  height: 45px;
+  min-height: 45px;
+  margin-right: 12px;
+}
+
+/* Avatar del grupo (principal) */
+.stacked-avatar .group-avatar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  z-index: 1;
+  border: 2px solid #1e1e2d; /* Color de fondo oscuro para el borde */
+}
+
+/* Avatar del usuario que envía (secundario) */
+.stacked-avatar .user-avatar {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  object-fit: cover;
+  z-index: 2;
+  border: 2px solid #1e1e2d; /* Color de fondo oscuro para el borde */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
   @media (max-width: 992px) {
     .notifications-container {
       max-height: 398px;
@@ -357,5 +404,22 @@
       min-width: 40px;
       height: 40px;
       min-height: 40px;
+    }
+
+    .stacked-avatar {
+      width: 40px;
+      min-width: 40px;
+      height: 40px;
+      min-height: 40px;
+    }
+  
+    .stacked-avatar .group-avatar {
+      width: 35px;
+      height: 35px;
+    }
+  
+    .stacked-avatar .user-avatar {
+      width: 22px;
+      height: 22px;
     }
   }

@@ -5,7 +5,7 @@ import { apiUrl } from '../config/config';
 
 export interface Notification {
     id: number;  // ID de la notificación
-    type: 'friendRequest' | 'friendAccepted' | 'friendRejected' | 'groupJoinRequest' | 'groupJoinAccepted';
+    type: 'friendRequest' | 'groupRequest';
     entity_id: string;  // ID de la entidad relacionada (request ID, group ID, etc.)
     content: any;  // Datos adicionales
     created_at: Date;
@@ -31,28 +31,23 @@ export class NotificationService {
     private loadingMore: boolean = false; // Para controlar múltiples solicitudes
     private hasMoreNotifications: boolean = true; // Para saber si hay más notificaciones disponibles
 
-    // Observables para que los componentes puedan suscribirse
     private notificationsSubject = new BehaviorSubject<Notification[]>([]);
     public notifications$ = this.notificationsSubject.asObservable();
 
-    // Ahora usamos un objeto para mantener los contadores separados
     private notificationCountSubject = new BehaviorSubject<NotificationCount>({
         totalCount: 0,
         unreadCount: 0
     });
     public notificationCount$ = this.notificationCountSubject.asObservable();
 
-    // Observable para indicar si hay carga en progreso
     private loadingSubject = new BehaviorSubject<boolean>(false);
     public loading$ = this.loadingSubject.asObservable();
 
-    // Observable para indicar si hay más notificaciones
     private hasMoreNotificationsSubject = new BehaviorSubject<boolean>(true);
     public hasMoreNotifications$ = this.hasMoreNotificationsSubject.asObservable();
 
     constructor() { }
 
-    // Conectar al socket y registrar el usuario
     connect(userId: string, initialLimit: number = 10): void {
         if (!userId) {
             console.error('Se intentó conectar sin ID de usuario');
@@ -65,7 +60,6 @@ export class NotificationService {
         this.hasMoreNotifications = true;
         this.hasMoreNotificationsSubject.next(true);
 
-        // Desconectar si ya existe una conexión
         if (this.socket) {
             this.disconnect();
         }
@@ -73,19 +67,12 @@ export class NotificationService {
         this.socket = io(this.apiUrl);
 
         this.socket.on('connect', () => {
-            // Registrar el usuario en el socket
             this.socket?.emit('register', userId);
-
-            // Cargar notificaciones iniciales
             this.loadNotifications(false);
-
-            // Obtener el número total de notificaciones
             this.fetchNotificationCounts();
         });
 
-        // Escuchar nuevas notificaciones
         this.socket.on('notification', (notificationData) => {
-            // La notificación ya debe venir con el formato correcto desde el servidor
             const newNotification: Notification = {
                 id: notificationData.id,
                 type: notificationData.type,
@@ -96,17 +83,14 @@ export class NotificationService {
                 visible: true
             };
 
-            // Actualizar la lista de notificaciones
             const currentNotifications = this.notificationsSubject.value;
 
-            // Evitar duplicados
             const exists = currentNotifications.some(n => n.id === newNotification.id);
 
             if (!exists) {
                 const updatedNotifications = [newNotification, ...currentNotifications];
                 this.notificationsSubject.next(updatedNotifications);
 
-                // Actualizar contador total (incrementar en 1)
                 this.updateLocalNotificationCount(1, newNotification.readed ? 0 : 1);
             }
         });
@@ -120,7 +104,6 @@ export class NotificationService {
         });
     }
 
-    // Método nuevo para obtener los contadores desde el servidor
     async fetchNotificationCounts(): Promise<void> {
         if (!this.userId) {
             return;
@@ -135,21 +118,20 @@ export class NotificationService {
             if (response.ok) {
                 const data = await response.json();
                 console.log('Contadores de notificaciones:', data);
-                // Actualizar los contadores globales
                 this.notificationCountSubject.next({
                     unreadCount: data.datos.count,
                     totalCount: 0
                 });
 
             } else {
-                console.error('Error al obtener contadores de notificaciones:', await response.text());
+                const datos = await response.json();
+                console.error('Error al obtener contadores de notificaciones:', datos.mensaje);
             }
         } catch (error) {
             console.error('Error al obtener contadores de notificaciones:', error);
         }
     }
 
-    // Actualizar los contadores localmente (útil para actualizaciones incrementales)
     private updateLocalNotificationCount(totalDelta: number = 0, unreadDelta: number = 0): void {
         const currentCount = this.notificationCountSubject.value;
 
@@ -159,17 +141,13 @@ export class NotificationService {
         });
     }
 
-    // Actualizar el contador de notificaciones locales (mantener por compatibilidad)
-    // Esta función ahora NO actualiza el contador global, solo cuenta las notificaciones visibles
     private updateVisibleNotificationCount(notifications: Notification[]): void {
         const visibleNotifications = notifications.filter(notif => notif.visible);
         const unreadVisibleNotifications = visibleNotifications.filter(notif => !notif.readed);
 
-        // Solo actualizar la información de visualización local
         console.log(`Notificaciones visibles: ${visibleNotifications.length}, No leídas: ${unreadVisibleNotifications.length}`);
     }
 
-    // Cargar notificaciones existentes desde el servidor
     async loadNotifications(append: boolean = false): Promise<void> {
         if (!this.userId || this.loadingMore || !this.hasMoreNotifications) {
             return;
@@ -178,7 +156,6 @@ export class NotificationService {
         this.loadingMore = true;
         this.loadingSubject.next(true);
 
-        // Solo resetear notificaciones si no es una carga de "cargar más"
         if (!append) {
             this.offsetNotifications = 0;
             this.notificationsSubject.next([]);
@@ -194,7 +171,6 @@ export class NotificationService {
                 const result = await response.json();
 
                 if (result.ok) {
-                    // Transformar respuestas a formato de notificación
                     const newNotifications: Notification[] = result.datos.map((item: any) => ({
                         id: item.id,
                         type: item.type,
@@ -206,15 +182,12 @@ export class NotificationService {
                         visible: item.visible
                     }));
 
-                    // Verificar si hay más notificaciones para cargar
                     this.hasMoreNotifications = newNotifications.length === this.limitNotifications;
                     this.hasMoreNotificationsSubject.next(this.hasMoreNotifications);
 
-                    // Si estamos añadiendo más notificaciones, concatenamos con las existentes
                     if (append) {
                         const currentNotifications = this.notificationsSubject.value;
 
-                        // Concatenar evitando duplicados
                         const mergedNotifications = [...currentNotifications];
 
                         newNotifications.forEach(notification => {
@@ -223,24 +196,22 @@ export class NotificationService {
                             }
                         });
 
-                        // Ordenar por fecha, más recientes primero
                         mergedNotifications.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
 
                         this.notificationsSubject.next(mergedNotifications);
                         this.updateVisibleNotificationCount(mergedNotifications);
                     } else {
-                        // Si es carga inicial, simplemente ordenamos y establecemos
                         newNotifications.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
                         this.notificationsSubject.next(newNotifications);
                         this.updateVisibleNotificationCount(newNotifications);
                     }
 
-                    // Actualizar offset para la próxima carga
                     this.offsetNotifications += this.limitNotifications;
                     console.log('Notificaciones cargadas:', newNotifications);
                 }
             } else {
-                console.error('Error al cargar notificaciones:', await response.text());
+                const datos = await response.json();
+                console.error('Error al cargar notificaciones:', datos.mensaje);
             }
         } catch (error) {
             console.error('Error al cargar notificaciones:', error);
@@ -250,14 +221,12 @@ export class NotificationService {
         }
     }
 
-    // Método para cargar más notificaciones (usado por el scroll infinito)
     loadMoreNotifications(): void {
         if (!this.loadingMore && this.hasMoreNotifications) {
             this.loadNotifications(true);
         }
     }
 
-    // Aceptar solicitud de amistad
     async acceptFriendRequest(notificationId: number): Promise<boolean> {
         try {
             const response = await fetch(`${this.apiUrl}api/friends/accept/${notificationId}`, {
@@ -269,11 +238,11 @@ export class NotificationService {
             });
 
             if (response.ok) {
-                // Actualizar localmente la notificación
-                this.updateNotificationStatus(notificationId, 'friendAccepted');
+                this.updateHideNotification(notificationId);
                 return true;
             } else {
-                console.error('Error al aceptar solicitud de amistad:', await response.text());
+                const datos = await response.json();
+                console.error('Error al aceptar solicitud de amistad: ', datos.mensaje);
                 return false;
             }
         } catch (error) {
@@ -282,14 +251,56 @@ export class NotificationService {
         }
     }
 
-    // Actualizar localmente el estado de una notificación
+    async acceptGroupRequest(notificationId: number): Promise<boolean> {
+        try {
+            const response = await fetch(`${this.apiUrl}api/grupos/acceptnotification/${notificationId}`, {
+                method: 'PUT',
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                this.updateHideNotification(notificationId);
+                return true;
+            } else {
+                const datos = await response.json();
+                console.error('Error al aceptar solicitud de grupo: ', datos.mensaje);
+                return false;
+            }
+        } catch (error) {
+            console.error('Error al aceptar solicitud de amistad:', error);
+            return false;
+        }
+    }
+
+    async rejectGroupRequest(notificationId: number): Promise<boolean> {
+        try {
+            const response = await fetch(`${this.apiUrl}api/grupos/rejectnotification/${notificationId}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                this.updateHideNotification(notificationId);
+                return true;
+            } else {
+                const datos = await response.json();
+                console.error('Error al rechazar solicitud de grupo: ', datos.mensaje);
+                return false;
+            }
+        } catch (error) {
+            console.error('Error al rechazar solicitud de grupo:', error);
+            return false;
+        }
+    }
+
+
+    // DE MOMENTO NO SE USA, FUNCION PARA CAMBIAR EL TIPO DE NOTIFICACION
     private updateNotificationStatus(notificationId: number, newType: string): void {
         const notifications = this.notificationsSubject.value;
         const updatedNotifications = notifications.map(notif => {
             if (notif.id === notificationId) {
-                // Si la notificación no estaba leída antes, actualizamos el contador global
                 if (!notif.readed) {
-                    this.updateLocalNotificationCount(0, -1); // Reducir el contador de no leídas
+                    this.updateLocalNotificationCount(0, -1);
                 }
 
                 return {
@@ -306,7 +317,27 @@ export class NotificationService {
         this.updateVisibleNotificationCount(updatedNotifications);
     }
 
-    // Rechazar solicitud de amistad
+    private updateHideNotification(notificationId: number): void {
+        const notifications = this.notificationsSubject.value;
+        const updatedNotifications = notifications.map(notif => {
+            if (notif.id === notificationId) {
+                if (!notif.readed) {
+                    this.updateLocalNotificationCount(0, -1);
+                }
+
+                return {
+                    ...notif,
+                    readed: true,
+                    read_at: new Date(),
+                    visible: false
+                };
+            }
+            return notif;
+        });
+        this.notificationsSubject.next(updatedNotifications);
+        this.updateVisibleNotificationCount(updatedNotifications);
+    }
+
     async rejectFriendRequest(requestId: number, notificationId: number): Promise<boolean> {
         try {
             const response = await fetch(`${this.apiUrl}api/friends/reject/${requestId}`, {
@@ -315,10 +346,11 @@ export class NotificationService {
             });
 
             if (response.ok) {
-                this.updateNotificationStatus(notificationId, 'friendRejected');
+                this.updateHideNotification(notificationId);
                 return true;
             } else {
-                console.error('Error al rechazar solicitud de amistad:', await response.text());
+                const datos = await response.json();
+                console.error('Error al rechazar solicitud de amistad: ', datos.mensaje);
                 return false;
             }
         } catch (error) {
@@ -327,7 +359,6 @@ export class NotificationService {
         }
     }
 
-    // Marcar notificación como leída
     async markAsRead(notificationId: number): Promise<boolean> {
         try {
             const response = await fetch(`${this.apiUrl}api/notifications/markasread/${notificationId}`, {
@@ -336,16 +367,11 @@ export class NotificationService {
             });
 
             if (response.ok) {
-                // Verificar si la notificación ya estaba leída
                 const notifications = this.notificationsSubject.value;
                 const targetNotification = notifications.find(n => n.id === notificationId);
-
-                // Solo actualizar el contador global si realmente cambia el estado
                 if (targetNotification && !targetNotification.readed) {
-                    this.updateLocalNotificationCount(0, -1); // Decrementar no leídas
+                    this.updateLocalNotificationCount(0, -1);
                 }
-
-                // Actualizar la lista de notificaciones localmente
                 const updatedNotifications = notifications.map(notif => {
                     if (notif.id === notificationId) {
                         return {
@@ -361,7 +387,8 @@ export class NotificationService {
                 this.updateVisibleNotificationCount(updatedNotifications);
                 return true;
             } else {
-                console.error('Error al marcar como leída:', await response.text());
+                const datos = await response.json();
+                console.error('Error al marcar como leída: ', datos.mensaje);
                 return false;
             }
         } catch (error) {
@@ -370,7 +397,6 @@ export class NotificationService {
         }
     }
 
-    // Marcar todas las notificaciones como leídas
     async markAllAsRead(): Promise<boolean> {
         try {
             const response = await fetch(`${this.apiUrl}api/notifications/read-all`, {
@@ -379,7 +405,6 @@ export class NotificationService {
             });
 
             if (response.ok) {
-                // Actualizar todas las notificaciones como leídas localmente
                 const notifications = this.notificationsSubject.value;
                 const updatedNotifications = notifications.map(notif => ({
                     ...notif,
@@ -388,8 +413,6 @@ export class NotificationService {
                 }));
 
                 this.notificationsSubject.next(updatedNotifications);
-
-                // Establecer contador de no leídas a 0
                 const currentCount = this.notificationCountSubject.value;
                 this.notificationCountSubject.next({
                     ...currentCount,
@@ -399,7 +422,8 @@ export class NotificationService {
                 this.updateVisibleNotificationCount(updatedNotifications);
                 return true;
             } else {
-                console.error('Error al marcar todas como leídas:', await response.text());
+                const datos = await response.json();
+                console.error('Error al marcar todas como leídas: ', datos.mensaje);
                 return false;
             }
         } catch (error) {
@@ -408,7 +432,6 @@ export class NotificationService {
         }
     }
 
-    // Ocultar notificación
     async hideNotification(notificationId: number): Promise<boolean> {
         try {
             const response = await fetch(`${this.apiUrl}api/notifications/hide/${notificationId}`, {
@@ -417,14 +440,10 @@ export class NotificationService {
             });
 
             if (response.ok) {
-                // Actualizar el BehaviorSubject local para reflejar el cambio sin necesidad de recargar
                 const currentNotifications = this.notificationsSubject.getValue();
                 const updatedNotifications = currentNotifications.filter(n => n.id !== notificationId);
 
-                // Actualizar el estado
                 this.notificationsSubject.next(updatedNotifications);
-
-                // Actualizar el contador de notificaciones no leídas si la notificación era no leída
                 const removedNotification = currentNotifications.find(n => n.id === notificationId);
                 if (removedNotification && !removedNotification.readed) {
                     const currentCount = this.notificationCountSubject.getValue();
@@ -436,7 +455,8 @@ export class NotificationService {
 
                 return true;
             } else {
-                console.error('Error al ocultar notificación:', await response.text());
+                const datos = await response.json();
+                console.error('Error al ocultar notificación: ', datos.mensaje);
                 return false;
             }
         } catch (error) {
@@ -445,7 +465,41 @@ export class NotificationService {
         }
     }
 
-    // Desconectar socket
+    async hideNotificationFromEntityGroup(groupMemberId: string): Promise<boolean> {
+        try {
+            const response = await fetch(`${this.apiUrl}api/notifications/hidegroup/${groupMemberId}`, {
+                method: 'PUT',
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const notificationId = data.datos;
+                const currentNotifications = this.notificationsSubject.getValue();
+                const updatedNotifications = currentNotifications.filter(n => n.id !== notificationId);
+
+                this.notificationsSubject.next(updatedNotifications);
+                const removedNotification = currentNotifications.find(n => n.id === notificationId);
+                if (removedNotification && !removedNotification.readed) {
+                    const currentCount = this.notificationCountSubject.getValue();
+                    this.notificationCountSubject.next({
+                        ...currentCount,
+                        unreadCount: Math.max(0, currentCount.unreadCount - 1)
+                    });
+                }
+
+                return true;
+            } else {
+                const datos = await response.json();
+                console.error('Error al ocultar notificación: ', datos.mensaje);
+                return false;
+            }
+        } catch (error) {
+            console.error('Error al ocultar notificación:', error);
+            return false;
+        }
+    }
+
     disconnect(): void {
         if (this.socket) {
             this.socket.disconnect();
@@ -454,7 +508,6 @@ export class NotificationService {
         }
     }
 
-    // Reiniciar paginación
     resetPagination(): void {
         this.offsetNotifications = 0;
         this.hasMoreNotifications = true;

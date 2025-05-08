@@ -112,7 +112,7 @@ export class LoginComponent {
     } else {
       this.loadingLogin = true;
       try {
-        const response = await fetch(`${apiUrl}api/auth/login`, {
+        const response = await fetch(`${apiUrl}auth/login`, {
           method: 'POST',
           credentials: 'include',
           headers: {
@@ -158,7 +158,7 @@ export class LoginComponent {
   async loginWithGoogle() {
     this.loadingGoogleLogin = true;
     try {
-      const response = await fetch(`${apiUrl}api/auth/google-auth-url`, {
+      const response = await fetch(`${apiUrl}auth/google-auth-url`, {
         method: 'GET',
         credentials: 'include'
       });

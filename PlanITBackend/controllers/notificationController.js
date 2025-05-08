@@ -3,6 +3,7 @@ const Respuesta = require("../utils/respuesta.js");
 const initModels = require("../models/init-models.js").initModels;
 // Crear la instancia de sequelize con la conexión a la base de datos
 const sequelize = require("../config/sequelize.js");
+const { where } = require("sequelize");
 
 const models = initModels(sequelize);
 const Notification = models.notification;
@@ -151,6 +152,56 @@ class NotificationController {
             });
 
             return res.json(Respuesta.exito(null, "Notificación ocultada"));
+
+        } catch (error) {
+            return res.status(500).json(Respuesta.error(null, "Error al ocultar notificación", "NOTIFICATION_HIDE_ERROR"));
+        }
+    }
+
+    async hideGroupNotification(req, res) {
+        try {
+            const userId = req.uid;
+            const groupMemberId = req.params.id;
+
+            if (!userId || !groupMemberId) {
+                return res.status(400).json(Respuesta.error(null, "Parámetros incompletos", "PARAMS_REQUIRED"));
+            }
+
+            const notification = await Notification.findOne({
+                where: {
+                    entity_id: groupMemberId,
+                },
+                attributes: ['id']
+            });
+
+            console.log("notification", notification);
+
+            if (!notification) {
+                return res.status(404).json(Respuesta.error(null, "Notificación no encontrada", "NOTIFICATION_NOT_FOUND"));
+            }
+
+            const notificationId = notification.id;
+
+            // Buscar la entrada de notificación para este usuario
+            const notificacionUsuario = await UserNotification.findOne({
+                where: {
+                    notification: notificationId,
+                    user: userId
+                }
+            });
+
+            if (!notificacionUsuario) {
+                return res.status(404).json(Respuesta.error(null, "Notificación no encontrada", "NOTIFICATION_NOT_FOUND"));
+            }
+
+            // Ocultar la notificación
+            await notificacionUsuario.update({
+                readed: true,
+                read_at: new Date(),
+                visible: false
+            });
+
+            return res.json(Respuesta.exito(notificacionUsuario.id, "Notificación ocultada"));
 
         } catch (error) {
             return res.status(500).json(Respuesta.error(null, "Error al ocultar notificación", "NOTIFICATION_HIDE_ERROR"));

@@ -1,5 +1,5 @@
 const { Server } = require('socket.io');
-const mensajeController = require('../controllers/mensajeController');
+const mensajeController = require('../controllers/mensajeController.js');
 const initModels = require("../models/init-models.js").initModels;
 // Crear la instancia de sequelize con la conexión a la base de datos
 const sequelize = require("../config/sequelize.js");
@@ -15,7 +15,7 @@ let userSockets = new Map();
 function setupSocket(server) {
     io = new Server(server, {
         cors: {
-            origin: process.env.NODE_ENV === 'development' ? 'http://192.168.1.37:4200' : '*',
+            origin: process.env.NODE_ENV === 'development' ? 'http://192.168.0.32:4200' : '*',
             methods: ['GET', 'POST', 'PUT', 'DELETE'],
             credentials: true
         }

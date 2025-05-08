@@ -16,8 +16,6 @@ function initModels(sequelize) {
   var user = _user(sequelize, DataTypes);
   var userNotification = _userNotification(sequelize, DataTypes);
 
-  groups.belongsToMany(user, { as: 'user_users', through: groupMember, foreignKey: "groups", otherKey: "user" });
-  user.belongsToMany(groups, { as: 'groups_groups', through: groupMember, foreignKey: "user", otherKey: "groups" });
   groupMember.belongsTo(groups, { as: "groups_group", foreignKey: "groups"});
   groups.hasMany(groupMember, { as: "group_members", foreignKey: "groups"});
   message.belongsTo(groups, { as: "groups_group", foreignKey: "groups"});

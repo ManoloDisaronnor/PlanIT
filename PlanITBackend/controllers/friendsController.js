@@ -3,8 +3,8 @@ const Respuesta = require("../utils/respuesta.js");
 const initModels = require("../models/init-models.js").initModels;
 // Crear la instancia de sequelize con la conexión a la base de datos
 const sequelize = require("../config/sequelize.js");
-const { Op, where } = require("sequelize");
-const { createNotification } = require("../services/socket-service.js");
+const { Op, where, col } = require("sequelize");
+const { createNotification } = require("../services/socket-notification-service.js");
 
 const models = initModels(sequelize);
 const Usuario = models.user;
@@ -17,61 +17,60 @@ class FriendsController {
     async getAllFriends(req, res) {
         try {
             const userUid = req.uid;
-            const limit = req.query.limit ? parseInt(req.query.limit) : 5;
-            const offset = req.query.offset ? parseInt(req.query.offset) : 0;
-            const searchText = req.query.search || '';
-            const search = searchText.toLowerCase();
+            const limit = parseInt(req.query.limit) || 5;
+            const offset = parseInt(req.query.offset) || 0;
+            const searchTxt = (req.query.search || '').toLowerCase();
 
-            if (!userUid) {
-                return res.status(400).json(Respuesta.error(null, "Usuario desconocido", "UID_REQUIRED"));
+            // Base de WHERE
+            const baseAnd = [
+                { accepted: 1 },
+                {
+                    [Op.or]: [
+                        { user_send: userUid },
+                        { user_requested: userUid }
+                    ]
+                }
+            ];
+
+            if (searchTxt) {
+                const like = `%${searchTxt}%`;
+                baseAnd.push({
+                    [Op.or]: [
+                        where(col('user_send_user.name'), { [Op.like]: like }),
+                        where(col('user_send_user.surname'), { [Op.like]: like }),
+                        where(col('user_send_user.username'), { [Op.like]: like }),
+                        where(col('user_requested_user.name'), { [Op.like]: like }),
+                        where(col('user_requested_user.surname'), { [Op.like]: like }),
+                        where(col('user_requested_user.username'), { [Op.like]: like }),
+                    ]
+                });
             }
 
-            // Buscar usuarios que no sean el usuario actual y que no estén en la lista de excluidos
             const friends = await Friends.findAll({
-                where: {
-                    [Op.and]: [
-                        { [Op.or]: [{ user_send: userUid }, { user_requested: userUid }] },
-                        { accepted: 1 }
-                    ],
-                },
+                where: { [Op.and]: baseAnd },
                 include: [
                     {
                         model: Usuario,
                         as: 'user_send_user',
-                        ...(search ? {
-                            where: {
-                                [Op.or]: [
-                                    { name: { [Op.like]: `%${search}%` } },
-                                    { surname: { [Op.like]: `%${search}%` } },
-                                    { username: { [Op.like]: `%${search}%` } }
-                                ]
-                            }
-                        } : {}),
-                        attributes: ['name', 'surname', 'username', 'imageUrl']
+                        attributes: ['uid', 'name', 'surname', 'username', 'imageUrl'],
                     },
                     {
                         model: Usuario,
                         as: 'user_requested_user',
-                        ...(search ? {
-                            where: {
-                                [Op.or]: [
-                                    { name: { [Op.like]: `%${search}%` } },
-                                    { surname: { [Op.like]: `%${search}%` } },
-                                    { username: { [Op.like]: `%${search}%` } }
-                                ]
-                            }
-                        } : {}),
-                        attributes: ['name', 'surname', 'username', 'imageUrl']
+                        attributes: ['uid', 'name', 'surname', 'username', 'imageUrl'],
                     }
                 ],
-                limit: limit,
-                offset: offset,
+                limit,
+                offset
             });
 
-            return res.json(Respuesta.exito(friends, "usuarios recuperados"));
+            return res.json(Respuesta.exito(friends, "amigos recuperados"));
+
         } catch (error) {
-            return res.status(500).json(Respuesta.error(null, "Error al recuperar los usuarios: " + error, "ERROR_AL_OBTENER_USUARIOS"));
+            return res.status(500)
+                .json(Respuesta.error(null, "Error al recuperar los amigos: " + error, "ERROR_AL_OBTENER_AMIGOS"));
         }
+
     }
 
     async friendRequest(req, res) {

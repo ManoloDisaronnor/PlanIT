@@ -1,4 +1,4 @@
-GET http://localhost:3000/api/grupos
+PUT http://192.168.0.32:3000/api/notifications/hidegroup/6NtRkB9_k-DYHQFRK7EkheE1nazv
 
 ###
 POST http://localhost:3000/api/grupos/creargrupo

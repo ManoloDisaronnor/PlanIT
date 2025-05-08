@@ -86,7 +86,7 @@ export function clearSessionStorage() {
 
 export async function logOut() {
     try {
-        const response = await fetch(`${apiUrl}api/auth/logout`, {
+        const response = await fetch(`${apiUrl}auth/logout`, {
             method: 'POST',
             credentials: 'include'
         });

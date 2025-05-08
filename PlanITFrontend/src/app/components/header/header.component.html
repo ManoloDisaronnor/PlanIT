@@ -40,8 +40,9 @@
                 <span class="material-icons-outlined icon">info</span>
             </div>
             <div class="header-button notification-button" (click)="openNotificationsMenu($event)">
-                <span class="material-icons-outlined icon" [ngClass]="{ 'new-notification' : notificationCount > 0 }">notifications</span>
-                <span *ngIf="notificationCount > 0" class="notification-badge">{{notificationCount}}</span>
+                <span class="material-icons-outlined icon"
+                    [ngClass]="{ 'new-notification' : notificationCount > 0 }">notifications</span>
+                <span *ngIf="notificationCount > 0" class="notification-badge">{{notificationCount < 9 ? notificationCount : '9+' }}</span>
             </div>
         </div>
     </div>
