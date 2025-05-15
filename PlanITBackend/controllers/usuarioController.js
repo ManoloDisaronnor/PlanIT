@@ -4,7 +4,7 @@ const initModels = require("../models/init-models.js").initModels;
 // Crear la instancia de sequelize con la conexión a la base de datos
 const sequelize = require("../config/sequelize.js");
 const { Op } = require("sequelize");
-const { createNotification } = require("../services/socket-notification-service.js");
+const { createNotification } = require("../services/socket-service.js");
 
 const models = initModels(sequelize);
 const Usuario = models.user;
@@ -20,8 +20,6 @@ class UsuarioController {
             const searchText = req.query.search || '';
             const search = searchText.toLowerCase();
 
-            // Subconsulta para encontrar todos los UIDs con los que el usuario tiene relación
-            // (ya sea como amigos o con solicitudes pendientes)
             const relatedUserIds = await Friends.findAll({
                 attributes: ['user_send', 'user_requested'],
                 where: {
@@ -33,7 +31,6 @@ class UsuarioController {
                 raw: true
             });
 
-            // Extraer todos los UIDs relacionados (eliminando duplicados)
             const excludeUids = new Set();
             relatedUserIds.forEach(relation => {
                 if (relation.user_send !== userUid) {
@@ -44,7 +41,6 @@ class UsuarioController {
                 }
             });
 
-            // Buscar usuarios que no sean el usuario actual y que no estén en la lista de excluidos
             const usuarios = await Usuario.findAll({
                 where: {
                     uid: {

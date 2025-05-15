@@ -6,7 +6,7 @@ const models = initModels(sequelize);
 const axios = require("axios");
 
 const FIREBASE_API_KEY = process.env.FIREBASE_API_KEY;
-const DOMAIN = process.env.DOMINIO || "http:192.168.0.32//:4200";
+const DOMAIN = process.env.DOMINIO || "http:192.168.1.37//:4200";
 const { OAuth2Client } = require('google-auth-library');
 
 const oAuth2Client = new OAuth2Client(
@@ -234,8 +234,6 @@ class AuthController {
                 maxAge: expiresIn,
                 sameSite: 'strict'
             });
-
-            console.log("redireccion" + DOMAIN + '/google-auth-callback?token=' + tokens.id_token);
 
             res.redirect(DOMAIN + '/google-auth-callback?token=' + tokens.id_token);
         } catch (error) {

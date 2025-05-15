@@ -6,9 +6,9 @@ dist/
 .angular/
 .angular-cache/
 .env
-.env.* 
+.env.*
+environments/
 serviceAccountKey.json
-config.ts
 logs/
 *.log
 bower_components/

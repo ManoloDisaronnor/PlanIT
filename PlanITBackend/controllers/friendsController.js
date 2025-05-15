@@ -4,11 +4,12 @@ const initModels = require("../models/init-models.js").initModels;
 // Crear la instancia de sequelize con la conexión a la base de datos
 const sequelize = require("../config/sequelize.js");
 const { Op, where, col } = require("sequelize");
-const { createNotification } = require("../services/socket-notification-service.js");
+const { createNotification } = require("../services/socket-service.js");
 
 const models = initModels(sequelize);
 const Usuario = models.user;
 const Friends = models.friends;
+const GroupMember = models.groupMember
 const Notification = models.notification;
 const UserNotification = models.userNotification;
 
@@ -71,6 +72,93 @@ class FriendsController {
                 .json(Respuesta.error(null, "Error al recuperar los amigos: " + error, "ERROR_AL_OBTENER_AMIGOS"));
         }
 
+    }
+
+    async getGroupFriends(req, res) {
+        try {
+            const userUid = req.uid;
+            const groupId = req.params.id;
+            const limit = parseInt(req.query.limit) || 5;
+            const offset = parseInt(req.query.offset) || 0;
+            const searchTxt = (req.query.search || '').toLowerCase();
+
+            if (!groupId) {
+                return res.status(400).json(Respuesta.error(null, "ID de grupo requerido", "GROUP_ID_REQUIRED"));
+            }
+
+            // Obtener los IDs de los usuarios que ya son miembros del grupo
+            const groupMembers = await GroupMember.findAll({
+                where: {
+                    [Op.and]: [
+                        { groups: groupId },
+                        {
+                            [Op.or]: [
+                                { joined: 1 },
+                                { joined: 0 }
+                            ]
+                        }
+                    ]
+                },
+                attributes: ['user']
+            });
+
+            const existingMembers = groupMembers.map(member => member.user);
+
+            // Base de WHERE
+            const baseAnd = [
+                { accepted: 1 },
+                {
+                    [Op.or]: [
+                        { user_send: userUid },
+                        { user_requested: userUid }
+                    ]
+                }
+            ];
+
+            if (searchTxt) {
+                const like = `%${searchTxt}%`;
+                baseAnd.push({
+                    [Op.or]: [
+                        where(col('user_send_user.name'), { [Op.like]: like }),
+                        where(col('user_send_user.surname'), { [Op.like]: like }),
+                        where(col('user_send_user.username'), { [Op.like]: like }),
+                        where(col('user_requested_user.name'), { [Op.like]: like }),
+                        where(col('user_requested_user.surname'), { [Op.like]: like }),
+                        where(col('user_requested_user.username'), { [Op.like]: like }),
+                    ]
+                });
+            }
+
+            const friends = await Friends.findAll({
+                where: { [Op.and]: baseAnd },
+                include: [
+                    {
+                        model: Usuario,
+                        as: 'user_send_user',
+                        attributes: ['uid', 'name', 'surname', 'username', 'imageUrl'],
+                    },
+                    {
+                        model: Usuario,
+                        as: 'user_requested_user',
+                        attributes: ['uid', 'name', 'surname', 'username', 'imageUrl'],
+                    }
+                ],
+                limit,
+                offset
+            });
+
+            // Filtrar amigos que ya son miembros del grupo
+            const filteredFriends = friends.filter(friend => {
+                const otherUserId = friend.user_send === userUid ? friend.user_requested : friend.user_send;
+                return !existingMembers.includes(otherUserId);
+            });
+
+            return res.json(Respuesta.exito(filteredFriends, "amigos recuperados"));
+
+        } catch (error) {
+            return res.status(500)
+                .json(Respuesta.error(null, "Error al recuperar los amigos: " + error, "ERROR_AL_OBTENER_AMIGOS"));
+        }
     }
 
     async friendRequest(req, res) {

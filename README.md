@@ -1,6 +1,6 @@
 # PlanIT
 
-![Version](https://img.shields.io/badge/version-0.3-yellow)
+![Version](https://img.shields.io/badge/version-0.5-blue)
 
 ---
 
@@ -14,6 +14,9 @@ PlanIT es una página web pensada para facilitar la organización de eventos ent
 
 - **Grupos de Chat:**  
   Permite la creación de grupos de chat para enviar mensajes entre amigos, similar a otras aplicaciones de mensajería.  
+  Comentarios de la version 0.5:
+  - Sistema de chat en tiempo real implementado
+  - Funcionalidad para enviar archivos imagenes y audio coming soon
   <!-- Comentario: Integración de chat para comunicación instantánea -->
 
 - **Gestión de Eventos con Integración a Google Maps:**  

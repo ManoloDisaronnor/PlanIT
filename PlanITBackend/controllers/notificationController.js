@@ -3,7 +3,6 @@ const Respuesta = require("../utils/respuesta.js");
 const initModels = require("../models/init-models.js").initModels;
 // Crear la instancia de sequelize con la conexión a la base de datos
 const sequelize = require("../config/sequelize.js");
-const { where } = require("sequelize");
 
 const models = initModels(sequelize);
 const Notification = models.notification;
@@ -173,8 +172,6 @@ class NotificationController {
                 },
                 attributes: ['id']
             });
-
-            console.log("notification", notification);
 
             if (!notification) {
                 return res.status(404).json(Respuesta.error(null, "Notificación no encontrada", "NOTIFICATION_NOT_FOUND"));

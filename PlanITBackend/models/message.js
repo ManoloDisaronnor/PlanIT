@@ -14,6 +14,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(1500),
       allowNull: false
     },
+    sourceUrl: {
+      type: DataTypes.STRING(100),
+      allowNull: true
+    },
     user: {
       type: DataTypes.STRING(28),
       allowNull: false,
@@ -30,6 +34,18 @@ module.exports = function(sequelize, DataTypes) {
         key: 'id'
       }
     },
+    reference: {
+      type: DataTypes.STRING(28),
+      allowNull: true,
+      references: {
+        model: 'message',
+        key: 'id'
+      }
+    },
+    reference_deleted: {
+      type: DataTypes.TINYINT,
+      allowNull: true
+    },
     datetime: {
       type: DataTypes.DATE,
       allowNull: false
@@ -39,6 +55,14 @@ module.exports = function(sequelize, DataTypes) {
     tableName: 'message',
     timestamps: false,
     indexes: [
+      {
+        name: "PRIMARY",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "id" },
+        ]
+      },
       {
         name: "FK1_user_message",
         using: "BTREE",
@@ -51,6 +75,13 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "groups" },
+        ]
+      },
+      {
+        name: "FK3_message_references",
+        using: "BTREE",
+        fields: [
+          { name: "reference" },
         ]
       },
     ]
