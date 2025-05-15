@@ -413,9 +413,6 @@ export class GroupsCreateComponent implements AfterViewInit, OnInit {
       this.groupNameErorr = null;
       if (this.selectedMembers.length > 0) {
         this.groupMembersError = null;
-        console.log('Nombre del grupo:', this.createGroupForm.controls.name.value);
-        console.log('Descripción del grupo:', this.createGroupForm.controls.description.value);
-        console.log('Miembros seleccionados:', this.selectedMembers);
         try {
           const formData = new FormData();
           if (this.previewImage !== '') {

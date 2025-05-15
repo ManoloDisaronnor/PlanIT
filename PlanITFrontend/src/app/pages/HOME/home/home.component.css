@@ -90,9 +90,21 @@
         width: 200px;
     }
 
+    .side-menu-chat-mobile {
+        display: none;
+    }
+
     .opt-menu-home {
         width: 350px;
         max-height: 400px;
+    }
+
+    .header-chat-mobile {
+        display: none;
+    }
+
+    .main-content-chat-mobile {
+        margin: 0;
     }
 }
 

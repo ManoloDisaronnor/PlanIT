@@ -1,4 +1,4 @@
-<div class="home-header">
+<div class="home-header" [ngClass]="{ 'home-header-chat-mobile' : router.url.includes('/home/groups/chat') || router.url.includes('/home/groups/info') }">
     <div [class.open]="navBarExpanded" class="open-close-menu" (click)="toggleNavBar()">
         <div class="open-close-menu-icon"></div>
         <div class="open-close-menu-icon"></div>

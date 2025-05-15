@@ -15,6 +15,7 @@ import { SettingsComponent } from './pages/HOME/SETTINGS/settings/settings.compo
 import { ProfileComponent } from './pages/HOME/PROFILE/profile/profile.component';
 import { NoGroupSelectedComponent } from './pages/HOME/GROUPS/no-group-selected/no-group-selected.component';
 import { GroupChatComponent } from './pages/HOME/GROUPS/group-chat/group-chat.component';
+import { GroupInfoComponent } from './pages/HOME/GROUPS/group-info/group-info.component';
 
 
 export const routes: Routes = [
@@ -46,6 +47,7 @@ export const routes: Routes = [
             { path: 'groups', component: GroupsComponent, canActivate: [homeGuard], children: [
                 { path: '', component: NoGroupSelectedComponent, canActivate: [homeGuard] },
                 { path: 'chat/:groupId', component: GroupChatComponent, canActivate: [homeGuard] },
+                { path: 'info/:groupId', component: GroupInfoComponent, canActivate: [homeGuard] },
             ] },
             { path: 'settings', component: SettingsComponent, canActivate: [homeGuard] },
             { path: 'profile', component: ProfileComponent, canActivate: [homeGuard] }

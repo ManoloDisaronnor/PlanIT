@@ -3,7 +3,7 @@ import { getCurrentUser, logOut, setSessionStorage } from '../../../../config/au
 import { apiUrl } from '../../../../config/config';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { NotificationService } from '../../../../services/notification.service';
 import { Subscription } from 'rxjs';
 
@@ -32,7 +32,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
   private userId: string | null = null;
 
-  constructor(private notificationService: NotificationService) { }
+  constructor(private notificationService: NotificationService, public router: Router) { }
 
   async ngOnInit() {
     // Primero verificamos el tamaño de la pantalla

@@ -21,6 +21,7 @@
     "@angular/router": "^19.2.0",
     "@lottiefiles/dotlottie-web": "^0.41.0",
     "firebase": "^11.5.0",
+    "howler": "^2.2.4",
     "lottie-web": "^5.12.2",
     "lucide-angular": "^0.483.0",
     "ngx-lottie": "^13.0.1",
@@ -34,6 +35,7 @@
     "@angular-devkit/build-angular": "^19.2.0",
     "@angular/cli": "^19.2.4",
     "@angular/compiler-cli": "^19.2.0",
+    "@types/howler": "^2.2.12",
     "@types/jasmine": "~5.1.0",
     "jasmine-core": "~5.6.0",
     "karma": "~6.4.0",
@@ -42,5 +44,23 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.7.2"
+  },
+  "configurations": {
+    "production": {
+      "fileReplacements": [
+        {
+          "replace": "src/environments/environment.ts",
+          "with": "src/environments/environment.prod.ts"
+        }
+      ]
+    },
+    "development": {
+      "fileReplacements": [
+        {
+          "replace": "src/environments/environment.ts",
+          "with": "src/environments/environment.dev.ts"
+        }
+      ]
+    }
   }
 }

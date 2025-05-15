@@ -11,7 +11,6 @@ export async function iniciarSesion(email: string, password: string) {
         .catch((error) => {
             throw error;
         });
-    setSessionStorage(auth.currentUser?.uid!!)
 }
 
 export function getCurrentUser(): Promise<User | null> {

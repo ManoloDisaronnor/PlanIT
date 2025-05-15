@@ -11,6 +11,11 @@ export class LoadingService {
         const loadingElement = document.getElementById('app-loading');
         if (loadingElement) {
             loadingElement.style.display = 'flex';
+            loadingElement.style.position = 'fixed';
+            loadingElement.style.top = '0';
+            loadingElement.style.left = '0';
+            loadingElement.style.zIndex = '9999';
+            document.body.style.overflow = 'hidden';
         }
     }
 
@@ -19,6 +24,7 @@ export class LoadingService {
         const loadingElement = document.getElementById('app-loading');
         if (loadingElement) {
             loadingElement.style.display = 'none';
+            document.body.style.overflow = '';
         }
     }
 

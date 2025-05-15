@@ -1,0 +1,270 @@
+<div id="group-info">
+    <section class="group-info-header-actions">
+        <div class="icon-container back-icon-container" (click)="goBack()">
+            <span class="material-icons back-icon">keyboard_backspace</span>
+        </div>
+    </section>
+    <section class="group-information" *ngIf="!loadingGroupInfo">
+        <div class="group-information-image">
+            <img src="{{this.groupImageUrl ? this.apiUrl + this.groupImageUrl : 'images/defaultGroup.png'}}"
+                alt="Imagen de grupo" class="group-image">
+        </div>
+        <div class="group-information-name">
+            <h1 class="group-name allow-select allow-copy">{{this.groupName}}</h1>
+            <p class="count-members">Grupo: {{groupMembersJoinedCount()}} miembros</p>
+            <h2 class="group-description allow-select allow-copy">{{this.groupDescription ? this.groupDescription : 'Hey there!, you are all using PlanIT'}}</h2>
+        </div>
+    </section>
+    <div class="members-section-title" *ngIf="!loadingGroupInfo">
+        <span>Miembros del grupo</span>
+        <div class="add-member-button" *ngIf="userAdmin" (mouseover)="fetchFriends(true)" (click)="showAddMembers($event)">
+            <span class="material-icons promote-icon">person_add</span>
+            <span class="add-text">Añadir</span>
+        </div>
+    </div>
+    <section class="group-information-items" *ngIf="!loadingGroupInfo">
+        <div class="user-list">
+            <div class="user-item" *ngFor="let member of groupMembers" title="{{member.founder ? 'Fundador' : member.admin ? 'Administrador' : '' }}">
+                <div class="user-info">
+                    <div class="user-image">
+                        <img src="{{member.user_user.imageUrl ? apiUrl + member.user_user.imageUrl : 'images/defaultProfilePicture.png'}}"
+                            alt="Imagen de perfil">
+                        @if (member.founder) {
+                            <div class="admin-indicator">
+                                <span class="material-icons admin-icon">self_improvement</span>
+                            </div>
+                        } @else if (member.admin) {
+                            <div class="admin-indicator">
+                                <span class="material-icons admin-icon">manage_accounts</span>
+                            </div>
+                        }
+                    </div>
+                    <div class="user-name">
+                        <p class="user-username allow-select allow-copy overflow-text">{{member.user_user.username}}</p>
+                    </div>
+                </div>
+                <div class="user-actions">
+                    @if (!member.joined || member.joined === -1) {
+                        <div class="icon-container-del" (click)="showAlertDialogFunction($event, 'kick', member.user_user.uid)" title="Cancelar invitacion" *ngIf="userAdmin && member.user_user.uid !== this.userUid && !member.founder && member.joined !== -1">
+                            <span class="material-icons-outlined">close</span>
+                        </div>
+                        @if (member.joined === -1) {
+                            <span class="pending-user left-user-text">Ha salido del grupo</span>
+                        } @else {
+                            <span class="pending-user">Esperando respuesta</span>
+                        }
+                    } @else if (!member.founder) {
+                        <div class="icon-container" (click)="showAlertDialogFunction($event, member.admin ? 'demote' : 'promote', member.user_user.uid)" title="{{ member.admin ? 'Descender a miembro' : 'Ascender a admin' }}" *ngIf="userAdmin && member.user_user.uid !== this.userUid && !member.founder">
+                            @if (member.admin) {
+                                <span class="material-icons promote-icon">arrow_circle_down</span>
+                            } @else {
+                                <span class="material-icons promote-icon">arrow_circle_up</span>
+                            }
+                        </div>
+                        <div class="icon-container-del" (click)="showAlertDialogFunction($event, 'kick', member.user_user.uid)" title="Expulsar miembro" *ngIf="userAdmin && member.user_user.uid !== this.userUid && !member.founder">
+                            <span class="material-icons">logout</span>
+                        </div>
+                    } @else {
+                        <span class="founder-text">El mismisimo fundador</span>
+                    }
+                </div>
+                <div class="member-since" *ngIf="!loadingGroupInfo && member.joined === 1">
+                    <span class="member-since-text">Se unió {{getTimeAgo(member.joined_at)}}</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="user-group-action" *ngIf="!loadingGroupInfo" (mouseover)="loadFeaturedMessages()" (click)="showFeaturedMessages($event)">
+        <div class="icon-container user-group-action-icon-conatiner">
+            <span class="material-icons promote-icon">star</span>
+        </div>
+        <span class="user-group-action-text">Mensajes destacados</span>
+    </div>
+    <div class="user-group-action user-gruop-action-del"*ngIf="!loadingGroupInfo" (click)="showAlertDialogFunction($event, 'leave')">
+        <div class="icon-container-del user-group-action-icon-conatiner">
+            <span class="material-icons">logout</span>
+        </div>
+        <span class="user-group-action-text">Salir del grupo</span>
+    </div>
+    <dialog class="alert-dialog" *ngIf="showAlertDialog">
+        <div class="alert-dialog-content">
+            <div class="dialog-title">
+                <h1>{{dialogTitle}}</h1>
+                <p>{{dialogDescription}}</p>
+            </div>
+            <div class="dialog-actions">
+                <button class="btn-cancel" (click)="closeAlertDialog($event)">Cancelar</button>
+                <button class="btn-accept" (click)="handleAlertDialog($event)">Continuar</button>
+            </div>
+        </div>
+    </dialog>
+    <section class="groups-add-members-form" *ngIf="showFriendsDialog">
+        <form class="step-two-form">
+            <!-- Contenedor para mostrar los miembros seleccionados -->
+            <div class="selected-members-wrapper">
+                <div class="selected-members-container" *ngIf="selectedMembers.length > 0">
+                    <ng-container *ngFor="let member of selectedMembers">
+                        <div class="selected-member2" *ngIf="member.id !== userUid">
+                            <img [src]="member.imageUrl ? apiUrl + member.imageUrl : 'images/defaultProfilePicture.png'"
+                                alt="Avatar">
+                            <span class="member-name2">{{member.name}} {{member.surname}}</span>
+                            <span class="remove-member2" (click)="removeMember(member.id)">
+                                <span class="material-icons-outlined">close</span>
+                            </span>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+
+            <div class="search-section">
+                <!-- Campo de búsqueda -->
+                <div class="search-container2">
+                    <input type="text" id="search-user" placeholder="Buscar amigos" name="search-user" maxlength="35"
+                        [(ngModel)]="searchFriend" (input)="onSearchUserChange()">
+                    <span class="material-icons-outlined search-icon2">search</span>
+                </div>
+
+                <!-- Mensaje de error para miembros -->
+                <div class="error-message2" *ngIf="groupMembersError">
+                    <span class="material-icons-outlined error-icon">info</span>
+                    <span>{{groupMembersError}}</span>
+                </div>
+            </div>
+
+            <div class="acordeon-content" (scroll)="onScroll($event)">
+                @if (friendsList.length <= 0 && !friendsLoading) { <p class="no-data">No hay coincidencias o no tienes mas amigos</p>
+                    } @else {
+                    <div class="user-item2" *ngFor="let friend of friendsList">
+                        @if (friend.user_requested !== userUid) {
+                        <div class="user-check2">
+                            <input #checkBox type="checkbox" id="friend-{{ friend.user_requested }}"
+                                name="friend-{{ friend.user_requested }}" [(ngModel)]="friend.checked"
+                                (change)="onFriendSelect(friend)" (click)="$event.stopPropagation()">
+                            <label for="friend-{{ friend.user_requested }}" class="checkbox-custom"></label>
+                        </div>
+                        <div class="user-info2" (click)="friend.checked = !friend.checked; onFriendSelect(friend)">
+                            <img src="{{friend.user_requested_user.imageUrl ? apiUrl + friend.user_requested_user.imageUrl : 'images/defaultProfilePicture.png'}}"
+                                alt="Avatar">
+                            <div class="user-names2">
+                                <span class="real-name2">{{ friend.user_requested_user.name + ' ' +
+                                    friend.user_requested_user.surname }}</span>
+                                <span class="username2">{{ friend.user_requested_user.username }}</span>
+                            </div>
+                        </div>
+                        } @else {
+                        <div class="user-check2">
+                            <input type="checkbox" id="friend-{{ friend.user_send }}"
+                                name="friend-{{ friend.user_send }}" [(ngModel)]="friend.checked"
+                                (change)="onFriendSelect(friend)" (click)="$event.stopPropagation()">
+                            <label for="friend-{{ friend.user_send }}" class="checkbox-custom"></label>
+                        </div>
+                        <div class="user-info2" (click)="friend.checked = !friend.checked; onFriendSelect(friend)">
+                            <img src="{{friend.user_send_user.imageUrl ? apiUrl + friend.user_send_user.imageUrl : 'images/defaultProfilePicture.png'}}"
+                                alt="Avatar">
+                            <div class="user-names2">
+                                <span class="real-name2">{{ friend.user_send_user.name + ' ' +
+                                    friend.user_send_user.surname }}</span>
+                                <span class="username2">{{ friend.user_send_user.username }}</span>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                    }
+                    @if (friendsLoading) {
+                    <div class="loading-indicator2">
+                        <app-loadinganimation [type]="'button'"></app-loadinganimation>
+                    </div>
+                    }
+
+                    <!-- Mensaje cuando no hay más amigos
+                    <div *ngIf="noMoreFriends && friendsList.length > 0 && !friendsLoading" class="no-more-friends">
+                        No hay más amigos para mostrar
+                    </div> -->
+            </div>
+
+            <div class="actions-container-2">
+                <button type="button" (click)="showAddMembers($event)" class="back-btn">
+                    Volver
+                </button>
+                <button [disabled]="selectedMembers.length <= 0" class="continue-btn" (click)="addMembers($event)">
+                    Empezar a chatear
+                </button>
+            </div>
+        </form>
+    </section>
+    <section class="featured-messages" *ngIf="showFeaturedMessagesDialog" [ngClass]="{ 'featured-messages-mobile': router.url.includes('/home/groups/info')}">
+        <div class="featured-messages-container" *ngIf="!loadingFeaturedMessages">
+            <div *ngFor="let message of featuredMessages" class="message-item-recieved" id="{{message.message}}"
+                [ngClass]="{ 'message-item-send': message.user === userUid }">
+                    <div class="msg-container" [ngClass]="{ 
+                            'msg-container-send': message.user === userUid }"
+                            (click)="navigateToMessage($event, message.message)">
+                        <div class="msg allow-select">
+                            <div class="message-sender-info"
+                                [ngClass]="{ 'message-user-send' : message.user === userUid }">
+                                <div class="sender-image">
+                                    <img [src]="message.message_message.user_user.imageUrl ? apiUrl + message.message_message.user_user.imageUrl : 'images/defaultUser.png'"
+                                        alt="ImagenUsuario" />
+                                </div>
+                                <span class="msg-username allow-copy allow-select">
+                                    @if (message.user === userUid) {
+                                    Tú
+                                    } @else {
+                                    {{message.message_message.user_user.username}}
+                                    }
+                                </span>
+                            </div>
+                            <div *ngIf="( message.message_message.reference && message.status !== 'deleted' ) || message.message_message.reference_deleted"
+                                class="message-item-reference-container">
+                                <div class="message-item-reference-info">
+                                    @if (!message.message_message.reference_deleted) {
+                                    <div class="message-sender-info">
+                                        <div class="sender-image">
+                                            <img [src]="message.message_message.reference_message.user_user.imageUrl ? apiUrl + message.message_message.reference_message.user_user.imageUrl : 'images/defaultUser.png'"
+                                                alt="ImagenUsuario" />
+                                        </div>
+                                        <span class="msg-username">
+                                            @if (message.message_message.reference_message.user_user.uid === userUid) {
+                                            Tú
+                                            } @else {
+                                            {{message.message_message.reference_message.user_user.username}}
+                                            }
+                                        </span>
+                                    </div>
+                                    <div class="message-content-container">
+                                        <div class="message-content-reference">
+                                            {{message.message_message.reference_message.content}}
+                                        </div>
+                                    </div>
+                                    } @else {
+                                    <div class="message-content-container">
+                                        <div class="message-content-reference-deleted">
+                                            <span class="material-icons">block</span>Este mensaje ha sido eliminado
+                                        </div>
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+                            <div *ngIf="message.message_message.sourceUrl && message.message_message.status !== 'deleted'"
+                                class="message-source-container">
+
+                            </div>
+                            <div class="message-content allow-copy allow-select">
+                                @if (message.message_message.status === 'deleted') {
+                                <span class="deleted-message">Este mensaje ha sido eliminado</span>
+                                } @else {
+                                {{message.message_message.content}}
+                                }
+                            </div>
+                            <div class="message-date"
+                                [ngClass]="{ 'message-date-send' : message.user === userUid }">
+                                <span class="message-date-text">{{displayDate(message.message_message.datetime)}}</span>
+                                <span class="material-icons featured-message-icon">star</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </section>
+</div>
+<app-infodialog *ngIf="generalError" [message]="generalError" [type]="'error'"></app-infodialog>

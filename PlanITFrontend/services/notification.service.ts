@@ -4,19 +4,19 @@ import { BehaviorSubject } from 'rxjs';
 import { apiUrl } from '../config/config';
 
 export interface Notification {
-    id: number;  // ID de la notificación
+    id: number;
     type: 'friendRequest' | 'groupRequest';
-    entity_id: string;  // ID de la entidad relacionada (request ID, group ID, etc.)
-    content: any;  // Datos adicionales
+    entity_id: string;
+    content: any;
     created_at: Date;
-    readed: boolean;  // Si ha sido leída o no
-    read_at?: Date;  // Cuándo fue leída
-    visible: boolean;  // Si debe mostrarse o no
+    readed: boolean;
+    read_at?: Date;
+    visible: boolean;
 }
 
 export interface NotificationCount {
-    totalCount: number;      // Total de notificaciones
-    unreadCount: number;     // Notificaciones no leídas
+    totalCount: number;
+    unreadCount: number;
 }
 
 @Injectable({
@@ -26,10 +26,11 @@ export class NotificationService {
     private socket: Socket | null = null;
     private apiUrl = apiUrl;
     private userId: string = '';
-    private limitNotifications: number = 10; // Límite de notificaciones a cargar
-    private offsetNotifications: number = 0; // Offset para paginación
-    private loadingMore: boolean = false; // Para controlar múltiples solicitudes
-    private hasMoreNotifications: boolean = true; // Para saber si hay más notificaciones disponibles
+    private limitNotifications: number = 10;
+    private offsetNotifications: number = 0;
+    private loadingMore: boolean = false;
+    private hasMoreNotifications: boolean = true;
+    private sound = new Howl({ src: ['audios/notification.mp3'] });
 
     private notificationsSubject = new BehaviorSubject<Notification[]>([]);
     public notifications$ = this.notificationsSubject.asObservable();
@@ -46,7 +47,13 @@ export class NotificationService {
     private hasMoreNotificationsSubject = new BehaviorSubject<boolean>(true);
     public hasMoreNotifications$ = this.hasMoreNotificationsSubject.asObservable();
 
-    constructor() { }
+    constructor() {
+        window.addEventListener('click', () => {
+            if (Howler.ctx && Howler.ctx.state === 'suspended') {
+                Howler.ctx.resume();
+            }
+        }, { once: true });
+    }
 
     connect(userId: string, initialLimit: number = 10): void {
         if (!userId) {
@@ -64,7 +71,12 @@ export class NotificationService {
             this.disconnect();
         }
 
-        this.socket = io(this.apiUrl);
+        this.socket = io(this.apiUrl, {
+            transports: ['websocket'],
+            reconnection: true,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 1000
+        });
 
         this.socket.on('connect', () => {
             this.socket?.emit('register', userId);
@@ -88,6 +100,9 @@ export class NotificationService {
             const exists = currentNotifications.some(n => n.id === newNotification.id);
 
             if (!exists) {
+                if (!newNotification.readed) {
+                    this.onNewUnreadNotification();
+                }
                 const updatedNotifications = [newNotification, ...currentNotifications];
                 this.notificationsSubject.next(updatedNotifications);
 
@@ -95,13 +110,13 @@ export class NotificationService {
             }
         });
 
-        this.socket.on('disconnect', () => {
-            console.log('Socket desconectado');
-        });
-
         this.socket.on('connect_error', (error) => {
             console.error('Error de conexión del socket:', error);
         });
+    }
+
+    private onNewUnreadNotification() {
+        this.sound.play();
     }
 
     async fetchNotificationCounts(): Promise<void> {
@@ -117,7 +132,6 @@ export class NotificationService {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log('Contadores de notificaciones:', data);
                 this.notificationCountSubject.next({
                     unreadCount: data.datos.count,
                     totalCount: 0
@@ -144,8 +158,6 @@ export class NotificationService {
     private updateVisibleNotificationCount(notifications: Notification[]): void {
         const visibleNotifications = notifications.filter(notif => notif.visible);
         const unreadVisibleNotifications = visibleNotifications.filter(notif => !notif.readed);
-
-        console.log(`Notificaciones visibles: ${visibleNotifications.length}, No leídas: ${unreadVisibleNotifications.length}`);
     }
 
     async loadNotifications(append: boolean = false): Promise<void> {
@@ -207,7 +219,6 @@ export class NotificationService {
                     }
 
                     this.offsetNotifications += this.limitNotifications;
-                    console.log('Notificaciones cargadas:', newNotifications);
                 }
             } else {
                 const datos = await response.json();
@@ -295,27 +306,27 @@ export class NotificationService {
 
 
     // DE MOMENTO NO SE USA, FUNCION PARA CAMBIAR EL TIPO DE NOTIFICACION
-    private updateNotificationStatus(notificationId: number, newType: string): void {
-        const notifications = this.notificationsSubject.value;
-        const updatedNotifications = notifications.map(notif => {
-            if (notif.id === notificationId) {
-                if (!notif.readed) {
-                    this.updateLocalNotificationCount(0, -1);
-                }
+    // private updateNotificationStatus(notificationId: number, newType: string): void {
+    //     const notifications = this.notificationsSubject.value;
+    //     const updatedNotifications = notifications.map(notif => {
+    //         if (notif.id === notificationId) {
+    //             if (!notif.readed) {
+    //                 this.updateLocalNotificationCount(0, -1);
+    //             }
 
-                return {
-                    ...notif,
-                    type: newType as any,
-                    readed: true,
-                    read_at: new Date()
-                };
-            }
-            return notif;
-        });
+    //             return {
+    //                 ...notif,
+    //                 type: newType as any,
+    //                 readed: true,
+    //                 read_at: new Date()
+    //             };
+    //         }
+    //         return notif;
+    //     });
 
-        this.notificationsSubject.next(updatedNotifications);
-        this.updateVisibleNotificationCount(updatedNotifications);
-    }
+    //     this.notificationsSubject.next(updatedNotifications);
+    //     this.updateVisibleNotificationCount(updatedNotifications);
+    // }
 
     private updateHideNotification(notificationId: number): void {
         const notifications = this.notificationsSubject.value;
@@ -504,7 +515,6 @@ export class NotificationService {
         if (this.socket) {
             this.socket.disconnect();
             this.socket = null;
-            console.log('Socket desconectado manualmente');
         }
     }
 

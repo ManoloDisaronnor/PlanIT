@@ -1,1 +1,294 @@
-<p>{{groupId}}</p>
+<div id="chat">
+    <section class="group-info-header">
+        <ng-container *ngIf="!selectedItems">
+            <div class="group-info" [ngClass]="{ 'hide-group-info' : selectedItems !== null }">
+                <div class="icon-container" (click)="goBack()">
+                    <span class="material-icons back-icon">keyboard_backspace</span>
+                </div>
+                @if (!loadingGroupInfo) {
+                <div class="group-image">
+                    <img [src]="this.groupImageUrl ? apiUrl + this.groupImageUrl : 'images/defaultGroup.png'"
+                        alt="Grupo" />
+                </div>
+                @if (userHasLeft) {
+                <div class="group-name overflow-text">
+                    {{ this.groupName ? this.groupName : 'Grupo desconocido' }}
+                </div>
+                } @else {
+                <div class="group-name overflow-text" routerLink="/home/groups/info/{{groupId}}">
+                    {{ this.groupName ? this.groupName : 'Grupo desconocido' }}
+                </div>
+                }
+                }
+            </div>
+        </ng-container>
+        <div class="group-actions">
+            @if (!selectedItems) {
+            <div class="icon-container" *ngIf="!userHasLeft" (click)="showGroupActionMenu($event)">
+                <span class="material-icons-outlined action-icon">more_vert</span>
+            </div>
+            } @else {
+            <div class="selection-container">
+                <div class="count-selected-messages">
+                    <span class="material-icons attach-icon">check_box</span>
+                    <span class="count-selected-messages-text">{{ selectedItems.length }} seleccionados</span>
+                </div>
+                <div class="actions-selecting-container">
+                    @if (canDeleteMessagesOption) {
+                    <div class="icon-container" title="Borrar mensajes"
+                        (click)="showDialogDeleteMessageConfirmation($event)"
+                        [ngClass]="{ 'container-action-disabled' : selectedItems.length === 0 }">
+                        <span class="material-icons action-selecting-icon">delete</span>
+                    </div>
+                    }
+                    <div class="icon-container" title="Cerrar" (click)="stopSelectingItems($event)">
+                        <span class="material-icons-outlined action-selecting-icon">close</span>
+                    </div>
+                </div>
+            </div>
+
+            }
+        </div>
+    </section>
+    <section class="messages-list" #messagesContainer (scroll)="onScroll($event)">
+        <ng-container *ngIf="noMessagesFound; else notEmpty">
+            <div class="no-messages">
+                <span class="material-icons-outlined no-msg-icon">chat</span>
+                <h1 class="no-messages-text">No hay mensajes en este grupo</h1>
+                <p class="no-messages-text-tip">¡Sé el primero en enviar un mensaje!</p>
+            </div>
+        </ng-container>
+        <ng-template #notEmpty>
+            <ng-container *ngIf="!loadingMessages || loadingMore; else loadingTpl">
+                <div class="loading-more loading-more-top" *ngIf="loadingMore && messagesService.hasMoreRecentMessages">
+                    <app-loadinganimation [type]="'large'"></app-loadinganimation>
+                </div>
+                <div *ngFor="let message of messages" class="message-item-recieved" id="{{message.id}}"
+                    [ngClass]="{ 'message-item-send': message.user.uid === userUid }"
+                    (mouseover)="showMessageActionsButton(message.id)" (mouseleave)="showMessageActionsButton('')">
+                    <div class="msg-select-items-container">
+                        <div class="msg-select" *ngIf="selectedItems && !message.status">
+                            <input type="checkbox" id="{{message.id}}" name="{{message.id}}" [checked]="message.checked"
+                                (change)="handleCheckboxChange(message, $event)" (click)="$event.stopPropagation()" />
+                            <label for="{{message.id}}" class="checkbox-custom"></label>
+                        </div>
+                        <div class="msg-container" (click)="selectItems(message, true)"
+                            (touchstart)="handleTouchStart($event, message.id, message)"
+                            (touchmove)="handleTouchMove($event, message.id, message)"
+                            (touchend)="handleTouchEnd($event, message.id, message)" [ngClass]="{ 
+                                'msg-container-send': message.user.uid === userUid, 
+                                'msg-container-focus': showMessageActionMenu === message.id || message.checked, 
+                                'msg-container-items-selecting': selectedItems }">
+                            <div class="msg allow-select">
+                                <div class="message-sender-info"
+                                    [ngClass]="{ 'message-user-send' : message.user.uid === userUid }">
+                                    <div class="sender-image">
+                                        <img [src]="message.user.imageUrl ? apiUrl + message.user.imageUrl : 'images/defaultUser.png'"
+                                            alt="ImagenUsuario" />
+                                    </div>
+                                    <span class="msg-username allow-copy allow-select">
+                                        @if (message.user.uid === userUid) {
+                                        Tú
+                                        } @else {
+                                        {{message.user.username}}
+                                        }
+                                    </span>
+                                </div>
+                                <div *ngIf="( message.reference && message.status !== 'deleted' ) || message.reference_deleted"
+                                    class="message-item-reference-container" (click)="locateMessage(message.reference)">
+                                    <div class="message-item-reference-info">
+                                        @if (!message.reference_deleted) {
+                                        <div class="message-sender-info">
+                                            <div class="sender-image">
+                                                <img [src]="message.reference_message.user_user.imageUrl ? apiUrl + message.reference_message.user_user.imageUrl : 'images/defaultUser.png'"
+                                                    alt="ImagenUsuario" />
+                                            </div>
+                                            <span class="msg-username">
+                                                @if (message.reference_message.user_user.uid === userUid) {
+                                                Tú
+                                                } @else {
+                                                {{message.reference_message.user_user.username}}
+                                                }
+                                            </span>
+                                        </div>
+                                        <div class="message-content-container">
+                                            <div class="message-content-reference">
+                                                {{message.reference_message.content}}
+                                            </div>
+                                        </div>
+                                        } @else {
+                                        <div class="message-content-container">
+                                            <div class="message-content-reference-deleted">
+                                                <span class="material-icons">block</span>Este mensaje ha sido eliminado
+                                            </div>
+                                        </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div *ngIf="message.sourceUrl && message.status !== 'deleted'"
+                                    class="message-source-container">
+
+                                </div>
+                                <div class="message-content allow-copy allow-select">
+                                    @if (message.status === 'deleted') {
+                                    <span class="deleted-message">Este mensaje ha sido eliminado</span>
+                                    } @else {
+                                    {{message.content}}
+                                    }
+                                </div>
+                                <div class="message-date"
+                                    [ngClass]="{ 'message-date-send' : message.user.uid === userUid }">
+                                    <span class="message-date-text">{{displayDate(message.datetime)}}</span>
+                                    <span class="material-icons featured-icon" *ngIf="message.featured">star</span>
+                                    <div class="loading-message-send" *ngIf="message.status === 'pending'">
+                                        <app-loadinganimation [type]="'small'"></app-loadinganimation>
+                                    </div>
+                                    <div class="message-status-error" *ngIf="message.status === 'error'">
+                                        Error al enviar los anteriores mensajes
+                                        <span class="material-icons-outlined error-icon">error</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="message-actions" *ngIf="!message.status && !selectedItems"
+                                [ngClass]="{ 'message-actions-show': showMessageActions === message.id, 'message-actions-send' : message.user.uid === userUid }">
+                                <div class="message-action-item icon-container" title="Responder"
+                                    (click)="replyMessage(message)">
+                                    <span class="material-icons-outlined attach-icon">reply</span>
+                                </div>
+                                <div class="message-action-item icon-container"
+                                    (click)="showMessageActionsMenu($event, message.id)">
+                                    <span class="material-icons-outlined attach-icon">keyboard_arrow_up</span>
+                                </div>
+                            </div>
+                            <div class="message-item-actions-menu" [attr.data-message-id]="message.id" [ngClass]="{ 
+                                'message-item-actions-menu-show' : showMessageActionMenu === message.id,
+                                'message-item-actions-menu-close': messageActionsClosing }">
+                                <div class="group-actions-menu-item" (click)="selectItems(message)">
+                                    <span class="material-icons attach-icon">check_box</span> Seleccionar
+                                </div>
+                                <div class="group-actions-menu-item" (click)="featureMessage($event, message)">
+                                    @if (message.featured) {
+                                    <span class="material-icons attach-icon linetrhough">star</span> No destacar
+                                    } @else {
+                                    <span class="material-icons attach-icon">star</span> Destacar
+                                    }
+                                </div>
+                                @if (message.user.uid !== userUid && userAdmin || message.user.uid === userUid) {
+                                <div class="group-actions-menu-item group-menu-del-action"
+                                    (click)="showDialogDeleteMessageConfirmation($event, message)">
+                                    <span class="material-icons attach-icon">delete</span> Borrar
+                                </div>
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="loading-more" *ngIf="loadingMore && messagesService.hasMoreOlderMessages">
+                    <app-loadinganimation [type]="'large'"></app-loadinganimation>
+                </div>
+            </ng-container>
+
+            <!-- Group actions menu -->
+            <div class="group-item-actions-menu" [ngClass]="{ 
+                'group-item-actions-menu-show' : groupActionsMenu, 
+                'group-item-actions-menu-close': groupActionsClosing }">
+                <div class="group-actions-menu-item" (click)="selectItems(null)">
+                    <span class="material-icons attach-icon">done_all</span> Seleccionar
+                </div>
+                <div class="group-actions-menu-item group-menu-del-action"
+                    (click)="showAlertDialogFunction($event, groupId)">
+                    <span class="material-icons-outlined">logout</span>Salir del grupo
+                </div>
+            </div>
+        </ng-template>
+
+        <!-- Loading template for initial load -->
+        <ng-template #loadingTpl>
+            <div class="loading-initial">
+                <app-loadinganimation [type]="'large'"></app-loadinganimation>
+            </div>
+        </ng-template>
+    </section>
+    <section class="message-input" [ngClass]="{ 'message-input-reference' : selectedMessage }">
+        <div class="scroll-to-bottom-btn" *ngIf="messagesService.hasMoreRecentMessages || visibleNewMessagesBtn"
+            (click)="scrollToBottomOnBtnClick($event)">
+            <span class="material-icons">keyboard_arrow_down</span>
+            <span>Volver al inicio</span>
+        </div>
+        <div class="message-input-container">
+            <div class="message-reference" *ngIf="selectedMessage">
+                <div class="message-reference-container">
+                    <div class="message-reference-info">
+                        <div class="message-sender-info">
+                            <div class="sender-image">
+                                <img [src]="selectedMessage.user.imageUrl ? apiUrl + selectedMessage.user.imageUrl : 'images/defaultUser.png'"
+                                    alt="ImagenUsuario" />
+                            </div>
+                            <span class="msg-username">
+                                @if (selectedMessage.user.uid === userUid) {
+                                Tú
+                                } @else {
+                                {{selectedMessage.user.username}}
+                                }
+                            </span>
+                        </div>
+                        <div class="message-content">
+                            {{selectedMessage.content}}
+                        </div>
+                    </div>
+                    <div class="message-reference-action icon-container" (click)="replyMessage(null)">
+                        <span class="material-icons-outlined attach-icon">cancel</span>
+                    </div>
+                </div>
+            </div>
+            <form (submit)="sendMessage($event)" class="input-form">
+                <div class="input-more-actions icon-container">
+                    <span class="material-icons-outlined attach-icon">attach_file</span>
+                </div>
+                <div class="input-container">
+                    <textarea [disabled]="userHasLeft" class="message autogrowing-textarea" placeholder="Mensaje"
+                        [(ngModel)]="messageInput" [ngModelOptions]="{ standalone: true }" #messageTextarea
+                        (input)="autoGrowTextarea()" (ngModelChange)="autoGrowTextarea()" (focus)="focusTextarea()"
+                        rows="1" (keydown)="($event.key === 'Enter' && !$event.shiftKey) ? sendMessage($event) : true">
+                    </textarea>
+                </div>
+                <div class="input-send">
+                    <button type="submit" class="send-btn"
+                        [disabled]="messageInput.trim() === '' || loadingSendMessage">
+                        <span class="material-icons send-icon">send</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+    <div class="delete-messages-dialog-container" *ngIf="showDeleteMessageConfirmation">
+        <div class="delete-messages-dialog">
+            <div class="delete-messages-dialog-content">
+                <h1 class="delete-messages-dialog-title">Eliminar mensajes</h1>
+                <p class="delete-messages-dialog-text">Estas a punto de eliminar {{this.selectedItems?.length}}
+                    mensajes, estas seguro que quieres continuar?</p>
+            </div>
+            <div class="delete-messages-dialog-actions">
+                <button class="btn-cancel" (click)="stopSelectingItems($event)">Cancelar</button>
+                <button class="btn-delete" (click)="deleteMessages($event)">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<dialog class="alert-dialog" *ngIf="showAlertDialog">
+    <div class="alert-dialog-content">
+        <div class="dialog-title">
+            <h1>¿Estás seguro de que quieres salir del group {{ this.groupName }}?</h1>
+            <p>Podrás leer los mensajes antiguos, pero no los nuevos, y no podrás volver a acceder a no ser que un
+                administrador te vuelva a invitar</p>
+        </div>
+        <div class="dialog-actions">
+            <button class="btn-cancel" (click)="showAlertDialogFunction($event, null)">Cancelar</button>
+            <button class="btn-accept" (click)="leaveGroup($event)">Continuar</button>
+        </div>
+    </div>
+</dialog>
+
+<app-infodialog *ngIf="generalError" [message]="generalError" [type]="'error'"></app-infodialog>

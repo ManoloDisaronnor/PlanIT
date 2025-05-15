@@ -1,5 +1,5 @@
-<div id="groups">
-    <aside class="side-group-menu">
+<div id="groups" [ngClass]="{ 'groups-chat-mobile' : router.url.includes('/home/groups/chat') || router.url.includes('/home/groups/info') }">
+    <aside class="side-group-menu" [ngClass]="{ 'side-menu-mobile-not-exp' : router.url.includes('/home/groups/chat') || router.url.includes('/home/groups/info') }">
         <div class="group-actions">
             <input type="text" id="search-group" placeholder="Buscar" name="search-group" maxlength="35" [(ngModel)]="searchGroup" (input)="onSearchGroupChange()">
             <div class="group-action" title="Crear grupo" (click)="toggleModal()">
@@ -23,19 +23,25 @@
                 (touchmove)="onTouchActionMove($event)"
                 (touchend)="onTouchActionEnd()"
                 (touchcancel)="onTouchActionEnd()"
-                (mouseover)="groupHover(group.groups_group.id)" 
-                (mouseleave)="groupHover('')" 
-                [ngClass]="{ 'group-item-invitation' : group.joined === 0 }"
+                (mouseover)="groupHover(group.groups_group.id, group.joined === 1)"
+                (mouseleave)="groupHover('', true)" 
+                [ngClass]="{ 'group-item-invitation' : group.joined === 0, 'group-item-mobile-selected' : groupActionTouchSelected === group.groups_group.id }"
                 routerLink="/home/groups/chat/{{group.groups_group.id}}"
-                routerLinkActive="active-group-item"
+                [ngClass]="{ 'active-group-item' : router.url.includes('/home/groups/chat/' + group.groups_group.id) }"
                 >
                     <div class="group-image">
                         <img [src]="group.groups_group.imageUrl ? apiUrl + group.groups_group.imageUrl : 'images/defaultGroup.png'" alt="Grupo" />
                     </div>
                     <div class="group-info">
-                        @if (group.joined === 1) {
+                        @if (group.joined === 1 || group.joined === -1) {
                             <p class="group-name">{{group.groups_group.name}}</p>
-                            <p class="last-message" *ngIf="group.lastMessage">{{ group.lastMessage.user }} {{ group.lastMessage.content }}</p>
+                            <p class="last-message">
+                                @if (group.lastMessage && group.joined !== -1) {
+                                    {{ group.lastMessage.user_user.username }} {{ group.lastMessage.content }}
+                                } @else if (group.joined === -1) {
+                                    Has salido del grupo
+                                }                                
+                            </p>
                         } @else {
                             <p class="invitation-text">Invitación para unirte a <strong>{{group.groups_group.name}}</strong></p>
                         }
@@ -47,7 +53,7 @@
                                     <span class="material-icons fixed-icon">push_pin</span>
                                 </div>
                                 <div class="group-item-actions-info-footer">
-                                    <span class="badge-notification-count" *ngIf="group.unreadMessages > 0">{{ group.unreadMessages }}</span>
+                                    <span class="badge-notification-count" *ngIf="group.unreadCount > 0">{{ group.unreadCount }}</span>
                                     @if (group.joined === 1) {
                                         <button class="group-item-action-btn" *ngIf="groupHovered === group.groups_group.id && !isLongPressActive" (click)="showGroupActionMenu($event, group.groups_group.id)">
                                             <span class="material-icons-outlined">more_vert</span>
@@ -58,14 +64,14 @@
                             <div class="group-item-actions-menu" *ngIf="groupHovered === group.groups_group.id || groupActionSelected == group.groups_group.id" [ngClass]="{ 
                             'group-item-actions-menu-show' : groupActionSelected === group.groups_group.id, 
                             'group-item-actions-menu-close': groupMenuClosing }" [ngStyle]="menuStyles">
-                                <div class="group-actions-menu-item">
+                                <div class="group-actions-menu-item" (click)="toggleFixGroup(group.groups_group.id, $event)">
                                     @if (group.fixed === 1) {
                                         <span class="material-icons menu-icon linetrhough">push_pin</span> No fijar
                                     } @else {
                                         <span class="material-icons menu-icon">push_pin</span> Fijar grupo
                                     }
                                 </div>
-                                <div class="group-actions-menu-item group-menu-del-action">
+                                <div class="group-actions-menu-item group-menu-del-action" (click)="showAlertDialogFunction($event, group)">
                                     <span class="material-icons-outlined menu-icon">logout</span>Salir del grupo
                                 </div>
                             </div>
@@ -95,7 +101,7 @@
             </div>
         </div>
     </aside>
-    <section class="chat-content">
+    <section class="chat-content" [ngClass]="{ 'chat-content-mobile' : router.url.includes('/home/groups/chat') || router.url.includes('/home/groups/info') }">
         <router-outlet></router-outlet>
     </section>
     <app-infodialog *ngIf="generalError" [type]="typeError" [message]="generalError"></app-infodialog>
@@ -107,6 +113,19 @@
         </div>
     </div>
 </div>
+
+<dialog class="alert-dialog" *ngIf="showAlertDialog">
+    <div class="alert-dialog-content">
+        <div class="dialog-title">
+            <h1>¿Estás seguro de que quieres salir del grupo {{this.groupSelected.name}}?</h1>
+            <p>Podrás leer los mensajes antiguos, pero no los nuevos, y no podrás volver a acceder a no ser que un administrador te vuelva a invitar</p>
+        </div>
+        <div class="dialog-actions">
+            <button class="btn-cancel" (click)="showAlertDialogFunction($event, null)">Cancelar</button>
+            <button class="btn-accept" (click)="leaveGroup($event)">Continuar</button>
+        </div>
+    </div>
+</dialog>
 
 <app-camara *ngIf="showCamera" (imageCaptured)="handleImageCaptured($event)" (close)="showCamera = false">
 </app-camara>

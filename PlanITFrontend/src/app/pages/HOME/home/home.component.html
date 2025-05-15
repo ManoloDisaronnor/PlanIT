@@ -1,12 +1,12 @@
 <div class="home-wrapper">
-    <section class="header">
+    <section class="header" [ngClass]="{ 'header-chat-mobile' : router.url.includes('/home/groups/chat') || router.url.includes('/home/groups/info') }">
         <app-header [navBarExpanded]="menuExpanded" (toggleLateralMenu)="toogleMenu($event)" (toggleFriendsMenu)="toggleFriendsMenu($event)" (toggleInformationMenu)="toggleInformationMenu($event)" (toggleNotificationsMenu)="toggleNotificationsMenu($event)"></app-header>
     </section>
     <section class="content-wrapper">
-        <aside class="side-menu" [ngClass]="{ 'side-menu-expanded': menuExpanded }">
+        <aside class="side-menu" [ngClass]="{ 'side-menu-expanded': menuExpanded, 'side-menu-chat-mobile' : router.url.includes('/home/groups/chat') || router.url.includes('/home/groups/info') }">
             <app-menu [menuExpanded]="menuExpanded" (toggleMenu)="toggleLateralMenu($event)"></app-menu>
         </aside>
-        <main class="main-content">
+        <main class="main-content" [ngClass]="{ 'main-content-chat-mobile' : router.url.includes('/home/groups/chat') || router.url.includes('/home/groups/info') }">
             <router-outlet></router-outlet>
         </main>
     </section>

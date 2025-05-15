@@ -2,7 +2,7 @@ import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MenuComponent } from "../../../components/menu/menu.component";
 import { HeaderComponent } from "../../../components/header/header.component";
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { FriendsComponent } from '../COMPONENTS/friends/friends.component';
 import { InformationComponent } from '../COMPONENTS/information/information.component';
 import { NotificationsComponent } from '../COMPONENTS/notifications/notifications.component';
@@ -21,6 +21,8 @@ export class HomeComponent {
   friendsMenuExpanded: boolean = false;
   informationMenuExpanded: boolean = false;
   notificationsMenuExpanded: boolean = false;
+
+  constructor(public router: Router) {}
 
   @HostListener('document:click', ['$event.target'])
   onClick(target: HTMLElement) {
