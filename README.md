@@ -1,6 +1,6 @@
 # PlanIT
 
-![Version](https://img.shields.io/badge/version-0.5-blue)
+![Version](https://img.shields.io/badge/version-alpha1.0-red)
 
 ---
 
@@ -21,6 +21,12 @@ PlanIT es una página web pensada para facilitar la organización de eventos ent
 
 - **Gestión de Eventos con Integración a Google Maps:**  
   Los usuarios pueden crear y gestionar eventos, indicando la ubicación exacta mediante Google Maps. Se pueden configurar eventos como públicos o privados, permitiendo descubrir eventos cercanos según la preferencia de cada usuario.  
+  Comentarios de la version alpha 1.0_
+  - Sistema de insignias para el usuario incorporado, crea y unete a eventos para obtener estas insignias
+  - Creación de eventos públicos, o, indicando grupos concretos para un evento cerrado.
+  - Pestaña discover para enventos públicos con filtrados mediante filtros y ordenamiento segun la ubicacion.
+  - Pestaña Personal para eventos en curso, futuros, o pasados.
+  - Pestaña Tus eventos para ver los eventos que has ido creando.
   <!-- Comentario: Utilización de Google Maps para mejorar la experiencia de localización -->
 
 ---
