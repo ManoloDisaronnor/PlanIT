@@ -1,0 +1,384 @@
+#user-event {
+    width: 100%;
+    padding: 1rem 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+#user-event::after {
+    content: '';
+    border-radius: 1rem;
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: skewX(-25deg);
+    animation: shine 2s ease-in-out forwards;
+}
+
+@keyframes shine {
+    0% { left: -100%; }
+    100% { left: 200%; }
+}
+
+.user-info {
+    width: 35%;
+    height: 100%;
+    margin: 2rem 0 3rem 2rem;
+}
+
+.user-image {
+    width: 75%;
+    max-width: 350px;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-names {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    margin-top: 1rem;
+    gap: 1rem;
+}
+
+.real-name {
+    font-size: 2rem;
+    color: #ffffff;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+.username {
+    font-size: 1.5rem;
+    color: #7c7cffce;
+    font-style: italic;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+.user-events {
+    flex: 1;
+    height: 100%;
+    margin: 2rem 3rem 2rem 0;
+}
+
+.user-events-header {
+    width: 100%;
+    text-align: right;
+}
+
+.user-events-header-text {
+    font-size: 1.5rem;
+    color: #7c7cff;
+    font-weight: 600;
+}
+
+.user-events-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.user-more-recent-events-header-text, .user-insignias-header span {
+    font-size: 1.2rem;
+    color: #a05cff;
+    font-weight: 600;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.user-insignias-header {
+    width: 100%;
+}
+
+.user-event-cards-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.no-recent-events {
+    font-size: 0.8rem;
+    color: #cecece;
+    font-style: italic;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.user-insignias {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.user-insignia {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 2rem;
+}
+
+.insignia-title {
+    font-size: 1.2rem;
+    color: white;
+    font-style: italic;
+}
+
+.insignia-icon-container {
+    position: relative;
+    padding: 0.5rem;
+    background-color: #ffffff10;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.insignia-icon-container span {
+    font-size: 1.2rem;
+    background: linear-gradient(45deg, #da2b00, #fdc600);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.5s ease;
+}
+
+.insigniaInfo {
+    width: 150px;
+    position: absolute;
+    bottom: 10px;
+    right: 0;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+    padding: 1rem;
+    background-color: #2b2b38;
+    border-radius: 8px;
+    border: 1px solid #ffffff40;
+    color: #ffffff;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.insigniaInfo p {
+    margin: 0;
+    font-size: 0.8rem;
+}
+
+.insigniaInfo .count {
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+}
+
+.insigniaInfo .plan {
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    -webkit-text-fill-color: initial;
+    color: #ffffff;
+    transition: none;
+    font-size: 0.8rem;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+@media (max-width: 1200px) {
+    .real-name {
+        font-size: 1.6rem;
+    }
+
+    .username {
+        font-size: 1.2rem;
+    }
+
+    .user-events-header-text {
+        font-size: 1.2rem;
+    }
+
+    .user-more-recent-events-header-text, .user-insignias-header span {
+        font-size: 1rem;
+    }
+
+    .user-event-cards-container {
+        gap: 1rem;
+    }
+
+    .insignia-title {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 992px) {
+    #user-event {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .user-info {
+        margin: 3rem 0 0 0;
+        width: 85%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .user-image {
+        width: 25%;
+        min-width: 150px;
+    }
+
+    .user-names {
+        max-width: 65%;
+        flex: 1;
+        margin-top: 0;
+        align-items: flex-start;
+        justify-content: center;
+    }
+
+    .real-name {
+        max-width: 100%;
+        font-size: 2rem;
+    }
+
+    .username {
+        max-width: 100%;
+        font-size: 1.5rem;
+    }
+
+    .user-events {
+        width: 85%;
+        margin: 0 0 3rem 0;
+    }
+
+    .user-events-header {
+        margin-top: 1rem;
+        text-align: center;
+    }
+
+    .user-events-header-text {
+        font-size: 1.5rem;
+    }
+
+    .user-events-content {
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+
+    .user-more-recent-events-header, .user-insignias-header {
+        display: flex;
+        align-items: start;
+        justify-content: flex-start;
+    }
+
+    .user-more-recent-events-header-text, .user-insignias-header span {
+        font-size: 1.2rem;
+    }
+
+    .user-insignias {
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+
+    .user-insignia {
+        flex-direction: row-reverse;
+    }
+
+    .insignia-title {
+        font-size: 1.2rem;
+        text-align: left;
+    }
+
+    .insigniaInfo {
+        left: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .user-image {
+        width: 20%;
+        min-width: 100px;
+    }
+
+    .user-info {
+        justify-content: flex-start;
+    }
+
+    .user-names {
+        margin-left: 1rem;
+    }
+
+    .real-name {
+        max-width: 100%;
+        font-size: 1.4rem;
+    }
+
+    .username {
+        max-width: 100%;
+        font-size: 1.2rem;
+    }
+
+    .user-events-header-text {
+        font-size: 1.2rem;
+    }
+
+    .user-more-recent-events-header-text, .user-insignias-header span {
+        font-size: 1rem;
+    }
+
+    .user-more-recent-events {
+        max-width: 100%;
+    }
+
+    .user-event-cards-container {
+        max-width: 100%;
+        justify-content: flex-start;
+        align-items: flex-start;
+        overflow-x: auto;
+        padding-top: 1rem;
+    }
+
+    .insignia-title {
+        font-size: 1rem;
+    }
+}

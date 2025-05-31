@@ -1,0 +1,105 @@
+<div id="user-event">
+    <div class="user-info">
+        <div class="user-image">
+            <img [src]="this.userImageUrl ? this.apiUrl + this.userImageUrl : 'images/defaultProfilePicture.png'"
+                alt="Imagen usuario" />
+        </div>
+        <div class="user-names">
+            <span class="real-name allow-select allow-copy">{{ this.userName + ' ' + this.userSurname }}</span>
+            <span class="username allow-select allow-copy">{{ this.userUsername }}</span>
+        </div>
+    </div>
+    <div class="user-events">
+        <div class="user-events-header">
+            <span class="user-events-header-text">INFORMACIÓN PERSONAL DE EVENTOS</span>
+        </div>
+        <div class="user-events-content">
+            <div class="user-more-recent-events">
+                <div class="user-more-recent-events-header">
+                    <span class="user-more-recent-events-header-text">Eventos participados recientemente</span>
+                </div>
+                <div class="user-event-cards-container">
+                    @if (recentEvents.length > 0) {
+                    @for (event of recentEvents; track event.id) {
+                    <div class="user-event-card-reduced" routerLink="/home/events/details/{{ event.id }}">
+                        @if (testEndingDate(event.ends)) {
+                            <span class="user-event-card-reduced-ongoing">En curso</span>
+                        }
+                        <span class="user-event-card-reduced-name">{{ event.name }}</span>
+                        <div class="user-event-card-reduced-image">
+                            <img [src]="event.imageUrl ? this.apiUrl + event.imageUrl : 'images/defaultEvent.png'" alt="Imagen evento" />
+                        </div>
+                        <div class="user-event-card-reduced-info">
+                            <div class="user-event-card-reduced-info-founder-image">
+                                <img [src]="event.founder_user.imageUrl ? this.apiUrl + event.founder_user.imageUrl : 'images/defaultProfilePicture.png'"
+                                    alt="Imagen fundador" />
+                            </div>
+                            @if (!event.public) {
+                            <div class="groups-stack" [ngClass]="{'groups-stack-more-groups' : event.group_invited_to_events.length !== 3, 'groups-stack-one-groups' : event.group_invited_to_events.length === 1 }">
+                                @if (event.group_invited_to_events.length <= 3) {
+                                    @for (group of event.group_invited_to_events; track group.groups_group.id) {
+                                    <div class="user-event-card-reduced-group-item">
+                                        <img [src]="group.groups_group.imageUrl ? this.apiUrl + group.groups_group.imageUrl : 'images/defaultProfilePicture.png'" alt="Imagen grupo" />
+                                    </div>
+                                    }                                
+                                } @else {
+                                <div class="user-event-card-reduced-group-item">
+                                    <img [src]="event.group_invited_to_events[0].groups_group.imageUrl ? this.apiUrl + event.group_invited_to_events[0].groups_group.imageUrl : 'images/defaultProfilePicture.png'" alt="Imagen grupo" />
+                                </div>
+                                <div class="user-event-card-reduced-group-count">
+                                    <span>+3</span>
+                                </div>
+                                }
+                            </div>
+                            } @else {
+                            <div class="user-event-card-reduced-info-public-label">
+                                <span>Evento público</span>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                    }
+                    } @else if (recentEvents.length <= 0 && !recentEventsLoading) { <span class="no-recent-events">No
+                        has participado en ningún evento recientemente, crea uno e invita
+                        a tus amigos o unete a uno</span>
+                        } @else if (recentEventsLoading) {
+                        <div class="loading-container">
+                            <app-loadinganimation [type]="'large'"></app-loadinganimation>
+                        </div>
+                        }
+                </div>
+            </div>
+            <div class="user-insignias">
+                <div class="user-insignias-header">
+                    <span class="user-insignias-header-text">Insignias del usuario</span>
+                </div>
+                <div class="user-insignia">
+                    <span class="insignia-title">Crea eventos públicos o asigna un grupo de amigos en <span
+                            class="plan">plan</span>IT</span>
+                    <div class="insignia-icon-container" (mouseover)="showInsigniaInfo('created')"
+                        (mouseleave)="hideInsigniaInfo()">
+                        <span class="material-symbols-outlined">celebration</span>
+                        <div class="insigniaInfo" *ngIf="showCreatedInsigniaInfo">
+                            <p>Has creado un total de</p>
+                            <span class="count">{{this.userInsignia.created}}</span>
+                            <p>eventos en <span class="plan">plan</span>IT</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-insignia">
+                    <span class="insignia-title">Unete a eventos de otros usuarios de la aplicación de <span
+                            class="plan">plan</span>IT</span>
+                    <div class="insignia-icon-container" (mouseover)="showInsigniaInfo('joined')"
+                        (mouseleave)="hideInsigniaInfo()">
+                        <span class="material-symbols-outlined">partner_exchange</span>
+                        <div class="insigniaInfo" *ngIf="showJoinedInsigniaInfo">
+                            <p>Te has unido a un total de</p>
+                            <span class="count">{{this.userInsignia.joined}}</span>
+                            <p>eventos en <span class="plan">plan</span>IT</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

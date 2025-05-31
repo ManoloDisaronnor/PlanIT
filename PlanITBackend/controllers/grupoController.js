@@ -169,6 +169,56 @@ class GrupoController {
         }
     }
 
+    async getCreateEvent(req, res) {
+        try {
+            const uid = req.uid;
+            const limit = req.query.limit ? parseInt(req.query.limit) : 10;
+            const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+            const searchText = req.query.search || '';
+            const search = searchText.toLowerCase();
+
+            if (!uid) {
+                return res.status(400).json(Respuesta.error(null, "El uid es requerido", "UID_REQUIRED"));
+            }
+
+            const grupos = await GroupMembers.findAll({
+                where: { 
+                    [Op.and]: [
+                        { user: uid },
+                        { joined: 1 }
+                    ]
+                 },
+                attributes: ["admin", 'fixed'],
+                include: {
+                    model: Grupo,
+                    as: "groups_group",
+                    ...(search ? {
+                        where: {
+                            [Op.or]: [
+                                { name: { [Op.like]: `%${search}%` } },
+                                { description: { [Op.like]: `%${search}%` } }
+                            ]
+                        }
+                    } : {}),
+                    attributes: ['id', 'name', 'imageUrl']
+                },
+                limit: limit,
+                offset: offset,
+                order: [
+                    ["fixed", "DESC"],
+                    ["joined", "DESC"],
+                    ["joined_at", "DESC"]
+                ],
+            });
+            if (!grupos || grupos.length === 0) {
+                return res.status(404).json(Respuesta.error(null, "No se encontraron grupos para el usuario", "NO_GROUPS_FOUND"));
+            }
+            return res.json(Respuesta.exito(grupos, "Grupos recuperados"));
+        } catch (error) {
+            return res.status(500).json(Respuesta.error(null, "Error al recuperar los grupos" + error, "ERROR_AL_OBTENER_GRUPOS"));
+        }
+    }
+
     async createGruop(req, res) {
         try {
             const group = {

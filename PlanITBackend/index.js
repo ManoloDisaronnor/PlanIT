@@ -12,12 +12,13 @@ const usuarioRoutes = require("./routes/usuarioRoutes");
 const authRoutes = require("./routes/authRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const friendRoutes = require("./routes/friendsRoutes");
+const eventsRoutes = require("./routes/eventsRoutes");
 const app = express();
 const http = require('http');
 const { setupSocket } = require('./services/socket-service');
 if (process.env.NODE_ENV === "development") {
     app.use(cors({
-        origin: ["http://localhost:4200", "http://192.168.1.37:4200"],
+        origin: ["http://localhost:4200", "http://192.168.1.11:4200"],
         credentials: true,
     }));
 }
@@ -29,6 +30,7 @@ app.use("/api/mensajes", mensajeRoutes);
 app.use("/api/usuarios", usuarioRoutes);
 app.use("/auth", authRoutes);
 app.use("/api/friends", friendRoutes);
+app.use("/api/events", eventsRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

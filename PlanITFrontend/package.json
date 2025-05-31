@@ -1,66 +1,69 @@
 {
-  "name": "plan-itfrontend",
-  "version": "0.0.0",
-  "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
-  },
-  "private": true,
-  "dependencies": {
-    "@angular/cdk": "^19.2.10",
-    "@angular/common": "^19.2.0",
-    "@angular/compiler": "^19.2.0",
-    "@angular/core": "^19.2.0",
-    "@angular/forms": "^19.2.0",
-    "@angular/material": "^19.2.10",
-    "@angular/platform-browser": "^19.2.0",
-    "@angular/platform-browser-dynamic": "^19.2.0",
-    "@angular/router": "^19.2.0",
-    "@lottiefiles/dotlottie-web": "^0.41.0",
-    "firebase": "^11.5.0",
-    "howler": "^2.2.4",
-    "lottie-web": "^5.12.2",
-    "lucide-angular": "^0.483.0",
-    "ngx-lottie": "^13.0.1",
-    "ngx-webcam": "^0.4.1",
-    "rxjs": "~7.8.0",
-    "socket.io-client": "^4.8.1",
-    "tslib": "^2.3.0",
-    "zone.js": "~0.15.0"
-  },
-  "devDependencies": {
-    "@angular-devkit/build-angular": "^19.2.0",
-    "@angular/cli": "^19.2.4",
-    "@angular/compiler-cli": "^19.2.0",
-    "@types/howler": "^2.2.12",
-    "@types/jasmine": "~5.1.0",
-    "jasmine-core": "~5.6.0",
-    "karma": "~6.4.0",
-    "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.0",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.7.2"
-  },
-  "configurations": {
-    "production": {
-      "fileReplacements": [
-        {
-          "replace": "src/environments/environment.ts",
-          "with": "src/environments/environment.prod.ts"
-        }
-      ]
+    "name": "plan-itfrontend",
+    "version": "0.0.0",
+    "scripts": {
+        "ng": "ng",
+        "start": "ng serve",
+        "build": "ng build",
+        "watch": "ng build --watch --configuration development",
+        "test": "ng test"
     },
-    "development": {
-      "fileReplacements": [
-        {
-          "replace": "src/environments/environment.ts",
-          "with": "src/environments/environment.dev.ts"
+    "private": true,
+    "dependencies": {
+        "@angular/cdk": "^19.2.10",
+        "@angular/common": "^19.2.0",
+        "@angular/compiler": "^19.2.0",
+        "@angular/core": "^19.2.0",
+        "@angular/forms": "^19.2.0",
+        "@angular/google-maps": "^19.2.16",
+        "@angular/material": "^19.2.10",
+        "@angular/platform-browser": "^19.2.0",
+        "@angular/platform-browser-dynamic": "^19.2.0",
+        "@angular/router": "^19.2.0",
+        "@lottiefiles/dotlottie-web": "^0.41.0",
+        "@mobiscroll/angular": "npm:@mobiscroll/angular-ivy-trial@^5.34.2",
+        "firebase": "^11.5.0",
+        "howler": "^2.2.4",
+        "lottie-web": "^5.12.2",
+        "lucide-angular": "^0.483.0",
+        "ngx-lottie": "^13.0.1",
+        "ngx-webcam": "^0.4.1",
+        "rxjs": "~7.8.0",
+        "socket.io-client": "^4.8.1",
+        "tslib": "^2.3.0",
+        "zone.js": "~0.15.0"
+    },
+    "devDependencies": {
+        "@angular-devkit/build-angular": "^19.2.0",
+        "@angular/cli": "^19.2.4",
+        "@angular/compiler-cli": "^19.2.0",
+        "@types/google.maps": "^3.58.1",
+        "@types/howler": "^2.2.12",
+        "@types/jasmine": "~5.1.0",
+        "jasmine-core": "~5.6.0",
+        "karma": "~6.4.0",
+        "karma-chrome-launcher": "~3.2.0",
+        "karma-coverage": "~2.2.0",
+        "karma-jasmine": "~5.1.0",
+        "karma-jasmine-html-reporter": "~2.1.0",
+        "typescript": "~5.7.2"
+    },
+    "configurations": {
+        "production": {
+            "fileReplacements": [
+                {
+                    "replace": "src/environments/environment.ts",
+                    "with": "src/environments/environment.prod.ts"
+                }
+            ]
+        },
+        "development": {
+            "fileReplacements": [
+                {
+                    "replace": "src/environments/environment.ts",
+                    "with": "src/environments/environment.dev.ts"
+                }
+            ]
         }
-      ]
     }
-  }
 }

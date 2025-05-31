@@ -629,11 +629,11 @@ input[type="text"]:focus {
     background-color: #a05cffde;
 }
 
-.btn-accept {
+.btn-accept-dialog {
     background-color: #e74c3c !important;
 }
 
-.btn-accept:hover {
+.btn-accept-dialog:hover {
     background-color: #e74c3cde !important;
 }
 

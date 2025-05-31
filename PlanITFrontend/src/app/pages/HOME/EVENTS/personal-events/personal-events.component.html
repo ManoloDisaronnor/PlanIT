@@ -1,0 +1,297 @@
+<div id="personal-events">
+    <div class="personal-info-container">
+        <app-usereventsinfo></app-usereventsinfo>
+    </div>
+    <div class="ongoing-events events-tab" (click)="toggleOnGoingEvents($event)"
+        (mouseover)="firstLoadOnGoingEventsOver()">
+        <div class="acordeon-event">
+            <span class="material-icons acordeon-icon"
+                [ngClass]="{ 'acordeon-icon-not-exp' : !onGoingEventsExpanded }">expand_more</span>
+            <div class="acordeon-header-text">
+                <span class="material-icons acordeon-filter-icon">event</span>
+                <span class="acordeon-header-text">Eventos en curso</span>
+            </div>
+        </div>
+        <div class="acordeon-content" *ngIf="onGoingEventsExpanded" (scroll)="onOnGoingEventsScroll($event)">
+            @if (onGoingEvents.length <= 0 && !onGoingEventsLoading) { <h2>No tienes nigún evento en curso actualmente
+                </h2>
+                } @else if (onGoingEventsLoading && onGoingEvents.length <= 0) { <div class="loading-more-events">
+                    <app-loadinganimation [type]="'large'"></app-loadinganimation>
+        </div>
+        } @else {
+        @for (event of onGoingEvents; track event.id) {
+        <div class="user-event-card" routerLink="/home/events/details/{{ event.id }}">
+            <div class="user-event-card-name">
+                <h2>{{ event.name }}</h2>
+            </div>
+            <div class="user-event-card-founder-name">
+                <span>Creador: {{ event.founder_user.username }}</span>
+            </div>
+            <div class="user-event-card-info">
+                <div class="user-event-card-info-images">
+                    <div class="user-event-card-image">
+                        <img class="event-image"
+                            [src]="event.imageUrl ? this.apiUrl + event.imageUrl : 'images/defaultEvent.png'"
+                            alt="Imagen del evento">
+                    </div>
+                    <div class="event-founder-image">
+                        <img [src]="event.founder_user.imageUrl ? this.apiUrl + event.founder_user.imageUrl : 'images/defaultProfilePicture.png'"
+                            alt="Imagen fundador">
+                    </div>
+                </div>
+                <div class="user-event-card-description">
+                    <span class="user-event-card-description-text">{{ event.description !== '' ?
+                        event.description : 'No se han descrito ningún detalle para este evento' }}</span>
+                    <div class="user-event-card-dates">
+                        <span class="user-event-card-start">{{ formatDates(event.starts, event.ends).startDate
+                            }}</span>
+                        <span class="user-event-card-ends">{{ formatDates(event.starts, event.ends).endDate
+                            }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="user-event-card-invited">
+                @if (!event.public) {
+                <div class="user-event-card-groups-stack"
+                    [ngClass]="{ 'user-event-card-groups-stack-more-groups' : event.group_invited_to_events.length !== 3, 'user-event-card-groups-stack-one-groups' : event.group_invited_to_events.length === 1 }">
+                    @if (event.group_invited_to_events.length <= 3) { @for (group of event.group_invited_to_events;
+                        track group.groups_group.id) { <div class="user-event-card-group-item">
+                        <img [src]="group.groups_group.imageUrl ? this.apiUrl + group.groups_group.imageUrl : 'images/defaultProfilePicture.png'"
+                            alt="Grupo invitado">
+                </div>
+                }
+                } @else {
+                <div class="user-event-card-group-item">
+                    <img [src]="event.group_invited_to_events[0].groups_group.imageUrl ? this.apiUrl + event.group_invited_to_events[0].groups_group.imageUrl : 'images/defaultProfilePicture.png'"
+                        alt="Grupo invitado">
+                </div>
+                <div class="user-event-card-group-count">
+                    <span>+3</span>
+                </div>
+                }
+            </div>
+            } @else {
+            <div class="user-event-card-info-public-label">
+                <span>Evento público</span>
+            </div>
+            }
+        </div>
+        <div class="user-event-card-labels">
+            @for ( label of event.filters_filters.slice(0, 3); track label.eventsFilter.filters ) {
+            <span class="user-event-card-label">{{ label.filter }}</span>
+            }
+            @if (event.filters_filters.length > 3) {
+            <span class="user-event-card-label">+{{ event.filters_filters.length - 3 }}...</span>
+            }
+        </div>
+        <div class="user-event-card-google-maps-link">
+            <img class="svgIcon" src="svgLogos/googlemaps.svg" alt="maps">
+            <a [href]="'https://www.google.com/maps?q=' + event.lat + ',' + event.lng" target="_blank"><span>Acceder a
+                    la
+                    ubicación</span></a>
+        </div>
+    </div>
+    }
+    @if (onGoingEventsLoadingMore && onGoingEvents.length > 0) {
+    <div class="loading-more-events">
+        <app-loadinganimation [type]="'large'"></app-loadinganimation>
+    </div>
+    }
+    }
+</div>
+</div>
+<div class="future-joined-events events-tab">
+    <div class="acordeon-event" (click)="toggleFutureEvents($event)" (mouseover)="firstLoadFutureEventsOver()">
+        <span class="material-icons acordeon-icon"
+            [ngClass]="{ 'acordeon-icon-not-exp' : !futureEventsExpanded }">expand_more</span>
+        <div class="acordeon-header-text">
+            <span class="material-icons acordeon-filter-icon">event</span>
+            <span class="acordeon-header-text">Eventos futuros</span>
+        </div>
+    </div>
+    <div class="acordeon-content" *ngIf="futureEventsExpanded" (scroll)="onFutureEventsScroll($event)">
+        @if (futureEvents.length <= 0 && !futureEventsLoading) { <h2>No tienes eventos próximos <span
+                class="plan">plan</span>eados</h2>
+            } @else if (futureEventsLoading && futureEvents.length <= 0) { <div class="loading-more-events">
+                <app-loadinganimation [type]="'large'"></app-loadinganimation>
+    </div>
+    } @else {
+    @for (event of futureEvents; track event.id) {
+    <div class="user-event-card" routerLink="/home/events/details/{{ event.id }}">
+        <div class="user-event-card-name">
+            <h2>{{ event.name }}</h2>
+        </div>
+        <div class="user-event-card-founder-name">
+            <span>Creador: {{ event.founder_user.username }}</span>
+        </div>
+        <div class="user-event-card-info">
+            <div class="user-event-card-info-images">
+                <div class="user-event-card-image">
+                    <img class="event-image"
+                        [src]="event.imageUrl ? this.apiUrl + event.imageUrl : 'images/defaultEvent.png'"
+                        alt="Imagen del evento">
+                </div>
+                <div class="event-founder-image">
+                    <img [src]="event.founder_user.imageUrl ? this.apiUrl + event.founder_user.imageUrl : 'images/defaultProfilePicture.png'"
+                        alt="Imagen fundador">
+                </div>
+            </div>
+            <div class="user-event-card-description">
+                <span class="user-event-card-description-text">{{ event.description !== '' ?
+                    event.description : 'No se han descrito ningún detalle para este evento' }}</span>
+                <div class="user-event-card-dates">
+                    <span class="user-event-card-start">{{ formatDates(event.starts, event.ends).startDate
+                        }}</span>
+                    <span class="user-event-card-ends">{{ formatDates(event.starts, event.ends).endDate
+                        }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="user-event-card-invited">
+            @if (!event.public) {
+            <div class="user-event-card-groups-stack"
+                [ngClass]="{ 'user-event-card-groups-stack-more-groups' : event.group_invited_to_events.length !== 3, 'user-event-card-groups-stack-one-groups' : event.group_invited_to_events.length === 1 }">
+                @if (event.group_invited_to_events.length <= 3) { @for (group of event.group_invited_to_events; track
+                    group.groups_group.id) { <div class="user-event-card-group-item">
+                    <img [src]="group.groups_group.imageUrl ? this.apiUrl + group.groups_group.imageUrl : 'images/defaultProfilePicture.png'"
+                        alt="Grupo invitado">
+            </div>
+            }
+            } @else {
+            <div class="user-event-card-group-item">
+                <img [src]="event.group_invited_to_events[0].groups_group.imageUrl ? this.apiUrl + event.group_invited_to_events[0].groups_group.imageUrl : 'images/defaultProfilePicture.png'"
+                    alt="Grupo invitado">
+            </div>
+            <div class="user-event-card-group-count">
+                <span>+3</span>
+            </div>
+            }
+        </div>
+        } @else {
+        <div class="user-event-card-info-public-label">
+            <span>Evento público</span>
+        </div>
+        }
+    </div>
+    <div class="user-event-card-labels">
+        @for ( label of event.filters_filters.slice(0, 3); track label.eventsFilter.filters ) {
+        <span class="user-event-card-label">{{ label.filter }}</span>
+        }
+        @if (event.filters_filters.length > 3) {
+        <span class="user-event-card-label">+{{ event.filters_filters.length - 3 }}...</span>
+        }
+    </div>
+    <div class="user-event-card-google-maps-link">
+        <img class="svgIcon" src="svgLogos/googlemaps.svg" alt="maps">
+        <a [href]="'https://www.google.com/maps?q=' + event.lat + ',' + event.lng" target="_blank"><span>Acceder a
+                la
+                ubicación</span></a>
+    </div>
+</div>
+}
+@if (futureEventsLoadingMore && futureEvents.length > 0) {
+<div class="loading-more-events">
+    <app-loadinganimation [type]="'large'"></app-loadinganimation>
+</div>
+}
+}
+</div>
+</div>
+<div class="past-events events-tab" (click)="togglePastEvents($event)" (mouseover)="firstLoadPastEventsOver()">
+    <div class="acordeon-event">
+        <span class="material-icons acordeon-icon"
+            [ngClass]="{ 'acordeon-icon-not-exp' : !pastEventsExpanded }">expand_more</span>
+        <div class="acordeon-header-text">
+            <span class="material-icons acordeon-filter-icon">event</span>
+            <span class="acordeon-header-text">Eventos pasados</span>
+        </div>
+    </div>
+    <div class="acordeon-content" *ngIf="pastEventsExpanded" (scroll)="onPastEventsScroll($event)">
+        @if (pastEvents.length <= 0 && !pastEventsLoading) { <h2>No has participado en ningún evento en <span
+                class="plan">plan</span>IT</h2>
+            } @else if (pastEventsLoading && pastEvents.length <= 0) { <div class="loading-more-events">
+                <app-loadinganimation [type]="'large'"></app-loadinganimation>
+    </div>
+    } @else {
+    @for (event of pastEvents; track event.id) {
+    <div class="user-event-card" routerLink="/home/events/details/{{ event.id }}">
+        <div class="user-event-card-name">
+            <h2>{{ event.name }}</h2>
+        </div>
+        <div class="user-event-card-founder-name">
+            <span>Creador: {{ event.founder_user.username }}</span>
+        </div>
+        <div class="user-event-card-info">
+            <div class="user-event-card-info-images">
+                <div class="user-event-card-image">
+                    <img class="event-image"
+                        [src]="event.imageUrl ? this.apiUrl + event.imageUrl : 'images/defaultEvent.png'"
+                        alt="Imagen del evento">
+                </div>
+                <div class="event-founder-image">
+                    <img [src]="event.founder_user.imageUrl ? this.apiUrl + event.founder_user.imageUrl : 'images/defaultProfilePicture.png'"
+                        alt="Imagen fundador">
+                </div>
+            </div>
+            <div class="user-event-card-description">
+                <span class="user-event-card-description-text">{{ event.description !== '' ?
+                    event.description : 'No se han descrito ningún detalle para este evento' }}</span>
+                <div class="user-event-card-dates">
+                    <span class="user-event-card-start">{{ formatDates(event.starts, event.ends).startDate
+                        }}</span>
+                    <span class="user-event-card-ends">{{ formatDates(event.starts, event.ends).endDate
+                        }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="user-event-card-invited">
+            @if (!event.public) {
+            <div class="user-event-card-groups-stack"
+                [ngClass]="{ 'user-event-card-groups-stack-more-groups' : event.group_invited_to_events.length !== 3, 'user-event-card-groups-stack-one-groups' : event.group_invited_to_events.length === 1 }">
+                @if (event.group_invited_to_events.length <= 3) { @for (group of event.group_invited_to_events; track
+                    group.groups_group.id) { <div class="user-event-card-group-item">
+                    <img [src]="group.groups_group.imageUrl ? this.apiUrl + group.groups_group.imageUrl : 'images/defaultProfilePicture.png'"
+                        alt="Grupo invitado">
+            </div>
+            }
+            } @else {
+            <div class="user-event-card-group-item">
+                <img [src]="event.group_invited_to_events[0].groups_group.imageUrl ? this.apiUrl + event.group_invited_to_events[0].groups_group.imageUrl : 'images/defaultProfilePicture.png'"
+                    alt="Grupo invitado">
+            </div>
+            <div class="user-event-card-group-count">
+                <span>+3</span>
+            </div>
+            }
+        </div>
+        } @else {
+        <div class="user-event-card-info-public-label">
+            <span>Evento público</span>
+        </div>
+        }
+    </div>
+    <div class="user-event-card-labels">
+        @for ( label of event.filters_filters.slice(0, 3); track label.eventsFilter.filters ) {
+        <span class="user-event-card-label">{{ label.filter }}</span>
+        }
+        @if (event.filters_filters.length > 3) {
+        <span class="user-event-card-label">+{{ event.filters_filters.length - 3 }}...</span>
+        }
+    </div>
+    <div class="user-event-card-google-maps-link">
+        <img class="svgIcon" src="svgLogos/googlemaps.svg" alt="maps">
+        <a [href]="'https://www.google.com/maps?q=' + event.lat + ',' + event.lng" target="_blank"><span>Acceder a
+                la
+                ubicación</span></a>
+    </div>
+</div>
+}
+@if (pastEventsLoadingMore && pastEvents.length > 0) {
+<div class="loading-more-events">
+    <app-loadinganimation [type]="'large'"></app-loadinganimation>
+</div>
+}
+}
+</div>
+</div>
+</div>

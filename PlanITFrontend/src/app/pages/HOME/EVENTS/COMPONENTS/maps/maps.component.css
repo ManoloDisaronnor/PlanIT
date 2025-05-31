@@ -1,0 +1,97 @@
+.search-container {
+    position: relative;
+    margin-bottom: 20px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+  
+.search-input {
+    flex: 1;
+    min-width: 150px;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-bottom: 1px solid #7c7cff;
+    border-radius: 4px;
+    background-color: #121222;
+    color: white;
+}
+
+.search-input:focus {
+    outline: none;
+}
+
+.buttons-container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+  
+.location-button {
+    padding: 0.3rem 0.8rem;
+    background-color: #7c7cffaa;
+    color: white;
+    border: none;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+  
+.location-button:hover {
+    background-color: #7c7cff;
+}
+  
+.location-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.location-button .ubi-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.ubi-btn img {
+    width: 20px;
+    height: 20px;
+}
+
+.ubi-icon {
+    font-size: 1.2rem;
+    color: #ea4335;
+}
+  
+.error-message {
+    width: 100%;
+    color: #d32f2f;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.location-coordinates {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
+}
+  
+.pac-container {
+    border-radius: 4px;
+    margin-top: 5px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    font-family: inherit;
+}
+
+google-map {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}

@@ -16,6 +16,11 @@ import { ProfileComponent } from './pages/HOME/PROFILE/profile/profile.component
 import { NoGroupSelectedComponent } from './pages/HOME/GROUPS/no-group-selected/no-group-selected.component';
 import { GroupChatComponent } from './pages/HOME/GROUPS/group-chat/group-chat.component';
 import { GroupInfoComponent } from './pages/HOME/GROUPS/group-info/group-info.component';
+import { PersonalEventsComponent } from './pages/HOME/EVENTS/personal-events/personal-events.component';
+import { DiscoverEventsComponent } from './pages/HOME/EVENTS/discover-events/discover-events.component';
+import { OwnedEventsComponent } from './pages/HOME/EVENTS/owned-events/owned-events.component';
+import { CreateEventsComponent } from './pages/HOME/EVENTS/create-events/create-events.component';
+import { EventDetailComponent } from './pages/HOME/EVENTS/event-detail/event-detail.component';
 
 
 export const routes: Routes = [
@@ -43,14 +48,22 @@ export const routes: Routes = [
         component: HomeComponent,
         canActivate: [homeGuard],
         children: [
-            { path: 'events', component: EventsComponent, canActivate: [homeGuard] },
+            { path: 'events', component: EventsComponent, canActivate: [homeGuard], children: [
+                { path: '', redirectTo: 'personal', pathMatch: 'full' },
+                { path: 'personal', component: PersonalEventsComponent, canActivate: [homeGuard] },
+                { path: 'discover', component: DiscoverEventsComponent, canActivate: [homeGuard] },
+                { path: 'owned', component: OwnedEventsComponent, canActivate: [homeGuard] },
+                { path: 'create', component: CreateEventsComponent, canActivate: [homeGuard] },
+                { path: 'details/:eventId', component: EventDetailComponent, canActivate: [homeGuard] },
+            ] },
             { path: 'groups', component: GroupsComponent, canActivate: [homeGuard], children: [
                 { path: '', component: NoGroupSelectedComponent, canActivate: [homeGuard] },
                 { path: 'chat/:groupId', component: GroupChatComponent, canActivate: [homeGuard] },
                 { path: 'info/:groupId', component: GroupInfoComponent, canActivate: [homeGuard] },
             ] },
             { path: 'settings', component: SettingsComponent, canActivate: [homeGuard] },
-            { path: 'profile', component: ProfileComponent, canActivate: [homeGuard] }
+            { path: 'profile', component: ProfileComponent, canActivate: [homeGuard] },
+            { path: '', redirectTo: 'events', pathMatch: 'full' }
         ]
     },
     { path: '', redirectTo: '/home', pathMatch: 'full' },

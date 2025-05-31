@@ -1,0 +1,256 @@
+<div id="event" [ngClass]="{ 'event-error-container' : eventNotShowingError }">
+    @if (eventNotShowingError) {
+    <div class="event-error">
+        <div class="event-error-header">
+            <h1><span class="plan">¡Vaya!</span> No hemos podido localizar este evento</h1>
+        </div>
+        <div class="lottie-container">
+            <canvas #lottieCanvas class="lottie-animation"></canvas>
+        </div>
+        <div class="event-error-content">
+            {{ eventNotShowingError }}
+        </div>
+        <div class="error-event-link">
+            <a routerLink="/home/events/personal" class="error-event-link-text">
+                <span class="material-icons-outlined">arrow_back</span>
+                <span>Volver a eventos</span>
+            </a>
+        </div>
+    </div>
+    } @else if (!loadingEventInfo) {
+        <div class="event-detail-container">
+            <section class="event-detail-header">
+                <h1 class="event-detail-name">{{ eventInfo.name }}</h1>
+                <div class="event-detail-header-image-container">
+                    <div class="event-detail-image">
+                        <img [src]="eventInfo.imageUrl ? this.apiUrl + eventInfo.imageUrl : 'images/defaultEvent.png'" alt="Imagen del evento" />
+                    </div>
+                    <div class="event-detail-founder-image" title="{{ eventInfo.founder_user.username }}">
+                        <img [src]="eventInfo.founder_user.imageUrl ? this.apiUrl + eventInfo.founder_user.imageUrl : 'images/defaultProfilePicture.png'" alt="Imagen fundador" />
+                    </div>
+                </div>
+                <div class="event-detail-header-info">
+                    <p class="event-detail-description">{{ eventInfo.description || 'No se ha podido obtener la descripción del evento, porque el creador del evento no ha especificado detalles para este evento.' }} <span class="description-title">DESCRIPCIÓN</span></p>
+                    <div class="event-detail-dates">
+                        <span class="event-detail-start">{{ formatDate(eventInfo.starts) }}<span>Fecha de inicio</span></span>
+                        <span class="event-detail-ends">{{ formatDate(eventInfo.ends) }}<span>Fecha finalización</span></span>
+                    </div>
+                </div>
+            </section>
+            <section class="event-detail-join" *ngIf="showJoinBtn" (click)="joinEvent($event)">
+                <button class="join-btn" [disabled]="loadingJoin">
+                    @if (!loadingJoin) {
+                        <span class="material-icons-outlined">check_circle</span>
+                        <span>Unirse al evento</span>
+                    } @else {
+                        <app-loadinganimation [type]="'button'"></app-loadinganimation>
+                    }
+                </button>
+            </section>
+            <section class="event-detail-filters event-detail-tab" *ngIf="eventInfo.filters_filters && eventInfo.filters_filters.length > 0">
+                <span class="event-tab-title">FILTROS</span>
+                <div class="event-detail-all-filters">
+                    @for (filter of eventInfo.filters_filters; track $index) {
+                        <span class="filter-label" (mouseover)="showFilterDescription($event, filter)" (mouseleave)="hideFilterDescription()">{{ filter.filter }} <span *ngIf="showDescriptionFilter === filter.eventsFilter.filters">{{ filter.description }}</span></span>
+                    }
+                </div>
+            </section>
+            <section class="event-detail-images">
+                <div class="event-detail-images-header">
+                    <span class="event-detail-images-header-text">IMAGENES</span>
+                    <div class="event-detail-images-add" *ngIf="userCanUploadImage" (click)="toggleMenu($event)">
+                        <span class="material-icons">add_photo_alternate</span>
+                        <span>Añadir imagen</span>
+                    </div>
+                </div>
+                <div #menuContainer *ngIf="showImageActionsMenu" class="image-actions-menu">
+                    <input #fileInputRef type="file" id="fileInput" accept="image/*"
+                        (change)="handleImageChange($event)" hidden>
+                    <div class="option" (click)="fileInputRef.click()">
+                        <span class="opt-text clickable">Subir</span>
+                        <span class="material-icons-outlined opt-icon">upload</span>
+                    </div>
+                    <div class="option" (click)="startCamera()">
+                        <span class="opt-text">Cámara</span>
+                        <span class="material-icons-outlined opt-icon">add_a_photo</span>
+                    </div>
+                </div>
+                <div class="event-detail-images-container" [ngClass]="{ 'event-detail-images-container-content' : eventInfo.event_images && eventInfo.event_images.length > 0 }">
+                    @if (eventInfo.event_images && eventInfo.event_images.length > 0) {
+                        @for (image of eventInfo.event_images; track trackByImageUrl($index, image)) {
+                            @defer (on viewport; prefetch on idle) {
+                                <div class="event-detail-image-item" (click)="openFullScreenImage(image)">
+                                    <div class="image-wrapper">
+                                        @if (getImageState(image.imageUrl)?.hasError) {
+                                            <div class="image-error">
+                                                <span class="material-icons">broken_image</span>
+                                                <span>Error al cargar</span>
+                                            </div>
+                                        } @else {
+                                            <img 
+                                                [src]="this.apiUrl + 'uploads/events/' + this.eventId + '/images/' + image.imageUrl" 
+                                                [alt]="'Imagen del evento'"
+                                                [class.image-loaded]="getImageState(image.imageUrl)?.isLoaded"
+                                                (load)="onImageLoad(image.imageUrl)"
+                                                (error)="onImageError(image.imageUrl)"
+                                                loading="lazy" />
+                                            
+                                            @if (!getImageState(image.imageUrl)?.isLoaded) {
+                                                <div class="image-loading-overlay">
+                                                    <app-loadinganimation [type]="'large'"></app-loadinganimation>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                    
+                                    <div class="uploader-image" (mouseover)="toggleShowUploadedByLabel(image.imageUrl)" (mouseleave)="toggleShowUploadedByLabel(null)">
+                                        <img [src]="this.apiUrl + image.userUploaded_user.imageUrl" alt="Creador">
+                                    </div>
+                                    <span class="uploader-username" *ngIf="showUploadedByLabel === image.imageUrl">Subida por: {{ image.userUploaded_user.username }}</span>
+                                    <span class="image-date-taken">{{ formatImageDate(image.uploaded_at) }}</span>
+                                </div>
+                            } @placeholder {
+                                <div class="event-detail-image-placeholder">
+                                    <div class="placeholder-shimmer"></div>
+                                </div>
+                            } @loading (minimum 100ms) {
+                                <div class="event-detail-image-skeleton">
+                                    <div class="skeleton-shimmer"></div>
+                                </div>
+                            }
+                        }
+                    } @else {
+                        <span class="event-detail-images-no-images">No se han subido imagenes a este evento.</span>
+                    }
+                </div>
+            </section>
+            <section class="event-details-scrollable" *ngIf="!eventInfo.public">
+                <span class="event-tab-title">GRUPOS INVITADOS</span>
+                <section class="event-detail-groups">
+                    @for (group of eventInfo.group_invited_to_events; track $index) {
+                        <div class="event-group-item">
+                            <div class="event-group-image">
+                                <img [src]="group.groups_group.imageUrl ? this.apiUrl + group.groups_group.imageUrl : 'images/defaultGroup.png'" alt="Imagen del grupo" />
+                            </div>
+                            <span class="event-group-name">{{ group.groups_group.name }}</span>
+                        </div>
+                    }
+                </section>
+            </section>
+            <section class="event-details-scrollable" *ngIf="eventInfo.public">
+                <span class="event-tab-title">USUARIOS CONFIRMADOS</span>
+                <section class="event-detail-participants">
+                @for (participant of eventInfo.user_joined_to_events; track $index) {
+                    <div class="event-participant-item">
+                        <div class="event-participant-image-container">
+                            <div class="event-participant-image">
+                                <img [src]="participant.participant_user.imageUrl ? this.apiUrl + participant.participant_user.imageUrl : 'images/defaultProfilePicture.png'" alt="Imagen del participante" />
+                            </div>
+                            @if (participant.participant === this.eventInfo.founder) {
+                                <span class="material-symbols-outlined role-icon" title="Creador">crown</span>
+                            }
+                        </div>
+                        <div class="event-participant-info">
+                            <span class="event-participant-fullname">{{ participant.participant_user.name + ' ' + participant.participant_user.surname }}</span>
+                            <span class="event-participant-username">{{ participant.participant_user.username }}</span>
+                        </div>
+                    </div>
+                }
+                </section>
+            </section>
+            <section class="event-detail-ubi event-detail-tab">
+                <span class="event-tab-title">UBICACIÓN</span>
+                <div class="user-event-card-google-maps-link">
+                    <img class="svgIcon" src="svgLogos/googlemaps.svg" alt="maps">
+                    <a [href]="'https://www.google.com/maps?q=' + eventInfo.lat + ',' + eventInfo.lng"
+                        target="_blank"><span>Abrir ubicación en Google Maps</span></a>
+                </div>
+                <div class="location-map" style="margin-top: 2rem;">
+                    <app-maps [readOnly]="true" [initialLocation]="{ lat: +eventInfo.lat, lng: +eventInfo.lng }" [initialZoom]="14">
+                    </app-maps>
+                </div>
+            </section>
+        </div>
+
+        <div class="filter-tooltip" 
+             *ngIf="showTooltip && showDescriptionFilter" 
+             [style.top.px]="tooltipPosition.top"
+             [style.left.px]="tooltipPosition.left">
+            {{ showDescriptionFilter }}
+        </div>
+    } @else {
+        <div class="loading-container">
+            <app-loadinganimation [type]="'large'"></app-loadinganimation>
+        </div>
+    }
+</div>
+
+<app-infodialog *ngIf="generalError" [message]="generalError" [type]="'error'"></app-infodialog>
+<app-camara *ngIf="showCamera" (imageCaptured)="handleImageCaptured($event)" (close)="showCamera = false">
+</app-camara>
+
+<div class="event-preview-upload-image-container" *ngIf="previewImage !== ''">
+    <div class="event-preview-upload-image">
+        <img [src]="previewImage" alt="Vista previa de la imagen">
+    </div>
+    <div class="event-preview-upload-actions">
+        <button class="event-preview-upload-button del-btn" title="Cancelar" (click)="this.previewImage = ''" [disabled]="loadingImageUpload">
+            <span class="material-icons-outlined">close</span>
+        </button>
+        <button class="event-preview-upload-button" title="Subir imagen" (click)="handleUploadImage($event)" [disabled]="loadingImageUpload">
+            @if (!loadingImageUpload) {
+                <span class="material-icons-outlined">check</span>
+            } @else {
+                <app-loadinganimation [type]="'button'"></app-loadinganimation>
+            }
+        </button>
+    </div>
+</div>
+
+<div class="event-detail-image-container" *ngIf="showFullScreenImage" (click)="closeFullScreenImage()">
+    <div class="fullscreen-image-wrapper" 
+         (click)="$event.stopPropagation()"
+         (mousedown)="onMouseDown($event)"
+         (touchstart)="onTouchStart($event)"
+         (touchmove)="onTouchMove($event)"
+         (touchend)="onTouchEnd($event)">
+        <img 
+            #fullscreenImage
+            [src]="this.apiUrl + 'uploads/events/' + this.eventId + '/images/' + showFullScreenImage.imageUrl" 
+            [alt]="'Imagen del evento en pantalla completa'"
+            [style.transform]="getImageTransform()"
+            draggable="false">
+    </div>
+    
+    <div class="fullscreen-controls">
+        <button class="control-btn zoom-out" 
+                (click)="zoomOut(); $event.stopPropagation()"
+                [disabled]="isZoomAtMin()">
+            <span class="material-icons">zoom_out</span>
+        </button>
+        
+        <span class="zoom-indicator">{{ getZoomPercentage() }}%</span>
+        
+        <button class="control-btn zoom-in" 
+                (click)="zoomIn(); $event.stopPropagation()"
+                [disabled]="isZoomAtMax()">
+            <span class="material-icons">zoom_in</span>
+        </button>
+        
+        <button class="control-btn reset-zoom" 
+                (click)="resetZoom(); $event.stopPropagation()"
+                [disabled]="isZoomReset()">
+            <span class="material-icons">center_focus_strong</span>
+        </button>
+        
+        <button class="control-btn close-btn" (click)="closeFullScreenImage(); $event.stopPropagation()">
+            <span class="material-icons">close</span>
+        </button>
+    </div>
+
+    <div class="uploader-image">
+        <img [src]="this.apiUrl + showFullScreenImage.userUploaded_user.imageUrl" alt="Creador">
+    </div>
+    <span class="uploader-username">Subida por: {{ showFullScreenImage.userUploaded_user.username }}</span>
+    <span class="image-date-taken">{{ formatImageDate(showFullScreenImage.uploaded_at) }}</span>
+</div>

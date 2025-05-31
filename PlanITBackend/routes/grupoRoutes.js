@@ -12,6 +12,7 @@ const Grupo = models.groups;
 
 router.get('/reduced/:id', firebaseAuth, grupoController.getGrupoById);
 router.get('/usergroups', firebaseAuth, grupoController.getGroupsForUser);
+router.get('/createevent', firebaseAuth, grupoController.getCreateEvent);
 router.get('/:id', firebaseAuth, grupoController.getGroupById);
 router.post('/create', firebaseAuth, idGeneratorMiddleware(Grupo), uploadGroup.single('groupImage'), grupoController.createGruop);
 router.put('/fix/:id', firebaseAuth, grupoController.toggleFix);

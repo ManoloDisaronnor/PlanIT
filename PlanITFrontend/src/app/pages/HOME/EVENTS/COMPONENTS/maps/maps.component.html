@@ -1,0 +1,47 @@
+<div class="search-container" *ngIf="!readOnly">
+    <input #searchInput type="text" placeholder="Buscar lugares..." class="search-input" />
+    <button class="location-button" (click)="goToMyLocation($event)" [disabled]="isLoadingLocation">
+        <span *ngIf="!isLoadingLocation">
+            Mi Ubicación
+        </span>
+        <span *ngIf="isLoadingLocation">
+            Cargando...
+        </span>
+    </button>
+    <div *ngIf="locationError" class="error-message">
+        {{ locationError }}
+    </div>
+</div>
+
+<div class="search-container" *ngIf="readOnly">
+    <div class="buttons-container">
+        <button class="location-button" (click)="goToEventLocation()" *ngIf="eventLocation">
+            <span class="material-icons ubi-icon">location_on</span>
+            <span>Centrar evento</span>
+        </button>
+        <button class="location-button" (click)="goToMyLocation($event)" [disabled]="isLoadingLocation">
+            <span class="ubi-btn" *ngIf="!isLoadingLocation">
+                <img class="svgIcon" src="svgLogos/googlemaps.svg" alt="maps">
+                <span>Mi ubicación</span>
+            </span>
+            <span *ngIf="isLoadingLocation">
+                <app-loadinganimation [type]="'button'"></app-loadinganimation>
+            </span>
+        </button>
+    </div>
+    <div *ngIf="locationError" class="error-message">
+        {{ locationError }}
+    </div>
+</div>
+
+<google-map #googleMap [height]="height" [width]="width" [center]="center" [zoom]="zoom" [options]="mapOptions"
+    (mapClick)="addMarker($event)" (zoomChanged)="onZoomChanged()">
+    <map-advanced-marker *ngIf="markerPosition" [position]="markerPosition" [options]="markerOptions">
+    </map-advanced-marker>
+    <map-circle *ngIf="userCurrentLocation && showCurrentLocation && userLocationActive" [center]="userCurrentLocation"
+        [options]="userLocationCircleOptions">
+    </map-circle>
+    <map-marker *ngIf="userCurrentLocation && showCurrentLocation && userLocationActive"
+        [position]="userCurrentLocation" [options]="userLocationMarkerOptions">
+    </map-marker>
+</google-map>

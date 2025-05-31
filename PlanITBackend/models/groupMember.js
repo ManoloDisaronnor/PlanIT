@@ -26,6 +26,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    founder: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
     fixed: {
       type: DataTypes.INTEGER,
       allowNull: false

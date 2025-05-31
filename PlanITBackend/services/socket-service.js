@@ -11,7 +11,7 @@ function setupSocket(server) {
     if (!io) {
         io = new Server(server, {
             cors: {
-                origin: process.env.NODE_ENV === 'development' ? 'http://192.168.1.37:4200' : '*',
+                origin: process.env.NODE_ENV === 'development' ? 'http://192.168.1.11:4200' : '*',
                 methods: ['GET', 'POST', 'PUT', 'DELETE'],
                 credentials: true
             }

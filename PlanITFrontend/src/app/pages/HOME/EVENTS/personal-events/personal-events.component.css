@@ -1,0 +1,110 @@
+#personal-events {
+    width: calc(100dvw - 100px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+.personal-info-container {
+    position: relative;
+    width: 95%;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 1rem;
+    position: relative;
+    background: linear-gradient(90deg, #da2b00aa, #fdc600aa);
+}
+
+.personal-info-container::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    bottom: 2px;
+    left: 2px;
+    background-color: #0d0d1b;
+    border-radius: calc(1rem - 2px);
+    z-index: 0;
+}
+
+.personal-info-container > * {
+    position: relative;
+    z-index: 1;
+}
+
+.events-tab {
+    width: 95%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 1rem;
+}
+
+.past-events {
+    margin: 1rem 0 2rem 0;
+}
+
+.acordeon-event {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem;
+    padding: 1.2rem 0;
+    border-radius: 8px;
+    background-color: #ffffff10;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.acordeon-event:hover {
+    background-color: #ffffff20;
+}
+
+.acordeon-icon {
+    margin-left: 1rem;
+    transform: rotate(0deg);
+    transition: transform 0.2s ease;
+}
+
+.acordeon-icon-not-exp {
+    transform: rotate(-90deg);
+}
+
+.acordeon-header-text {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5rem;
+}
+
+.acordeon-header-text span {
+    font-size: 1.2rem;
+    color: #7c7cff;
+}
+
+.acordeon-filter-icon {
+    font-size: 1.5rem !important;
+    color: #a05cff !important;
+}
+
+.acordeon-content {
+    margin-top: 1rem;
+    padding: 1rem;
+    width: 99%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2rem;
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+    #personal-events {
+        width: 100dvw;
+    }
+}

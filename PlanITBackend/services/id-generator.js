@@ -12,7 +12,16 @@ async function generateUniqueId(model) {
     return id;
 }
 
-// Middleware para generar un ID único
+async function generateUniqueEventImage(req, model) {
+    let value, exists;
+    do {
+        value = nanoid28();
+        const route = 'uploads/events/' + req.params.eventId + '/images/' + value + '_eventimage.jpg';
+        exists = await model.findOne({ where: { imageUrl: route } });
+    } while (exists);
+    return value;
+}
+
 function idGeneratorMiddleware(model) {
     return async (req, res, next) => {
         try {
@@ -24,7 +33,20 @@ function idGeneratorMiddleware(model) {
     };
 }
 
+function idGeneratorMiddleWareForEventImage(model) {
+    return async (req, res, next) => {
+        try {
+            req.imageUrl = await generateUniqueEventImage(req, model);
+            next();
+        } catch (error) {
+            next(error);
+        }
+    };
+}
+
 module.exports = {
     generateUniqueId,
-    idGeneratorMiddleware
+    idGeneratorMiddleware,
+    generateUniqueEventImage,
+    idGeneratorMiddleWareForEventImage
 };

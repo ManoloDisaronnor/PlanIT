@@ -8,6 +8,7 @@ dist/
 .env
 .env.*
 environments/
+config-maps.ts
 serviceAccountKey.json
 logs/
 *.log

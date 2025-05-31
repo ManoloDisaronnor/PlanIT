@@ -1,0 +1,247 @@
+<div id="event-create">
+    <h2 class="create-event-header">Crear nuevo evento</h2>
+
+    <form [formGroup]="eventFormGroup" class="event-form-container" (submit)="handleSubmit($event)">
+        <div class="event-image-container">
+            <div class="event-image-container">
+                <div class="event-image-img-actions-container">
+                    <div (click)="toggleMenu($event)" class="preview-image-container">
+                        <img class="preview-image" [src]="previewImage != '' ? previewImage : 'images/defaultEvent.png'"
+                            alt="Preview Image">
+                    </div>
+                    <div (click)="toggleMenu($event)" class="edit-icon-container">
+                        <span class="material-icons-outlined edit-icon">{{ !showImageActionsMenu ? 'edit' :
+                            'keyboard_arrow_up' }}</span>
+                    </div>
+                    <div #menuContainer *ngIf="showImageActionsMenu" class="image-actions-menu">
+                        <input #fileInputRef type="file" id="fileInput" accept="image/*"
+                            (change)="handleImageChange($event)" hidden>
+                        <div class="option" (click)="fileInputRef.click()">
+                            <span class="opt-text clickable">Subir</span>
+                            <span class="material-icons-outlined opt-icon">upload</span>
+                        </div>
+                        <div class="option" (click)="startCamera()">
+                            <span class="opt-text">Cámara</span>
+                            <span class="material-icons-outlined opt-icon">add_a_photo</span>
+                        </div>
+                        <div class="option option-del" (click)="handleDeleteImage()">
+                            <span class="opt-text">Eliminar</span>
+                            <span class="material-icons-outlined opt-icon-del">hide_image</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="events-form-groups">
+            <span class="events-form-groups-name">DESCRIPCIÓN GENERAL</span>
+            <div class="form-row first-group name-privacity-form">
+                <div class="form-group divided-form-group">
+                    <div class="input-wrapper">
+                        <div [ngClass]="{ 'input-container-error' : nameError}" class="input-container">
+                            <input [ngClass]="{ 'error' : nameError}" type="text" placeholder="" formControlName="name"
+                                autocomplete="new-password" maxlength="50">
+                            <label for="name">Nombre del evento</label>
+                            <span [ngClass]="{ 'errorborder' : nameError }" class="input-border"></span>
+                            <span *ngIf="shouldShowCounter(nameRemainingChars, nameMaxLength)" class="char-counter"
+                                [style.color]="getCounterColor(nameRemainingChars, nameMaxLength)">
+                                {{ nameRemainingChars }}/{{ nameMaxLength }}
+                            </span>
+                        </div>
+                        <div [ngClass]="{ 'icon-wrapper-error' : nameError}" class="icon-wrapper">
+                            <lucide-icon *ngIf="nameError" name="info" size="20px" class="error-icon"
+                                (mouseenter)="showHelperText('name')" (mouseleave)="hideHelperText()">
+                            </lucide-icon>
+                            <span *ngIf="helperTextVisible === 'name'" class="helper-text">
+                                {{ nameError }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="privacity-container" (mouseover)="fetchGroupsForPrivacity()">
+                    <span>Evento público: </span>
+                    <input type="checkbox" id="privacity" name="privacity" formControlName="public" hidden>
+                    <label for="privacity" class="checkbox-custom"></label>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <div class="input-container">
+                            <textarea type="text" placeholder="" formControlName="description"
+                                autocomplete="new-password" maxlength="1500"></textarea>
+                            <label for="name">Descripción del evento</label>
+                            <span class="input-border"></span>
+                            <span *ngIf="shouldShowCounter(descriptionRemainingChars, descriptionMaxLength)"
+                                class="char-counter"
+                                [style.color]="getCounterColor(descriptionRemainingChars, descriptionMaxLength)">
+                                {{ descriptionRemainingChars }}/{{ descriptionMaxLength }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="events-form-groups" style="margin-top: 2rem;">
+            <span class="events-form-groups-name">SELECCIÓN DE FILTROS</span>
+            <div class="form-row acordeon-row">
+                <section class="filter-acordeon">
+                    <div class="filter-acordeon-header" (click)="clothingFilterExpanded = !clothingFilterExpanded">
+                        <span class="material-icons arrow-filter-header"
+                            [ngClass]="{ 'filter-expanded-icon' : clothingFilterExpanded }"
+                            style="margin-right: 1rem;">keyboard_arrow_down</span>
+                        <span class="material-symbols-outlined filter-icon">apparel</span>
+                        <span class="filter-acordeon-text">Vestimenta</span>
+                    </div>
+                    <div class="filter-acordeon-content" *ngIf="clothingFilterExpanded">
+                        @for (filter of allFilters; track $index) {
+                        <div class="filter-option" [ngClass]="{ 'filter-option-active' : filter.selected }"
+                            *ngIf="filter.type === 'clothing'" (click)="onFilterSelected(filter)">
+                            <span class="filter-option-name">{{ filter.filter }}</span>
+                            <span class="filter-option-description">{{ filter.description }}</span>
+                        </div>
+                        }
+                    </div>
+                </section>
+            </div>
+            <div class="form-row acordeon-row">
+                <section class="filter-acordeon">
+                    <div class="filter-acordeon-header" (click)="musicFilterExpanded = !musicFilterExpanded">
+                        <span class="material-icons arrow-filter-header"
+                            [ngClass]="{ 'filter-expanded-icon' : musicFilterExpanded }"
+                            style="margin-right: 1rem;">keyboard_arrow_down</span>
+                        <span class="material-symbols-outlined filter-icon">music_note</span>
+                        <span class="filter-acordeon-text">Música</span>
+                    </div>
+                    <div class="filter-acordeon-content" *ngIf="musicFilterExpanded">
+                        @for (filter of allFilters; track $index) {
+                        <div class="filter-option" [ngClass]="{ 'filter-option-active' : filter.selected }"
+                            *ngIf="filter.type === 'music'" (click)="onFilterSelected(filter)">
+                            <span class="filter-option-name">{{ filter.filter }}</span>
+                            <span class="filter-option-description">{{ filter.description }}</span>
+                        </div>
+                        }
+                    </div>
+                </section>
+            </div>
+            <div class="form-row acordeon-row">
+                <section class="filter-acordeon">
+                    <div class="filter-acordeon-header" (click)="pricingFilterExpanded = !pricingFilterExpanded">
+                        <span class="material-icons arrow-filter-header"
+                            [ngClass]="{ 'filter-expanded-icon' : pricingFilterExpanded }"
+                            style="margin-right: 1rem;">keyboard_arrow_down</span>
+                        <span class="material-symbols-outlined filter-icon">euro</span>
+                        <span class="filter-acordeon-text">Precio</span>
+                    </div>
+                    <div class="filter-acordeon-content" *ngIf="pricingFilterExpanded">
+                        @for (filter of allFilters; track $index) {
+                        <div class="filter-option" [ngClass]="{ 'filter-option-active' : filter.selected }"
+                            *ngIf="filter.type === 'pricing'" (click)="onFilterSelected(filter)">
+                            <span class="filter-option-name">{{ filter.filter }}</span>
+                            <span class="filter-option-description">{{ filter.description }}</span>
+                        </div>
+                        }
+                    </div>
+                </section>
+            </div>
+            <div class="form-row acordeon-row">
+                <section class="filter-acordeon">
+                    <div class="filter-acordeon-header" (click)="placeFilterExpanded = !placeFilterExpanded">
+                        <span class="material-icons arrow-filter-header"
+                            [ngClass]="{ 'filter-expanded-icon' : placeFilterExpanded }"
+                            style="margin-right: 1rem;">keyboard_arrow_down</span>
+                        <span class="material-symbols-outlined filter-icon">map</span>
+                        <span class="filter-acordeon-text">Lugar</span>
+                    </div>
+                    <div class="filter-acordeon-content" *ngIf="placeFilterExpanded">
+                        @for (filter of allFilters; track $index) {
+                        <div class="filter-option" [ngClass]="{ 'filter-option-active' : filter.selected }"
+                            *ngIf="filter.type === 'place'" (click)="onFilterSelected(filter)">
+                            <span class="filter-option-name">{{ filter.filter }}</span>
+                            <span class="filter-option-description">{{ filter.description }}</span>
+                        </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="events-form-groups" style="margin-top: 2rem;" *ngIf="!eventFormGroup.get('public')?.value">
+            <span class="events-form-groups-name">INVITACIÓN A GRUPOS</span>
+            <div class="group-selection" (scroll)="onScroll($event)">
+                <div class="group-selection-error" *ngIf="groupListError">
+                    <span class="material-icons-outlined">error</span>
+                    <span class="error-text">{{ groupListError }}</span>
+                </div>
+                @if (groupList.length <= 0 && !groupListLoading) { <p class="no-data">No hay coincidencias</p>
+                    } @else {
+                    <div class="group-item" *ngFor="let group of groupList">
+                        <div class="group-check">
+                            <input #checkBox hidden type="checkbox" id="friend-{{ group.groups_group.id }}"
+                                name="friend-{{ group.groups_group.id }}" [checked]="group.checked"
+                                (change)="group.checked = !group.checked; onGroupSelect(group)"
+                                (click)="$event.stopPropagation()">
+                            <label for="friend-{{ group.groups_group.id }}" class="checkbox-custom"></label>
+                        </div>
+                        <div class="group-info" (click)="toggleGroupSelection(group)">
+                            <img src="{{group.groups_group.imageUrl ? apirUrl + group.groups_group.imageUrl : 'images/defaultGroup.png'}}"
+                                alt="Grupo">
+                            <div class="group-names">
+                                <span class="groupname">{{ group.groups_group.name }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                    @if (groupListLoading) {
+                    <div class="loading-indicator">
+                        <app-loadinganimation [type]="'button'"></app-loadinganimation>
+                    </div>
+                    }
+            </div>
+        </div>
+
+        <div class="events-form-groups" style="margin-top: 3rem;">
+            <span class="events-form-groups-name">FECHA Y HORARIO</span>
+            <div class="group-selection-error" *ngIf="dateError" style="margin-top: 1rem;">
+                <span class="material-icons-outlined">error</span>
+                <span class="error-text">{{ dateError }}</span>
+            </div>
+            <mbsc-datepicker
+            [controls]="['calendar', 'time']"
+            select="range"
+            display="inline"
+            [touchUi]="true"
+            theme="ios"
+            themeVariant="light"
+            timeFormat="HH:mm"
+            [firstDay]="1"
+            [locale]="localeEs"
+            (onChange)="onDateRangeChange($event)"
+            [responsive]="{
+                large: {
+                    pages: 2
+                }
+            }" style="margin-top: 1rem;">
+            </mbsc-datepicker>
+        </div>
+
+        <div class="events-form-groups" style="margin-top: 3rem;">
+            <span class="events-form-groups-name">UBICACIÓN</span>
+            <div class="maps-container">
+                <app-maps [readOnly]="false" (locationSelected)="onLocationSelected($event)">
+                </app-maps>
+            </div>
+        </div>
+
+        <div class="submit-btn-container" style="margin: 2rem 0;">
+            <input type="submit" value="Guardar evento" class="submit-button"
+                [disabled]="eventFormGroup.invalid || loadingCreateEvent || (!this.eventFormGroup.get('public')?.value && !groupsSelected) || (!this.eventFormGroup.get('public')?.value && groupsSelected!!.length <= 0)">
+        </div>
+        <app-infodialog *ngIf="generalError" [type]="'error'" [message]="generalError"></app-infodialog>
+    </form>
+</div>
+
+<app-camara *ngIf="showCamera" (imageCaptured)="handleImageCaptured($event)" (close)="showCamera = false">
+</app-camara>

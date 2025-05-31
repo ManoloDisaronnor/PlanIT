@@ -1,1 +1,144 @@
-<p>events works!</p>
+<div id="events">
+    <div class="events-container">
+        <nav class="header-navigation" *ngIf="!router.url.includes('/home/events/details')">
+            <div class="filter-toggle" title="{{ showFilters ? 'Ocultar filtros' : 'Mostrar filtros' }}"
+                (click)="toggleFilters($event)" *ngIf="router.url.includes('/home/events/discover')">
+                <span class="material-icons">{{ !showFilters ? 'filter_alt' : 'close' }}</span>
+            </div>
+            <div class="header-create-event" title="Crear evento" routerLink="/home/events/create"
+                [ngClass]="{ 'header-create-event-discover' : !router.url.includes('/home/events/discover') }">
+                <span class="material-symbols-outlined">calendar_add_on</span>
+            </div>
+            <div class="header-navigate" routerLink="/home/events/personal" routerLinkActive="header-navigate-active">
+                <span class="header-navigate-text">Personal</span>
+            </div>
+            <div class="header-navigate" routerLink="/home/events/discover" routerLinkActive="header-navigate-active">
+                <span class="header-navigate-text">Descubrir</span>
+            </div>
+            <div class="header-navigate last-header-navigate" routerLink="/home/events/owned"
+                routerLinkActive="header-navigate-active">
+                <span class="header-navigate-text">Tus eventos</span>
+            </div>
+        </nav>
+        <section class="events-content-container" (scroll)="onScroll($event)" [ngClass]="{ 'events-content-container-no-navbar' : router.url.includes('/home/events/details') }">
+            <aside class="events-filters" [ngClass]="{ 'events-filters-show' : showFilters }">
+                <div class="filters-container">
+                    <div class="filters-header">
+                        <span class="filters-header-text">Filtros</span>
+                    </div>
+                    <div class="selected-filters" *ngIf="selectedFilters && selectedFilters.length > 0">
+                        <div class="all-filters-container">
+                            @for (selectedFilter of selectedFilters; track $index) {
+                            <div class="filter-label" (click)="selectFilter(selectedFilter)">
+                                <span class="labeled-filter">{{selectedFilter.filter}}</span>
+                                <div class="remove-filter-container">
+                                    <span class="material-icons remove-filter-icon">close</span>
+                                </div>
+                            </div>
+                            }
+                            <div class="remove-all-filters-btn" (click)="removeAllFilters($event)">
+                                <span class="material-icons-outlined">close</span>
+                                <span class="remove-all-filters-text">Limpiar</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="filters-list">
+                        <section class="acordeon-filter clothing-filter">
+                            <div class="acordeon-header" (click)="clothingFilterExpanded = !clothingFilterExpanded">
+                                <span class="material-icons acordeon-icon">{{ clothingFilterExpanded ? 'expand_more' :
+                                    'chevron_right' }}</span>
+                                <div class="acordeon-header-text">
+                                    <span class="material-icons acordeon-filter-icon">checkroom</span>
+                                    <span class="acordeon-header-text">Vestimenta</span>
+                                </div>
+                            </div>
+                            <div class="acordeon-info">
+                                @for (filter of allFilters; track $index) {
+                                @if (filter.type === 'clothing') {
+                                <div class="filter-item" [ngClass]="{ 'filter-item-show' : clothingFilterExpanded }">
+                                    <div class="filter-checkbox">
+                                        <input type="checkbox" id="{{ filter.filter }}" name="{{ filter.filter }}"
+                                            [checked]="filter.checked" hidden (change)="selectFilter(filter)">
+                                        <label for="{{ filter.filter }}" class="checkbox-custom"></label>
+                                    </div>
+                                    <span class="filter-item-text">{{filter.filter}}</span>
+                                </div>
+                                }
+                                }
+                            </div>
+                            <div class="acordeon-header" (click)="musicFilterExpanded = !musicFilterExpanded">
+                                <span class="material-icons acordeon-icon">{{ musicFilterExpanded ? 'expand_more' :
+                                    'chevron_right' }}</span>
+                                <div class="acordeon-header-text">
+                                    <span class="material-icons acordeon-filter-icon">headset_mic</span>
+                                    <span class="acordeon-header-text">Música</span>
+                                </div>
+                            </div>
+                            <div class="acordeon-info">
+                                @for (filter of allFilters; track $index) {
+                                @if (filter.type === 'music') {
+                                <div class="filter-item" [ngClass]="{ 'filter-item-show' : musicFilterExpanded }">
+                                    <div class="filter-checkbox">
+                                        <input type="checkbox" id="{{ filter.filter }}" name="{{ filter.filter }}"
+                                            [checked]="filter.checked" hidden (change)="selectFilter(filter)">
+                                        <label for="{{ filter.filter }}" class="checkbox-custom"></label>
+                                    </div>
+                                    <span class="filter-item-text">{{filter.filter}}</span>
+                                </div>
+                                }
+                                }
+                            </div>
+                            <div class="acordeon-header" (click)="pricingFilterExpanded = !pricingFilterExpanded">
+                                <span class="material-icons acordeon-icon">{{ pricingFilterExpanded ? 'expand_more' :
+                                    'chevron_right' }}</span>
+                                <div class="acordeon-header-text">
+                                    <span class="material-icons acordeon-filter-icon">attach_money</span>
+                                    <span class="acordeon-header-text">Precio</span>
+                                </div>
+                            </div>
+                            <div class="acordeon-info">
+                                @for (filter of allFilters; track $index) {
+                                @if (filter.type === 'pricing') {
+                                <div class="filter-item" [ngClass]="{ 'filter-item-show' : pricingFilterExpanded }">
+                                    <div class="filter-checkbox">
+                                        <input type="checkbox" id="{{ filter.filter }}" name="{{ filter.filter }}"
+                                            [checked]="filter.checked" hidden (change)="selectFilter(filter)">
+                                        <label for="{{ filter.filter }}" class="checkbox-custom"></label>
+                                    </div>
+                                    <span class="filter-item-text">{{filter.filter}}</span>
+                                </div>
+                                }
+                                }
+                            </div>
+                            <div class="acordeon-header" (click)="placeFilterExpanded = !placeFilterExpanded">
+                                <span class="material-icons acordeon-icon">{{ placeFilterExpanded ? 'expand_more' :
+                                    'chevron_right' }}</span>
+                                <div class="acordeon-header-text">
+                                    <span class="material-icons-outlined acordeon-filter-icon">map</span>
+                                    <span class="acordeon-header-text">Lugares</span>
+                                </div>
+                            </div>
+                            <div class="acordeon-info">
+                                @for (filter of allFilters; track $index) {
+                                @if (filter.type === 'place') {
+                                <div class="filter-item" [ngClass]="{ 'filter-item-show' : placeFilterExpanded }">
+                                    <div class="filter-checkbox">
+                                        <input type="checkbox" id="{{ filter.filter }}" name="{{ filter.filter }}"
+                                            [checked]="filter.checked" hidden (change)="selectFilter(filter)">
+                                        <label for="{{ filter.filter }}" class="checkbox-custom"></label>
+                                    </div>
+                                    <span class="filter-item-text">{{filter.filter}}</span>
+                                </div>
+                                }
+                                }
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </aside>
+            <router-outlet></router-outlet>
+        </section>
+    </div>
+</div>
+
+<app-infodialog *ngIf="generalError" [type]="'error'" [message]="generalError"></app-infodialog>

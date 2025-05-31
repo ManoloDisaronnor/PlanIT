@@ -81,7 +81,6 @@ export class GroupChatComponent {
   private textMeasurerEl: HTMLDivElement | null = null;
 
   constructor(private renderer: Renderer2, private route: ActivatedRoute, public messagesService: MessagesService, private router: Router) {
-    // Check if device is mobile
     this.isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   }
 
