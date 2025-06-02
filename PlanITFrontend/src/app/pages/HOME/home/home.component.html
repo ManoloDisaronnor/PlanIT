@@ -12,9 +12,8 @@
     </section>
     <div id="friends" class="opt-menu-home" [ngClass]="{ 'opt-menu-home-exp' : friendsMenuExpanded}" #friendsMenu>
         <app-friends></app-friends>
-    </div>
-    <div id="information" *ngIf="informationMenuExpanded" #informationMenu>
-        <app-information></app-information>
+    </div>    <div id="information" *ngIf="informationMenuExpanded" #informationMenu>
+        <app-information (closeModal)="closeInformationModal()"></app-information>
     </div>
     <div id="notifications" class="opt-menu-home" [ngClass]="{ 'opt-menu-home-exp' : notificationsMenuExpanded}" #notificationsMenu>
         <app-notifications (close)="toggleNotificationsMenu(!this.notificationsMenuExpanded)"></app-notifications>

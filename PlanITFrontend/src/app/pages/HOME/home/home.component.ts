@@ -62,10 +62,13 @@ export class HomeComponent {
     this.friendsMenuExpanded = false;
     this.notificationsMenuExpanded = false;
   }
-
   toggleNotificationsMenu(event: boolean) {
     this.notificationsMenuExpanded = event;
     this.friendsMenuExpanded = false;
+    this.informationMenuExpanded = false;
+  }
+
+  closeInformationModal() {
     this.informationMenuExpanded = false;
   }
 }

@@ -17,7 +17,7 @@ import { CommonModule } from '@angular/common';
 import { LoadinganimationComponent } from '../../../../components/loadinganimation/loadinganimation.component';
 import { InfodialogComponent } from '../../../../components/infodialog/infodialog.component';
 import { CamaraComponent } from '../../../../components/camara/camara.component';
-import { MapsComponent } from "../COMPONENTS/maps/maps.component";
+import { MapsComponent } from '../COMPONENTS/maps/maps.component';
 
 interface ImageState {
   imageUrl: string;
@@ -38,8 +38,8 @@ interface ImageState {
     LoadinganimationComponent,
     InfodialogComponent,
     CamaraComponent,
-    MapsComponent
-],
+    MapsComponent,
+  ],
   templateUrl: './event-detail.component.html',
   styleUrl: './event-detail.component.css',
 })
@@ -84,6 +84,11 @@ export class EventDetailComponent {
   tooltipPosition = { top: 0, left: 0 };
   showTooltip = false;
 
+  currentImageIndex = 0;
+  private touchStartX = 0;
+  private touchEndX = 0;
+  private readonly swipeThreshold = 50;
+
   imageStates = signal<Map<string, ImageState>>(new Map());
 
   private paramSub?: Subscription;
@@ -126,10 +131,84 @@ export class EventDetailComponent {
     this.paramSub?.unsubscribe();
   }
 
+  getCurrentImageIndex(): number {
+    if (!this.showFullScreenImage || !this.eventInfo?.event_images) {
+      return 0;
+    }
+    return this.eventInfo.event_images.findIndex(
+      (img: any) => img.imageUrl === this.showFullScreenImage.imageUrl
+    );
+  }
+
+  navigateToPreviousImage(): void {
+    if (
+      !this.eventInfo?.event_images ||
+      this.eventInfo.event_images.length <= 1
+    ) {
+      return;
+    }
+
+    const currentIndex = this.getCurrentImageIndex();
+    if (currentIndex > 0) {
+      this.showFullScreenImage = this.eventInfo.event_images[currentIndex - 1];
+      this.resetZoom();
+    }
+  }
+
+  navigateToNextImage(): void {
+    if (
+      !this.eventInfo?.event_images ||
+      this.eventInfo.event_images.length <= 1
+    ) {
+      return;
+    }
+
+    const currentIndex = this.getCurrentImageIndex();
+    if (currentIndex < this.eventInfo.event_images.length - 1) {
+      this.showFullScreenImage = this.eventInfo.event_images[currentIndex + 1];
+      this.resetZoom();
+    }
+  }
+
+  hasPreviousImage(): boolean {
+    return this.getCurrentImageIndex() > 0;
+  }
+
+  hasNextImage(): boolean {
+    const currentIndex = this.getCurrentImageIndex();
+    return currentIndex < (this.eventInfo?.event_images?.length || 0) - 1;
+  }
+
   openFullScreenImage(image: any): void {
     this.showFullScreenImage = image;
+    this.currentImageIndex = this.getCurrentImageIndex();
     this.resetZoom();
     document.body.style.overflow = 'hidden';
+  }
+
+  onImageTouchStart(event: TouchEvent): void {
+    if (event.touches.length === 1) {
+      this.touchStartX = event.touches[0].clientX;
+    }
+  }
+
+  onImageTouchEnd(event: TouchEvent): void {
+    if (event.changedTouches.length === 1) {
+      this.touchEndX = event.changedTouches[0].clientX;
+      this.handleSwipeGesture();
+    }
+  }
+
+  private handleSwipeGesture(): void {
+    const deltaX = this.touchEndX - this.touchStartX;
+
+    if (Math.abs(deltaX) > this.swipeThreshold) {
+      if (deltaX > 0 && this.hasPreviousImage()) {
+        this.navigateToPreviousImage();
+      } else if (deltaX < 0 && this.hasNextImage()) {
+        this.navigateToNextImage();
+      }
+    }
   }
 
   closeFullScreenImage(): void {
@@ -209,6 +288,30 @@ export class EventDetailComponent {
           this.translateX = 0;
           this.translateY = 0;
         }
+      }
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent): void {
+    if (this.showFullScreenImage) {
+      switch (event.key) {
+        case 'ArrowLeft':
+          event.preventDefault();
+          if (this.hasPreviousImage()) {
+            this.navigateToPreviousImage();
+          }
+          break;
+        case 'ArrowRight':
+          event.preventDefault();
+          if (this.hasNextImage()) {
+            this.navigateToNextImage();
+          }
+          break;
+        case 'Escape':
+          event.preventDefault();
+          this.closeFullScreenImage();
+          break;
       }
     }
   }
@@ -347,19 +450,19 @@ export class EventDetailComponent {
   }
 
   private addNewImageState(image: any): void {
-  const currentStates = this.imageStates();
-  const updatedStates = new Map(currentStates);
-  
-  updatedStates.set(image.imageUrl, {
-    imageUrl: image.imageUrl,
-    uploaded_at: image.uploaded_at,
-    userUploaded_user: image.userUploaded_user,
-    isLoaded: false,
-    hasError: false
-  });
-  
-  this.imageStates.set(updatedStates);
-}
+    const currentStates = this.imageStates();
+    const updatedStates = new Map(currentStates);
+
+    updatedStates.set(image.imageUrl, {
+      imageUrl: image.imageUrl,
+      uploaded_at: image.uploaded_at,
+      userUploaded_user: image.userUploaded_user,
+      isLoaded: false,
+      hasError: false,
+    });
+
+    this.imageStates.set(updatedStates);
+  }
 
   async getUserId(): Promise<void> {
     const user = sessionStorage.getItem('user');

@@ -29,7 +29,7 @@
                                 <div class="user-names">
                                     <span class="real-name">{{ friend.user_requested_user.name + ' ' +
                                         friend.user_requested_user.surname }}</span>
-                                    <span>{{ friend.user_requested_user.username }}</span>
+                                    <span class="username">{{ friend.user_requested_user.username }}</span>
                                 </div>
                             </div>
                             }@else {
@@ -39,7 +39,7 @@
                                 <div class="user-names">
                                     <span class="real-name">{{ friend.user_send_user.name + ' ' +
                                         friend.user_send_user.surname }}</span>
-                                    <span>{{ friend.user_send_user.username }}</span>
+                                    <span class="username">{{ friend.user_send_user.username }}</span>
                                 </div>
                             </div>
                             }
@@ -66,7 +66,7 @@
                             <div class="user-info">
                                 <img src="{{user.imageUrl ? this.apiUrl + user.imageUrl : 'images/defaultProfilePicture.png'}}"
                                     alt="Avatar">
-                                <span>{{ user.username }}</span>
+                                <span class="real-name-all-users">{{ user.username }}</span>
                             </div>
                             <button class="add-friend" (click)="sendFriendRequest(user.uid)"
                                 [disabled]="user.requested || loadingFriendRequest === user.uid">

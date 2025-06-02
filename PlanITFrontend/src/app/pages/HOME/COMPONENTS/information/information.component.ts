@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-information',
@@ -7,5 +7,9 @@ import { Component } from '@angular/core';
   styleUrl: './information.component.css'
 })
 export class InformationComponent {
+  @Output() closeModal = new EventEmitter<void>();
 
+  close() {
+    this.closeModal.emit();
+  }
 }

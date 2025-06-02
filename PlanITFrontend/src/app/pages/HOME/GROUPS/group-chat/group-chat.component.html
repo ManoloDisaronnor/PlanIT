@@ -189,7 +189,6 @@
                 </div>
             </ng-container>
 
-            <!-- Group actions menu -->
             <div class="group-item-actions-menu" [ngClass]="{ 
                 'group-item-actions-menu-show' : groupActionsMenu, 
                 'group-item-actions-menu-close': groupActionsClosing }">
@@ -203,7 +202,6 @@
             </div>
         </ng-template>
 
-        <!-- Loading template for initial load -->
         <ng-template #loadingTpl>
             <div class="loading-initial">
                 <app-loadinganimation [type]="'large'"></app-loadinganimation>
@@ -244,7 +242,7 @@
             </div>
             <form (submit)="sendMessage($event)" class="input-form">
                 <div class="input-more-actions icon-container">
-                    <span class="material-icons-outlined attach-icon">attach_file</span>
+                    <span class="material-icons-outlined attach-icon" (click)="showFutureFeaturesDialog = true">attach_file</span>
                 </div>
                 <div class="input-container">
                     <textarea [disabled]="userHasLeft" class="message autogrowing-textarea" placeholder="Mensaje"
@@ -288,6 +286,12 @@
             <button class="btn-cancel" (click)="showAlertDialogFunction($event, null)">Cancelar</button>
             <button class="btn-accept" (click)="leaveGroup($event)">Continuar</button>
         </div>
+    </div>
+</dialog>
+
+<dialog class="alert-dialog" *ngIf="showFutureFeaturesDialog" (click)="showFutureFeaturesDialog = false">
+    <div class="alert-dialog-content">
+        <app-featurecommingsoon [futureFeatures]="['Posibilidad de subida de archivos al chat.', 'Posibilidad de acceso a la camara para subir y almacenar imagenes.', 'Posibilidad de acceso al microfono para el envio de audios al chat.']"></app-featurecommingsoon>
     </div>
 </dialog>
 

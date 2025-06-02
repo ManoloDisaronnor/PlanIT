@@ -8,10 +8,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoadinganimationComponent } from "../../../../components/loadinganimation/loadinganimation.component";
 import { InfodialogComponent } from "../../../../components/infodialog/infodialog.component";
+import { FeaturecommingsoonComponent } from "../../../../components/featurecommingsoon/featurecommingsoon.component";
 
 @Component({
   selector: 'app-group-chat',
-  imports: [CommonModule, FormsModule, LoadinganimationComponent, RouterModule, InfodialogComponent],
+  imports: [CommonModule, FormsModule, LoadinganimationComponent, RouterModule, InfodialogComponent, FeaturecommingsoonComponent],
   templateUrl: './group-chat.component.html',
   styleUrl: './group-chat.component.css'
 })
@@ -30,6 +31,7 @@ export class GroupChatComponent {
   noMessagesFound: boolean = true;
 
   showAlertDialog: boolean = false;
+  showFutureFeaturesDialog: boolean = false;
   groupSelected: any | null = null;
 
   messagesLimit: number = 20;

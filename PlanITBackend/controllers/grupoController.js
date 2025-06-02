@@ -160,7 +160,7 @@ class GrupoController {
                     ["joined_at", "DESC"]
                 ],
             });
-            if (!grupos || grupos.length === 0) {
+            if (!grupos || grupos.length === 0 && offset === 0) {
                 return res.status(404).json(Respuesta.error(null, "No se encontraron grupos para el usuario", "NO_GROUPS_FOUND"));
             }
             return res.json(Respuesta.exito(grupos, "Grupos recuperados"));

@@ -289,7 +289,7 @@ export class GroupsComponent implements AfterViewChecked {
         }
       } else {
         if (data.codError === "NO_GROUPS_FOUND") {
-          this.showInformation("No tienes grupos creados", "info");
+          this.showInformation("No se encontraron grupos", "info");
           this.lottieInitialized = true;
         } else {
           this.showInformation(data.mensaje, "error");

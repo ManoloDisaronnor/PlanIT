@@ -211,9 +211,9 @@
     <div class="fullscreen-image-wrapper" 
          (click)="$event.stopPropagation()"
          (mousedown)="onMouseDown($event)"
-         (touchstart)="onTouchStart($event)"
+         (touchstart)="onTouchStart($event); onImageTouchStart($event)"
          (touchmove)="onTouchMove($event)"
-         (touchend)="onTouchEnd($event)">
+         (touchend)="onTouchEnd($event); onImageTouchEnd($event)">
         <img 
             #fullscreenImage
             [src]="this.apiUrl + 'uploads/events/' + this.eventId + '/images/' + showFullScreenImage.imageUrl" 
@@ -221,6 +221,20 @@
             [style.transform]="getImageTransform()"
             draggable="false">
     </div>
+    
+    <button class="nav-btn nav-btn-left" 
+            *ngIf="hasPreviousImage()"
+            (click)="navigateToPreviousImage(); $event.stopPropagation()"
+            title="Imagen anterior">
+        <span class="material-icons">chevron_left</span>
+    </button>
+    
+    <button class="nav-btn nav-btn-right" 
+            *ngIf="hasNextImage()"
+            (click)="navigateToNextImage(); $event.stopPropagation()"
+            title="Imagen siguiente">
+        <span class="material-icons">chevron_right</span>
+    </button>
     
     <div class="fullscreen-controls">
         <button class="control-btn zoom-out" 
@@ -253,4 +267,8 @@
     </div>
     <span class="uploader-username">Subida por: {{ showFullScreenImage.userUploaded_user.username }}</span>
     <span class="image-date-taken">{{ formatImageDate(showFullScreenImage.uploaded_at) }}</span>
+    
+    <div class="image-counter">
+        {{ getCurrentImageIndex() + 1 }} / {{ eventInfo?.event_images?.length || 0 }}
+    </div>
 </div>

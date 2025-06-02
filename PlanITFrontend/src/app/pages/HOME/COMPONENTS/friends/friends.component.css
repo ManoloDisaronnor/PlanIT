@@ -59,7 +59,7 @@ input[type="text"]:focus {
     cursor: pointer;
     transition: background-color 0.2s;
 }
-  
+
 .reload-btn:hover {
     background-color: #7c7cff80;
 }
@@ -170,14 +170,42 @@ input[type="text"]:focus {
 }
 
 .user-names {
+    flex: 1;
+    max-width: calc(100% - 60px);
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
 
 .real-name {
+    color: #7c7cff;
     font-weight: 600;
     font-size: 1.2rem;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.real-name-all-users {
+    color: #7c7cff;
+    font-weight: 600;
+    font-size: 1rem;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+}
+
+.username {
+    color: #cecece;
+    font-size: 0.9rem;
+    font-style: italic;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .user-info img {
@@ -193,7 +221,7 @@ input[type="text"]:focus {
     color: #666;
     font-style: italic;
 }
-  
+
 .add-friend {
     min-width: 80px;
     display: flex;
@@ -208,7 +236,7 @@ input[type="text"]:focus {
     cursor: pointer;
     transition: background-color 0.2s;
 }
-  
+
 .add-friend:hover {
     background-color: #7c7cff80;
 }
@@ -222,7 +250,7 @@ input[type="text"]:focus {
 .add-icon {
     font-size: 1.2rem;
 }
-  
+
 .no-data {
     text-align: center;
     color: #999;
@@ -237,5 +265,9 @@ input[type="text"]:focus {
 
     .acordeon-content {
         max-height: 300px;
+    }
+
+    .real-name-all-users {
+        max-width: 125px;
     }
 }

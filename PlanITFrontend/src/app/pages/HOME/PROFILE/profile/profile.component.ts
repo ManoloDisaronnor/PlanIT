@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { CommingsoonComponent } from "../../../../components/commingsoon/commingsoon.component";
 
 @Component({
   selector: 'app-profile',
-  imports: [],
+  imports: [CommingsoonComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
