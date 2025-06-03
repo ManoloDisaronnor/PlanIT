@@ -3,22 +3,48 @@ import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject } from 'rxjs';
 import { apiUrl } from '../config/config';
 
+/**
+ * Interface que define la estructura de una notificación
+ * @interface Notification
+ */
 export interface Notification {
+    /** ID único de la notificación */
     id: number;
+    /** Tipo de notificación */
     type: 'friendRequest' | 'groupRequest';
+    /** ID de la entidad relacionada (usuario, grupo, etc.) */
     entity_id: string;
+    /** Contenido de la notificación */
     content: any;
+    /** Fecha de creación de la notificación */
     created_at: Date;
+    /** Indica si la notificación ha sido leída */
     readed: boolean;
+    /** Fecha de lectura de la notificación */
     read_at?: Date;
+    /** Visibilidad de la notificación */
     visible: boolean;
 }
 
+/**
+ * Interface para el conteo de notificaciones
+ * @interface NotificationCount
+ */
 export interface NotificationCount {
+    /** Número total de notificaciones */
     totalCount: number;
+    /** Número de notificaciones no leídas */
     unreadCount: number;
 }
 
+/**
+ * Servicio para gestionar notificaciones del usuario en tiempo real
+ * Maneja la conexión WebSocket, carga, marcado como leído y reproducción de sonidos
+ * 
+ * @class NotificationService
+ * @since 1.0.0
+ * @author Manuel Santos Márquez
+ */
 @Injectable({
     providedIn: 'root'
 })

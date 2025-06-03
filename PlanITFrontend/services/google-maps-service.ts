@@ -2,19 +2,38 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
 import { catchError, tap, switchMap, filter, retry, delay } from 'rxjs/operators';
 
+/**
+ * Servicio para integración con Google Maps API
+ * Proporciona funcionalidades para lugares, geocodificación y geolocalización
+ * Maneja la carga asíncrona de librerías y la obtención de ubicación del usuario
+ * 
+ * @class GoogleMapsService
+ * @since 1.0.0
+ * @author Manuel Santos Márquez
+ */
 @Injectable({
     providedIn: 'root'
 })
-export class GoogleMapsService {
+export class GoogleMapsService {    /** Librería de Places de Google Maps cargada */
     private placesLibrary: any = null;
+    /** BehaviorSubject para la librería de Places */
     private placesLibrarySubject = new BehaviorSubject<any>(null);
+    /** BehaviorSubject para la ubicación del usuario */
     private userLocationSubject = new BehaviorSubject<google.maps.LatLngLiteral | null>(null);
+    /** Flag para evitar múltiples cargas simultáneas */
     private isLoadingPlaces = false;
 
     constructor() {
         this.initPlacesLibrary();
         this.getUserLocation().subscribe();
     }
+
+    /**
+     * Inicializa la librería de Places de Google Maps de forma asíncrona
+     * Implementa reintentos automáticos en caso de fallo
+     * 
+     * @private
+     */
 
     private async initPlacesLibrary() {
         if (this.isLoadingPlaces) return;

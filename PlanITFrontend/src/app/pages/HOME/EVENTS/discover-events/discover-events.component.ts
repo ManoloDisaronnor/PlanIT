@@ -20,6 +20,16 @@ import { InfodialogComponent } from '../../../../components/infodialog/infodialo
 import { ScrollService } from '../../../../../../services/scroll-service';
 import { RouterLink } from '@angular/router';
 
+/**
+ * Componente para descubrir eventos públicos en el mapa
+ * Permite buscar eventos por ubicación, aplicar filtros y visualizar en Google Maps
+ * Incluye funcionalidades de geolocalización y autocompletado de lugares
+ * 
+ * @class DiscoverEventsComponent
+ * @implements {OnInit, AfterViewInit, OnDestroy}
+ * @since 1.0.0
+ * @author Manuel Santos Márquez
+ */
 @Component({
   selector: 'app-discover-events',
   imports: [
@@ -35,19 +45,28 @@ import { RouterLink } from '@angular/router';
 })
 export class DiscoverEventsComponent
   implements OnInit, AfterViewInit, OnDestroy
-{
+{  /** Referencia al input de búsqueda para autocompletado */
   @ViewChild('searchInput') searchInput!: ElementRef;
+  /** URL base de la API */
   apiUrl = apiUrl;
 
+  /** Latitud del usuario actual */
   userLat: number | null = null;
+  /** Longitud del usuario actual */
   userLng: number | null = null;
+  /** Latitud de la búsqueda activa */
   searchLat: number | null = null;
+  /** Longitud de la búsqueda activa */
   searchLng: number | null = null;
 
+  /** Ubicación de búsqueda actual */
   currentSeachLocation: string | null = null;
 
+  /** Estado de carga de ubicación */
   isLoadingLocation = false;
+  /** Error de geolocalización */
   locationError: string | null = null;
+  /** Estado de inicialización del autocompletado */
   autocompleteInitialized = false;
 
   events: any[] = [];

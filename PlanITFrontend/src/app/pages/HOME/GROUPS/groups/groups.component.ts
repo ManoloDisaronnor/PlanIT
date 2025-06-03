@@ -14,39 +14,72 @@ import { MessagesService } from '../../../../../../services/messages.service';
 import { getCurrentUser, setSessionStorage } from '../../../../../../config/authUser';
 import { GroupMessagesService } from '../../../../../../services/groups.service';
 
+/**
+ * Componente principal para la gestión de grupos
+ * Permite visualizar, buscar, crear y administrar grupos del usuario
+ * Incluye funcionalidades de chat en tiempo real y gestión de miembros
+ * 
+ * @class GroupsComponent
+ * @implements {AfterViewChecked}
+ * @since 1.0.0
+ * @author Manuel Santos Márquez
+ */
 @Component({
   selector: 'app-groups',
   imports: [CommonModule, InfodialogComponent, GroupsCreateComponent, RouterOutlet, CamaraComponent, RouterModule, LoadinganimationComponent, FormsModule],
   templateUrl: './groups.component.html',
   styleUrl: './groups.component.css'
 })
-export class GroupsComponent implements AfterViewChecked {
+export class GroupsComponent implements AfterViewChecked {  /** Lista de grupos del usuario */
   groupList: any[] = [];
+  /** Mensaje de error general */
   generalError: string | null = null;
+  /** Tipo de error para el componente de diálogo */
   typeError: string = 'error';
+  /** Controla la visibilidad del modal */
   showModal: boolean = false;
+  /** Controla la visibilidad de la cámara */
   showCamera: boolean = false;
+  /** Indica si el menú de grupo se está cerrando */
   groupMenuClosing: boolean = false;
 
+  /** UID del usuario actual */
   userUid: string = '';
+  /** Nombre del usuario actual */
   userName: string = '';
+  /** URL de la imagen del usuario actual */
   userImageUrl: string = '';
+  /** URL base de la API */
   apiUrl: string = apiUrl;
 
+  /** Límite de grupos por carga */
   groupLimit: number = 10;
+  /** Offset para paginación de grupos */
   groupOffset: number = 0;
+  /** Término de búsqueda de grupos */
   searchGroup: string = '';
+  /** Subject para debounce de búsqueda */
   private searchDebouncer = new Subject<string>();
+  /** Suscripción al observable de búsqueda */
   private searchSubscription: Subscription;
+  /** Indica si no hay más grupos para cargar */
   noMoreGroups: boolean = false;
+  /** Estado de carga de grupos */
   loadingGroups: boolean = false;
+  /** ID del grupo actualmente en carga */
   loadingGroup: string = '';
+  /** ID del grupo sobre el que está el hover */
   groupHovered: string = '';
+  /** ID del grupo con acción seleccionada */
   groupActionSelected: string = '';
+  /** ID del grupo con acción táctil seleccionada */
   groupActionTouchSelected: string = '';
 
+  /** Estilos para posicionamiento del menú contextual */
   menuStyles: { top?: string; left?: string } = {};
+  /** Controla la visibilidad del diálogo de alerta */
   showAlertDialog: boolean = false;
+  /** Grupo actualmente seleccionado */
   groupSelected: any | null = null;
 
   longPressTimeout: any = null;

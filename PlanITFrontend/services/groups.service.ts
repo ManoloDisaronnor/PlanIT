@@ -3,34 +3,72 @@ import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { apiUrl } from '../config/config';
 
+/**
+ * Interface que define la estructura del último mensaje en un grupo
+ * @interface LastMessage
+ */
 interface LastMessage {
+    /** ID único del mensaje */
     id: string;
+    /** Tipo de contenido del mensaje */
     type: 'text' | 'image' | 'video' | 'audio';
+    /** Contenido del mensaje */
     content: string;
+    /** ID del grupo al que pertenece el mensaje */
     groups: string;
+    /** Información del usuario que envió el mensaje */
     user_user: {
         username: string;
     };
+    /** Fecha y hora de envío del mensaje */
     datetime: Date;
 }
 
+/**
+ * Interface para mapear contadores de mensajes no leídos por grupo
+ * @interface UnreadCountsMap
+ */
 interface UnreadCountsMap {
     [groupId: string]: BehaviorSubject<number>;
 }
 
+/**
+ * Servicio para gestionar mensajes de grupos y comunicación en tiempo real
+ * Maneja la conexión WebSocket, mensajes no leídos y últimos mensajes
+ * 
+ * @class GroupMessagesService
+ * @since 1.0.0
+ * @author Manuel Santos Márquez
+ */
 @Injectable({
     providedIn: 'root'
 })
-export class GroupMessagesService {
+export class GroupMessagesService {    /** Conexión WebSocket para comunicación en tiempo real */
     private socket: Socket | null = null;
+    /** URL base de la API */
     private apiUrl = apiUrl;
+    /** ID del usuario actualmente conectado */
     private userId: string = '';
+    /** Mapa de BehaviorSubjects para últimos mensajes por grupo */
     private lastMessagesMap = new Map<string, BehaviorSubject<LastMessage | null>>();
+    /** Estado de la conexión WebSocket */
     private isConnected = false;
-
+    /** Mapa de contadores de mensajes no leídos por grupo */
     private unreadCountsMap: UnreadCountsMap = {};
 
     constructor() { }
+
+    /**
+     * Establece la conexión WebSocket con el servidor
+     * Registra al usuario y configura los listeners de eventos
+     * 
+     * @param {string} userId - ID del usuario que se conecta
+     * 
+     * @example
+     * ```typescript
+     * groupService.connect('user123');
+     * ```
+     */
 
     connect(userId: string): void {
         if (this.isConnected || !userId) return;

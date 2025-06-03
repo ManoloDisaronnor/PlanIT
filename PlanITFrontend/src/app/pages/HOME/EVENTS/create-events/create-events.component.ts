@@ -10,14 +10,25 @@ import { CamaraComponent } from "../../../../components/camara/camara.component"
 import { LucideAngularModule } from 'lucide-angular';
 import { LoadinganimationComponent } from "../../../../components/loadinganimation/loadinganimation.component";
 
+/**
+ * Componente para la creación de eventos
+ * Permite a los usuarios crear eventos con ubicación, fecha, filtros y grupos invitados
+ * Incluye validación de formularios, gestión de imágenes y integración con mapas
+ * 
+ * @class CreateEventsComponent
+ * @since 1.0.0
+ * @author Manuel Santos Márquez
+ */
 @Component({
   selector: 'app-create-events',
   imports: [CommonModule, MapsComponent, InfodialogComponent, MbscModule, FormsModule, ReactiveFormsModule, CamaraComponent, LucideAngularModule, LoadinganimationComponent],
   templateUrl: './create-events.component.html',
   styleUrl: './create-events.component.css'
 })
-export class CreateEventsComponent {
+export class CreateEventsComponent {  /** URL base de la API */
   apirUrl = apiUrl;
+  
+  /** Formulario reactivo para la creación de eventos */
   eventFormGroup = new FormGroup({
     name: new FormControl('', [Validators.required]),
     description: new FormControl(''),
@@ -26,28 +37,48 @@ export class CreateEventsComponent {
     ends: new FormControl<Date | null>(null, [Validators.required]),
     public: new FormControl(true, [Validators.required])
   });
+  
+  /** Filtros seleccionados para el evento */
   filtersSelected: any[] = [];
+  /** Grupos seleccionados para invitar al evento */
   groupsSelected: any[] | null = null;
+  /** Ubicación seleccionada en el mapa */
   selectedLocation: google.maps.LatLngLiteral | null = null;
+  /** URL de preview de la imagen subida */
   previewImage: string = '';
+  /** Archivo de imagen seleccionado */
   imageFile: File | null = null;
+  /** Controla la visibilidad del menú de acciones de imagen */
   showImageActionsMenu = false;
+  /** Controla la visibilidad de la cámara */
   showCamera: boolean = false;
 
+  /** Longitud máxima permitida para el nombre del evento */
   nameMaxLength = 50;
+  /** Longitud máxima permitida para la descripción del evento */
   descriptionMaxLength = 1500;
 
+  /** Lista de todos los filtros disponibles */
   allFilters: any[] = [];
+  /** Estado de expansión del filtro de vestimenta */
   clothingFilterExpanded = false;
+  /** Estado de expansión del filtro de música */
   musicFilterExpanded = false;
+  /** Estado de expansión del filtro de precios */
   pricingFilterExpanded = false;
+  /** Estado de expansión del filtro de lugar */
   placeFilterExpanded = false;
 
+  /** Configuración regional para Mobiscroll */
   localeEs = localeEs;
 
+  /** Término de búsqueda de grupos */
   seacrhGroup: string = '';
+  /** Subject para debounce de búsqueda de grupos */
   private searchDebouncer = new Subject<string>();
+  /** Suscripción al observable de búsqueda */
   private searchSubscription: Subscription;
+  /** Offset para paginación de grupos */
   groupOffset = 0;
   groupLimit = 10;
   noMoreGroups = false;

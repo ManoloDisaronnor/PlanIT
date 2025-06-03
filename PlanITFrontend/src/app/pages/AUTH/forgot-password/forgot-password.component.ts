@@ -7,30 +7,53 @@ import { InfodialogComponent } from '../../../components/infodialog/infodialog.c
 import { LoadinganimationComponent } from '../../../components/loadinganimation/loadinganimation.component';
 import { apiUrl } from '../../../../../config/config';
 
+/**
+ * Componente para la recuperación de contraseña olvidada
+ * Permite al usuario solicitar un restablecimiento de contraseña mediante email
+ * Incluye validación de formulario y manejo de errores
+ * 
+ * @class ForgotPasswordComponent
+ * @since 1.0.0
+ * @author Manuel Santos Márquez
+ */
 @Component({
   selector: 'app-forgot-password',
   imports: [RouterLink, CommonModule, ReactiveFormsModule, LucideAngularModule, InfodialogComponent, LoadinganimationComponent],
   templateUrl: './forgot-password.component.html',
   styleUrl: './forgot-password.component.css'
 })
-export class ForgotPasswordComponent {
+export class ForgotPasswordComponent {  /** Formulario reactivo para la solicitud de recuperación de contraseña */
   forgotPasswordForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email])
   });
   
+  /** Error específico del campo email */
   emailError: string | null = null;
+  /** Error general del proceso */
   generalError: string | null = null;
+  /** Controla la visibilidad del texto de ayuda */
   helperTextVisible: string | null = null;
+  /** Estado de carga durante el envío de la solicitud */
   loading: boolean = false;
 
   constructor(private router: Router) { }
 
+  /**
+   * Inicialización del componente
+   * Configura listeners para cambios en el formulario
+   */
   ngOnInit() {
     this.forgotPasswordForm.valueChanges.subscribe(() => {
       this.handleFormChanges(this.emailError !== null);
     });
   }
 
+  /**
+   * Maneja los cambios en el formulario y actualiza los errores correspondientes
+   * 
+   * @param {boolean} errorEmail - Indica si hay un error previo en el email
+   * @private
+   */
   private handleFormChanges(errorEmail: boolean) {
     if (errorEmail) {
       if (!this.forgotPasswordForm.controls.email.invalid) {
@@ -42,11 +65,23 @@ export class ForgotPasswordComponent {
       }
     }
   }
-
+  /**
+   * Muestra el texto de ayuda para un campo específico
+   * 
+   * @param {string} field - Nombre del campo para mostrar ayuda
+   * 
+   * @example
+   * ```typescript
+   * showHelperText('email');
+   * ```
+   */
   showHelperText(field: string) {
     this.helperTextVisible = field;
   }
 
+  /**
+   * Oculta el texto de ayuda actualmente visible
+   */
   hideHelperText() {
     this.helperTextVisible = null;
   }

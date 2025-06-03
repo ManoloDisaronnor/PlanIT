@@ -559,6 +559,43 @@ class EventsController {
                 return res.status(400).json(Respuesta.error(null, "ID del evento es obligatorio", "ID_EVENTO_OBLIGATORIO"));
             }
 
+            const publicEvent = await Event.findOne({
+                where: { id: eventId },
+                attributes: ['public']
+            });
+
+            if (!publicEvent) {
+                return res.status(404).json(Respuesta.error(null, "No hemos podido localizar el evento que estabas buscando, puede que ya no este disponible o haya sido eliminado", "EVENTO_NO_ENCONTRADO"));
+            }
+
+            if (publicEvent.public === 0) {
+                const userIsJoined = await Event.findOne({
+                    where: {
+                        [Op.and]: [
+                            { id: eventId },
+                            {
+                                [Op.or]: [
+                                    { founder: uid },
+                                    Sequelize.literal(`
+                                        EXISTS (
+                                            SELECT 1 
+                                            FROM group_invited_to_event ge
+                                            JOIN \`groups\` g ON ge.groups = g.id
+                                            JOIN group_member gm ON g.id = gm.groups
+                                            WHERE ge.event = \`event\`.id AND gm.user = '${uid}' AND gm.joined = 1
+                                        )
+                                    `),
+                                ]
+                            }
+                        ]
+                    }
+                });
+
+                if (!userIsJoined) {
+                    return res.status(403).json(Respuesta.error(null, "No tienes permiso para acceder a este evento. Este evento es privado y solo pueden acceder los miembros de los grupos invitados", "NO_TIENE_PERMISOS_EVENTO_PRIVADO"));
+                }
+            }
+
             const event = await Event.findOne({
                 where: { id: eventId },
                 include: [
@@ -610,10 +647,6 @@ class EventsController {
                     [{ model: UploadEvent, as: 'event_images' }, 'uploaded_at', 'DESC']
                 ]
             });
-
-            if (!event) {
-                return res.status(404).json(Respuesta.error(null, "No hemos podido localizar el evento que estabas buscando, puede que ya no este disponible o haya sido eliminado", "EVENTO_NO_ENCONTRADO"));
-            }
 
             const [permissionCheck] = await sequelize.query(`
             SELECT 

@@ -5,31 +5,66 @@ import { apiUrl } from '../config/config';
 import { Howl } from 'howler';
 import { GroupMessagesService } from './groups.service';
 
+/**
+ * Interface que define la estructura de un mensaje en el sistema
+ * @interface Message
+ */
 interface Message {
+    /** ID único del mensaje */
     id: string;
+    /** Tipo de contenido del mensaje */
     type: 'text' | 'image' | 'video' | 'audio';
+    /** Contenido textual del mensaje */
     content: string;
+    /** URL del archivo adjunto si aplica */
     sourceUrl?: string;
+    /** Indica si el mensaje está destacado */
     featured: boolean;
+    /** Indica si el mensaje ha sido leído */
     readed: boolean;
+    /** Fecha de lectura del mensaje */
     read_at?: Date;
+    /** Información del usuario que envió el mensaje */
     user: any;
+    /** Referencia a otro mensaje (respuesta) */
     reference?: any;
+    /** Indica si el mensaje referenciado fue eliminado */
     reference_deleted?: boolean;
+    /** Datos del mensaje referenciado */
     reference_message?: any;
+    /** Fecha y hora de envío */
     datetime: Date;
+    /** Visibilidad del mensaje */
     visible?: boolean;
+    /** Estado del mensaje */
     status?: string;
+    /** ID del grupo al que pertenece */
     groups: string;
 }
 
+/**
+ * Interface para metadatos de mensajes cargados
+ * @interface MessagesMetadata
+ */
 interface MessagesMetadata {
+    /** Número total de mensajes en el grupo */
     totalMensajes?: number;
+    /** Índice del mensaje objetivo en búsquedas */
     targetMessageIndex?: number;
+    /** Indica si hay mensajes más recientes disponibles */
     hasMoreRecentMessages?: boolean;
+    /** Indica si hay mensajes más antiguos disponibles */
     hasMoreOlderMessages?: boolean;
 }
 
+/**
+ * Servicio principal para gestión de mensajes en tiempo real
+ * Maneja la comunicación WebSocket, carga de mensajes, envío y reproducción de sonidos
+ * 
+ * @class MessagesService
+ * @since 1.0.0
+ * @author Manuel Santos Márquez
+ */
 @Injectable({
     providedIn: 'root'
 })

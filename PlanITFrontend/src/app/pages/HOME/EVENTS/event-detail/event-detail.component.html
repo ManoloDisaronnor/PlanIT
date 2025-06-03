@@ -76,7 +76,7 @@
                     </div>
                 </div>
                 <div class="event-detail-images-container" [ngClass]="{ 'event-detail-images-container-content' : eventInfo.event_images && eventInfo.event_images.length > 0 }">
-                    @if (eventInfo.event_images && eventInfo.event_images.length > 0) {
+                    @if (eventInfo.event_images && eventInfo.event_images.length > 0 && userCanSeeImages) {
                         @for (image of eventInfo.event_images; track trackByImageUrl($index, image)) {
                             @defer (on viewport; prefetch on idle) {
                                 <div class="event-detail-image-item" (click)="openFullScreenImage(image)">
@@ -120,7 +120,13 @@
                             }
                         }
                     } @else {
-                        <span class="event-detail-images-no-images">No se han subido imagenes a este evento.</span>
+                        @if (!userCanSeeImages) {
+                            <span class="event-detail-images-no-images">No puedes ver las imagenes de este evento. Unete a el para participar y poder ver las imagenes del evento.</span>
+                        } @else if (checkFutureEvent()){
+                            <span class="event-detail-images-no-images">El evento todavía no ha comenzado. Al comenzar todos los participantes podran subir imagenes del evento.</span>
+                        } @else {
+                            <span class="event-detail-images-no-images">No se han subido imagenes a este evento.</span>
+                        }
                     }
                 </div>
             </section>

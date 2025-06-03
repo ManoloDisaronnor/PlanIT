@@ -8,24 +8,43 @@ import { apiUrl } from '../../../../../config/config';
 import { InfodialogComponent } from "../../../components/infodialog/infodialog.component";
 import { LoadinganimationComponent } from '../../../components/loadinganimation/loadinganimation.component';
 
+/**
+ * Componente de registro de nuevos usuarios
+ * Permite crear cuentas mediante email/contraseña con validación de formularios
+ * Incluye manejo de errores y redirección automática tras registro exitoso
+ * 
+ * @class SignupComponent
+ * @since 1.0.0
+ * @author Manuel Santos Márquez
+ */
 @Component({
   selector: 'app-signup',
   imports: [RouterLink, LucideAngularModule, CommonModule, ReactiveFormsModule, InfodialogComponent, InfodialogComponent, LoadinganimationComponent],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.css'
 })
-export class SignupComponent {
+export class SignupComponent {  /** Formulario reactivo para el registro de usuarios */
   signUpForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required, Validators.minLength(6)])
   });
+  /** Error específico del campo email */
   emailError: string | null = null;
+  /** Error específico del campo contraseña */
   passwordError: string | null = null;
+  /** Error general del proceso de registro */
   generalError: string | null = null;
+  /** Controla la visibilidad del texto de ayuda */
   helperTextVisible: string | null = null;
+  /** Estado de carga durante el registro */
   loadingSignUp: boolean = false;
+  /** Controla la visibilidad de la contraseña */
   showPassword: boolean = false;
 
+  /**
+   * Inicialización del componente
+   * Cierra cualquier sesión existente y configura listeners del formulario
+   */
   async ngOnInit() {
     await logOut();
     this.signUpForm.valueChanges.subscribe(() => {
@@ -33,6 +52,13 @@ export class SignupComponent {
     });
   }
 
+  /**
+   * Maneja los cambios en el formulario y actualiza los errores correspondientes
+   * 
+   * @param {boolean} errorEmail - Indica si hay un error previo en el email
+   * @param {boolean} errorPassword - Indica si hay un error previo en la contraseña
+   * @private
+   */
   private handleFormChanges(errorEmail: boolean, errorPassword: boolean) {
     if (errorEmail || errorPassword) {
       if (!this.signUpForm.controls.email.invalid) {

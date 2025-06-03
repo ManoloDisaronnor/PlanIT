@@ -9,27 +9,49 @@ import { LoadinganimationComponent } from '../../../components/loadinganimation/
 import { apiUrl } from '../../../../../config/config';
 import { getCurrentUser, iniciarSesion, logOut, setSessionStorage } from '../../../../../config/authUser';
 
+/**
+ * Componente de inicio de sesión de la aplicación
+ * Maneja la autenticación de usuarios mediante email/contraseña y Google OAuth
+ * Incluye validación de formularios, manejo de errores y animaciones
+ * 
+ * @class LoginComponent
+ * @since 1.0.0
+ * @author Manuel Santos Márquez
+ */
 @Component({
   selector: 'app-login',
   imports: [RouterLink, CommonModule, ReactiveFormsModule, LucideAngularModule, InfodialogComponent, LoadinganimationComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent {  /** Formulario reactivo para el inicio de sesión con validaciones */
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required, Validators.minLength(6)])
   });
+  /** Error específico del campo email */
   emailError: string | null = null;
+  /** Error específico del campo contraseña */
   passwordError: string | null = null;
+  /** Error general del proceso de login */
   generalError: string | null = null;
+  /** Controla la visibilidad del texto de ayuda */
   helperTextVisible: string | null = null;
+  /** Estado de carga del login tradicional */
   loadingLogin: boolean = false;
+  /** Estado de carga del login con Google */
   loadingGoogleLogin: boolean = false;
+  /** Controla la visibilidad de la contraseña */
   showPassword: boolean = false;
+  /** Instancia de la animación Lottie */
   private dotLottieInstance!: DotLottie;
 
   constructor(private route: ActivatedRoute) { }
+
+  /**
+   * Inicialización del componente
+   * Cierra cualquier sesión existente y configura listeners de parámetros de ruta
+   */
 
   async ngOnInit() {
     await logOut();
@@ -43,10 +65,13 @@ export class LoginComponent {
       this.handleFormChanges(this.emailError !== null, this.passwordError !== null);
     });
   }
-
+  /** Referencia al canvas para la animación Lottie */
   @ViewChild('lottieCanvas', { static: true })
   lottieCanvas!: ElementRef<HTMLCanvasElement>;
 
+  /**
+   * Inicializa la animación Lottie después de la vista
+   */
   ngAfterViewInit(): void {
     this.initializeLottie();
   }

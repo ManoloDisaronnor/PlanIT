@@ -4,7 +4,6 @@ const initModels = require("../models/init-models.js").initModels;
 // Crear la instancia de sequelize con la conexión a la base de datos
 const sequelize = require("../config/sequelize.js");
 const { Op } = require("sequelize");
-const { createNotification } = require("../services/socket-service.js");
 
 const models = initModels(sequelize);
 const Usuario = models.user;
