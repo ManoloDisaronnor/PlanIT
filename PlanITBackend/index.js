@@ -18,7 +18,7 @@ const http = require('http');
 const { setupSocket } = require('./services/socket-service');
 if (process.env.NODE_ENV === "development") {
     app.use(cors({
-        origin: ["http://localhost:4200", "http://192.168.0.36:4200"],
+        origin: ["http://localhost:4200"],
         credentials: true,
     }));
 }

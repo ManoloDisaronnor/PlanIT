@@ -70,11 +70,11 @@
                 </div>
 
                 <div class="login-links">
-                    <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+                    <a class="forgot-password" routerLink="/auth/forgot">¿Olvidaste tu contraseña?</a>
                     <p class="signup-link">¿Nuevo en PlanIt? <a routerLink="/auth/signup">Crea una cuenta</a></p>
                 </div>
             </form>
         </div>
     </div>
 </div>
-<app-infodialog *ngIf="generalError" [type]="'error'" [message]="generalError"></app-infodialog>
+<app-infodialog *ngIf="generalError" [type]="generalError === 'Se ha enviado un correo para reestablecer la contraseña' ? 'info' : 'error'" [message]="generalError"></app-infodialog>

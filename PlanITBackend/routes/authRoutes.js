@@ -7,6 +7,7 @@ router.get('/checkauthstatus', firebaseAuth, authController.checkAuthStatus);
 router.post('/firebasesignup', authController.insertFirebaseUser);
 router.post('/login', authController.loginWithEmailAndPassword);
 router.post('/logout', authController.logout);
+router.post('/forgot-password', authController.forgotPassword);
 router.get('/google-auth-url', authController.getGoogleAuthUrl);
 router.get('/google-callback', authController.handleGoogleCallback);
 

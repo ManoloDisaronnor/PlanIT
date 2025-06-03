@@ -21,6 +21,7 @@ import { DiscoverEventsComponent } from './pages/HOME/EVENTS/discover-events/dis
 import { OwnedEventsComponent } from './pages/HOME/EVENTS/owned-events/owned-events.component';
 import { CreateEventsComponent } from './pages/HOME/EVENTS/create-events/create-events.component';
 import { EventDetailComponent } from './pages/HOME/EVENTS/event-detail/event-detail.component';
+import { ForgotPasswordComponent } from './pages/AUTH/forgot-password/forgot-password.component';
 
 
 export const routes: Routes = [
@@ -31,6 +32,7 @@ export const routes: Routes = [
         children: [
             { path: 'login', component: LoginComponent },
             { path: 'signup', component: SignupComponent },
+            { path: 'forgot', component: ForgotPasswordComponent },
             { path: '', redirectTo: 'login', pathMatch: 'full' }
         ]
     },

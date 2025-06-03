@@ -6,7 +6,7 @@ const models = initModels(sequelize);
 const axios = require("axios");
 
 const FIREBASE_API_KEY = process.env.FIREBASE_API_KEY;
-const DOMAIN = process.env.DOMINIO || "http://192.168.0.36:4200";
+const DOMAIN = process.env.DOMINIO || "http://localhost:4200";
 const { OAuth2Client } = require('google-auth-library');
 
 const oAuth2Client = new OAuth2Client(
@@ -21,11 +21,13 @@ class AuthController {
 
     async loginWithEmailAndPassword(req, res) {
         try {
-            const { email, password } = req.body;
-            if (!email || !password) {
+            const { email, password } = req.body;            if (!email || !password) {
                 return res.status(400).json(Respuesta.error(null, "Email y contraseña son obligatorios", "CAMPOS_OBLIGATORIOS"));
             }
-            if (!email.includes("@")) {
+            
+            // Validación mejorada del email con expresión regular
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailRegex.test(email)) {
                 return res.status(400).json(Respuesta.error(null, "El email no es válido", "EMAIL_INVALIDO"));
             }
             if (password.length < 6) {
@@ -233,12 +235,58 @@ class AuthController {
                 secure: process.env.NODE_ENV === 'production',
                 maxAge: expiresIn,
                 sameSite: 'strict'
-            });
-
-            res.redirect(DOMAIN + '/google-auth-callback?token=' + tokens.id_token);
+            });            res.redirect(DOMAIN + '/google-auth-callback?token=' + tokens.id_token);
         } catch (error) {
             console.error('Google callback error:', error);
             res.redirect(DOMAIN + '/auth/login');
+        }
+    }
+
+    async forgotPassword(req, res) {
+        try {
+            const { email } = req.body;
+              if (!email) {
+                return res.status(400).json(Respuesta.error(null, "El email es obligatorio", "CAMPO_OBLIGATORIO"));
+            }
+            
+            // Validación mejorada del email con expresión regular
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailRegex.test(email)) {
+                return res.status(400).json(Respuesta.error(null, "El email no es válido", "EMAIL_INVALIDO"));
+            }
+
+            // Check if user exists in Firebase
+            try {
+                await admin.auth().getUserByEmail(email);
+            } catch (emailError) {
+                return res.status(404).json(Respuesta.error(null, "No existe una cuenta con este email", "EMAIL_NOT_FOUND"));
+            }            // Send password reset email using Firebase Admin SDK
+            const resetLink = await admin.auth().generatePasswordResetLink(email);
+            
+            // For this implementation, we could use a third-party email service like SendGrid
+            // or let the frontend handle it using Firebase client SDK
+            // For now, we'll use Firebase Auth REST API to send the reset email directly
+            const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${FIREBASE_API_KEY}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    requestType: 'PASSWORD_RESET',
+                    email: email
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error?.message || 'Error al enviar el correo');
+            }
+
+            return res.json(Respuesta.exito(null, "Correo de recuperación enviado exitosamente"));
+
+        } catch (error) {
+            console.error('Forgot password error:', error);
+            return res.status(500).json(Respuesta.error(null, "Error al enviar el correo de recuperación: " + error.message, "ERROR_RECUPERACION"));
         }
     }
 
