@@ -201,7 +201,7 @@
     cursor: pointer;
     z-index: 2;
 }
-  
+
 .msg-select .checkbox-custom {
     display: inline-block;
     width: 20px;
@@ -212,12 +212,12 @@
     transition: border-color 0.2s ease, background-color 0.2s ease;
     cursor: pointer;
 }
-  
+
 .msg-select .checkbox-custom:hover {
     border-color: #5a5aff;
 }
-  
-.msg-select input[type="checkbox"]:checked + .checkbox-custom::after {
+
+.msg-select input[type="checkbox"]:checked+.checkbox-custom::after {
     content: "";
     position: absolute;
     top: 50%;
@@ -229,7 +229,7 @@
     border-radius: 2px;
 }
 
-.msg-select input[type="checkbox"]:checked + .checkbox-custom {
+.msg-select input[type="checkbox"]:checked+.checkbox-custom {
     border-color: #a05cff;
 }
 
@@ -413,9 +413,11 @@
     0% {
         transform: translateX(0);
     }
+
     50% {
         transform: translateX(30px);
     }
+
     100% {
         transform: translateX(0);
     }
@@ -433,9 +435,11 @@
     0% {
         transform: translateX(0);
     }
+
     50% {
         transform: translateX(-30px);
     }
+
     100% {
         transform: translateX(0);
     }
@@ -449,9 +453,11 @@
     0% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(1.02);
     }
+
     100% {
         transform: scale(1);
     }
@@ -532,13 +538,13 @@
     transform-origin: top right;
     transition: transform 0.2s, opacity 0.2s, visibility 0.2s;
 }
-  
+
 .group-item-actions-menu-show {
     opacity: 1;
     visibility: visible;
     transform: scale(1);
 }
-  
+
 .group-item-actions-menu-close {
     opacity: 0;
     transform: scale(0);
@@ -558,13 +564,13 @@
     transform-origin: top left;
     transition: transform 0.2s, opacity 0.2s, visibility 0.2s;
 }
-  
+
 .message-item-actions-menu-show {
     opacity: 1;
     visibility: visible;
     transform: scale(1);
 }
-  
+
 .message-item-actions-menu-close {
     opacity: 0;
     transform: scale(0);
@@ -597,7 +603,7 @@
     bottom: auto;
     top: calc(100% + 1rem);
 }
-  
+
 .position-below {
     top: auto;
     bottom: calc(100% + 1rem);
@@ -636,14 +642,17 @@
     position: relative;
     width: 100%;
     min-height: 60px;
+    max-height: 200px;
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    transition: min-height 0.05s ease;
+    transition: min-height 0.1s ease;
+    overflow: visible;
 }
 
 .message-input-reference {
-    height: 130px;
+    min-height: 130px;
+    max-height: 220px;
 }
 
 .message-input-container {
@@ -667,6 +676,8 @@
     border-top-left-radius: 1rem;
     animation: slideIn 0.2s ease-in-out forwards;
     margin-bottom: -4px;
+    min-height: 65px;
+    z-index: 1;
 }
 
 @keyframes slideIn {
@@ -674,6 +685,7 @@
         transform: translateY(100%);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -702,9 +714,9 @@
 .input-form {
     width: 98%;
     min-height: 50px;
-    max-height: 130px;
+    max-height: 150px;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     gap: 0.5rem;
     margin: 5px 0 5px 0;
 }
@@ -738,7 +750,7 @@
 }
 
 .autogrowing-textarea {
-    min-height: 50px;
+    min-height: 45px;
     max-height: 120px;
     resize: none;
     overflow-y: hidden;
@@ -747,7 +759,8 @@
     box-sizing: border-box;
     white-space: pre-wrap;
     word-wrap: break-word;
-    transition: height 0.05s ease;
+    word-break: break-word;
+    transition: height 0.1s ease;
 }
 
 .autogrowing-textarea::placeholder {
@@ -849,7 +862,7 @@
     text-align: center;
 }
 
-.delete-messages-dialog-content *{
+.delete-messages-dialog-content * {
     margin: 0;
     font-size: 1.1rem;
 }
@@ -1065,12 +1078,25 @@
     background-color: rgba(124, 124, 255, 0.15);
     pointer-events: none;
 }
-  
+
 @keyframes longPressPulse {
-    0% { transform: scale(1); }
-    30% { transform: scale(1.03); background-color: rgba(124, 124, 255, 0.2); }
-    70% { transform: scale(1.03); background-color: rgba(124, 124, 255, 0.3); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    30% {
+        transform: scale(1.03);
+        background-color: rgba(124, 124, 255, 0.2);
+    }
+
+    70% {
+        transform: scale(1.03);
+        background-color: rgba(124, 124, 255, 0.3);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 
@@ -1136,7 +1162,7 @@
         width: 70%;
         padding: 1rem;
     }
-    
+
     .scroll-to-bottom-btn .material-icons {
         font-size: 1.2rem;
     }
@@ -1156,7 +1182,7 @@
         opacity: 0;
         transition: opacity 0.3s ease;
     }
-    
+
     .swipe-hint-visible {
         opacity: 1;
     }
@@ -1170,12 +1196,28 @@
         transform: scale(0);
         transition: transform 0.5s ease;
     }
-    
+
     .long-press-indicator-active {
         transform: scale(1.5);
     }
 
     .message-content-container {
         min-height: 25px;
+    }
+
+    .message-input {
+        max-height: 180px;
+    }
+    
+    .message-input-reference {
+        max-height: 200px;
+    }
+    
+    .autogrowing-textarea {
+        max-height: 100px;
+    }
+    
+    .input-form {
+        max-height: 130px;
     }
 }

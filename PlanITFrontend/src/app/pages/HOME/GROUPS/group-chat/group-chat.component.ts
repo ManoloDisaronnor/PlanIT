@@ -1,20 +1,30 @@
 import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MessagesService } from '../../../../../../services/messages.service';
-import { getCurrentUser, setSessionStorage } from '../../../../../../config/authUser';
+import {
+  getCurrentUser,
+  setSessionStorage,
+} from '../../../../../../config/authUser';
 import { Subscription } from 'rxjs';
 import { apiUrl } from '../../../../../../config/config';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LoadinganimationComponent } from "../../../../components/loadinganimation/loadinganimation.component";
-import { InfodialogComponent } from "../../../../components/infodialog/infodialog.component";
-import { FeaturecommingsoonComponent } from "../../../../components/featurecommingsoon/featurecommingsoon.component";
+import { LoadinganimationComponent } from '../../../../components/loadinganimation/loadinganimation.component';
+import { InfodialogComponent } from '../../../../components/infodialog/infodialog.component';
+import { FeaturecommingsoonComponent } from '../../../../components/featurecommingsoon/featurecommingsoon.component';
 
 @Component({
   selector: 'app-group-chat',
-  imports: [CommonModule, FormsModule, LoadinganimationComponent, RouterModule, InfodialogComponent, FeaturecommingsoonComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    LoadinganimationComponent,
+    RouterModule,
+    InfodialogComponent,
+    FeaturecommingsoonComponent,
+  ],
   templateUrl: './group-chat.component.html',
-  styleUrl: './group-chat.component.css'
+  styleUrl: './group-chat.component.css',
 })
 export class GroupChatComponent {
   apiUrl = apiUrl;
@@ -76,19 +86,27 @@ export class GroupChatComponent {
   private longPressDetected: boolean = false;
   private moveThreshold: number = 5;
 
-
-  @ViewChild('messagesContainer') private messagesContainer!: ElementRef<HTMLElement>;
+  @ViewChild('messagesContainer')
+  private messagesContainer!: ElementRef<HTMLElement>;
   @ViewChild('messageTextarea') private messageTextarea!: ElementRef;
   previousHeight: number = 45;
   private textMeasurerEl: HTMLDivElement | null = null;
 
-  constructor(private renderer: Renderer2, private route: ActivatedRoute, public messagesService: MessagesService, private router: Router) {
-    this.isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  constructor(
+    private renderer: Renderer2,
+    private route: ActivatedRoute,
+    public messagesService: MessagesService,
+    private router: Router
+  ) {
+    this.isMobileDevice =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
   }
 
   ngOnInit() {
     this.getUserId().then(() => {
-      this.paramSub = this.route.paramMap.subscribe(async params => {
+      this.paramSub = this.route.paramMap.subscribe(async (params) => {
         this.groupId = params.get('groupId')!;
 
         this.messages = [];
@@ -106,33 +124,36 @@ export class GroupChatComponent {
       });
 
       this.subscriptions.push(
-        this.messagesService.messages$.subscribe(msgs => {
+        this.messagesService.messages$.subscribe((msgs) => {
           this.messages = msgs;
           const scrollElement = document.querySelector('.messages-list');
           let scrollTop = -10000;
           if (scrollElement) {
             scrollTop = scrollElement.scrollTop;
           }
-          if (!this.messagesService.hasMoreRecentMessages && scrollTop >= -500) {
+          if (
+            !this.messagesService.hasMoreRecentMessages &&
+            scrollTop >= -500
+          ) {
             this.scrollToBottom();
           }
         })
       );
 
       this.subscriptions.push(
-        this.messagesService.loading$.subscribe(loading => {
+        this.messagesService.loading$.subscribe((loading) => {
           this.loadingMessages = loading;
         })
       );
 
       this.subscriptions.push(
-        this.messagesService.hasMoreMessages$.subscribe(hasMore => {
+        this.messagesService.hasMoreMessages$.subscribe((hasMore) => {
           this.hasMoreMessages = hasMore;
         })
       );
 
       this.subscriptions.push(
-        this.messagesService.noMessagesFound$.subscribe(noMessages => {
+        this.messagesService.noMessagesFound$.subscribe((noMessages) => {
           this.noMessagesFound = noMessages;
         })
       );
@@ -140,37 +161,19 @@ export class GroupChatComponent {
   }
 
   ngAfterViewInit() {
-    this.textMeasurerEl = this.renderer.createElement('div');
-    this.renderer.setStyle(this.textMeasurerEl, 'position', 'absolute');
-    this.renderer.setStyle(this.textMeasurerEl, 'top', '-9999px');
-    this.renderer.setStyle(this.textMeasurerEl, 'left', '-9999px');
-    this.renderer.setStyle(this.textMeasurerEl, 'width', this.messageTextarea.nativeElement.offsetWidth + 'px');
-    this.renderer.setStyle(this.textMeasurerEl, 'font-size', '1rem');
-    this.renderer.setStyle(this.textMeasurerEl, 'font-family', 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif');
-    this.renderer.setStyle(this.textMeasurerEl, 'line-height', '20px');
-    this.renderer.setStyle(this.textMeasurerEl, 'padding', '10px 15px');
-    this.renderer.setStyle(this.textMeasurerEl, 'box-sizing', 'border-box');
-    this.renderer.setStyle(this.textMeasurerEl, 'white-space', 'pre-wrap');
-    this.renderer.setStyle(this.textMeasurerEl, 'word-wrap', 'break-word');
-
-    if (this.textMeasurerEl) {
-      document.body.appendChild(this.textMeasurerEl);
-    }
-
-    if (this.textMeasurerEl) {
-      document.body.appendChild(this.textMeasurerEl);
-    }
     const queryParams = this.route.snapshot.queryParams;
     if (queryParams['messageId']) {
       this.preventAutoScroll = true;
-      const subscription = this.messagesService.loading$.subscribe(loading => {
-        if (!loading && this.messages.length > 0) {
-          setTimeout(() => {
-            this.locateMessage(queryParams['messageId']);
-          }, 500);
-          subscription.unsubscribe();
+      const subscription = this.messagesService.loading$.subscribe(
+        (loading) => {
+          if (!loading && this.messages.length > 0) {
+            setTimeout(() => {
+              this.locateMessage(queryParams['messageId']);
+            }, 500);
+            subscription.unsubscribe();
+          }
         }
-      });
+      );
     }
   }
 
@@ -181,15 +184,17 @@ export class GroupChatComponent {
     this.messagesService.disconnect();
     this.messages = [];
     this.paramSub?.unsubscribe();
-    this.subscriptions.forEach(s => s.unsubscribe());
-    if (this.textMeasurerEl && document.body.contains(this.textMeasurerEl)) {
-      document.body.removeChild(this.textMeasurerEl);
-    }
+    this.subscriptions.forEach((s) => s.unsubscribe());
   }
 
   handleTouchStart(event: TouchEvent, messageId: string, message: any) {
     if (!this.isMobileDevice || this.userHasLeft || this.selectedItems) return;
-    if (message.status === 'pending' || message.status === 'error' || message.status === 'deleted') return;
+    if (
+      message.status === 'pending' ||
+      message.status === 'error' ||
+      message.status === 'deleted'
+    )
+      return;
     const touch = event.touches[0];
     this.touchStartX = touch.clientX;
     this.touchStartY = touch.clientY;
@@ -216,7 +221,10 @@ export class GroupChatComponent {
     const deltaX = touch.clientX - this.touchStartX;
     const deltaY = touch.clientY - this.touchStartY;
 
-    if (Math.abs(deltaX) > this.moveThreshold || Math.abs(deltaY) > this.moveThreshold) {
+    if (
+      Math.abs(deltaX) > this.moveThreshold ||
+      Math.abs(deltaY) > this.moveThreshold
+    ) {
       this.cancelLongPress();
 
       if (Math.abs(deltaX) > Math.abs(deltaY) && this.currentSwipeElement) {
@@ -271,8 +279,13 @@ export class GroupChatComponent {
       this.currentSwipeElement.style.transition = 'transform 0.3s ease';
       this.currentSwipeElement.style.transform = 'translateX(0)';
 
-      if (Math.abs(currentPos) >= this.swipeMinDistance && message &&
-        message.status !== 'pending' && message.status !== 'deleted' && message.status !== 'error') {
+      if (
+        Math.abs(currentPos) >= this.swipeMinDistance &&
+        message &&
+        message.status !== 'pending' &&
+        message.status !== 'deleted' &&
+        message.status !== 'error'
+      ) {
         setTimeout(() => {
           this.replyMessage(message);
         }, 300);
@@ -307,7 +320,9 @@ export class GroupChatComponent {
   }
 
   showMessageActionsMenuForTouch(rect: DOMRect, messageId: string) {
-    const menu = document.querySelector(`.message-item-actions-menu[data-message-id="${messageId}"]`)! as HTMLElement;
+    const menu = document.querySelector(
+      `.message-item-actions-menu[data-message-id="${messageId}"]`
+    )! as HTMLElement;
     const chat = document.getElementById('chat');
     if (!chat || !menu) return;
     chat.appendChild(menu);
@@ -368,10 +383,13 @@ export class GroupChatComponent {
   async getGroup() {
     this.loadingGroupInfo = true;
     try {
-      const response = await fetch(`${apiUrl}api/grupos/reduced/${this.groupId}`, {
-        method: 'GET',
-        credentials: 'include'
-      });
+      const response = await fetch(
+        `${apiUrl}api/grupos/reduced/${this.groupId}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+        }
+      );
 
       const data = await response.json();
       if (response.ok) {
@@ -383,7 +401,9 @@ export class GroupChatComponent {
         this.showFetchError(data.mensaje);
       }
     } catch (error: any) {
-      this.showFetchError('Error al cargar los datos del grupo: ' + error.message);
+      this.showFetchError(
+        'Error al cargar los datos del grupo: ' + error.message
+      );
     } finally {
       this.loadingGroupInfo = false;
     }
@@ -420,20 +440,24 @@ export class GroupChatComponent {
         textarea.scrollIntoView({
           behavior: 'smooth',
           block: 'nearest',
-          inline: 'nearest'
+          inline: 'nearest',
         });
         setTimeout(() => {
           if (chat) {
             chat.scrollTop = 0;
           }
         }, 1000);
-      }, 200);
+      }, 500);
     }
-
   }
 
   async onScroll(event: any): Promise<void> {
-    if (this.navigatingToMessage || this.preventAutoScroll || this.messagesService.isAutoLoadBlocked) return;
+    if (
+      this.navigatingToMessage ||
+      this.preventAutoScroll ||
+      this.messagesService.isAutoLoadBlocked
+    )
+      return;
 
     const element = event.target;
     const scrollTop = element.scrollTop;
@@ -468,7 +492,9 @@ export class GroupChatComponent {
           element.scrollTop = newScrollTop - 50;
         }, 50);
       } catch (error: any) {
-        this.showFetchError('Error al cargar más mensajes recientes: ' + error.message);
+        this.showFetchError(
+          'Error al cargar más mensajes recientes: ' + error.message
+        );
       } finally {
         this.loadingMore = false;
       }
@@ -488,7 +514,8 @@ export class GroupChatComponent {
   showMessageActionsButton(messageId: string) {
     if (this.isMobileDevice) return;
 
-    if (this.showMessageActions !== '' && this.showMessageActions === messageId) return;
+    if (this.showMessageActions !== '' && this.showMessageActions === messageId)
+      return;
     if (this.userHasLeft) return;
     if (messageId === '') {
       if (this.showMessageActionMenu === '') {
@@ -523,18 +550,37 @@ export class GroupChatComponent {
     const time = `${hours}:${minutes}`;
 
     const dayNames = ['Dom.', 'Lun.', 'Mar.', 'Mié.', 'Jue.', 'Vie.', 'Sáb.'];
-    const monthNames = ['Ene.', 'Feb.', 'Mar.', 'Abr.', 'May.', 'Jun.', 'Jul.', 'Ago.', 'Sep.', 'Oct.', 'Nov.', 'Dic.'];
+    const monthNames = [
+      'Ene.',
+      'Feb.',
+      'Mar.',
+      'Abr.',
+      'May.',
+      'Jun.',
+      'Jul.',
+      'Ago.',
+      'Sep.',
+      'Oct.',
+      'Nov.',
+      'Dic.',
+    ];
 
     if (sameDay) {
       return time;
     } else if (yesterday) {
       return `Ayer ${time}`;
     } else if (sameWeek) {
-      return `${dayNames[messageDate.getDay()]} ${messageDate.getDate()} ${time}`;
+      return `${
+        dayNames[messageDate.getDay()]
+      } ${messageDate.getDate()} ${time}`;
     } else if (sameYear) {
-      return `${dayNames[messageDate.getDay()]} ${messageDate.getDate()} ${monthNames[messageDate.getMonth()]} ${time}`;
+      return `${dayNames[messageDate.getDay()]} ${messageDate.getDate()} ${
+        monthNames[messageDate.getMonth()]
+      } ${time}`;
     } else {
-      return `${dayNames[messageDate.getDay()]} ${messageDate.getDate()} ${monthNames[messageDate.getMonth()]} ${messageDate.getFullYear()} ${time}`;
+      return `${dayNames[messageDate.getDay()]} ${messageDate.getDate()} ${
+        monthNames[messageDate.getMonth()]
+      } ${messageDate.getFullYear()} ${time}`;
     }
   }
 
@@ -552,17 +598,22 @@ export class GroupChatComponent {
 
   handleOutsideTouch = (event: TouchEvent) => {
     const menuElement = document.querySelector('.group-item-actions-menu');
-    const messageMenuElement = document.querySelector('.message-item-actions-menu');
+    const messageMenuElement = document.querySelector(
+      '.message-item-actions-menu'
+    );
 
     if (menuElement && !menuElement.contains(event.target as Node)) {
       this.closeGroupActionMenu();
     }
-    if (messageMenuElement && !messageMenuElement.contains(event.target as Node)) {
+    if (
+      messageMenuElement &&
+      !messageMenuElement.contains(event.target as Node)
+    ) {
       setTimeout(() => {
         this.closeMessageActionMenu();
       }, 200);
     }
-  }
+  };
 
   showMessageActionsMenu(event: MouseEvent, messageId: string) {
     event.stopPropagation();
@@ -572,10 +623,14 @@ export class GroupChatComponent {
     }
     const clickedElement = event.target as HTMLElement;
 
-    const clickedEl = (event.target as HTMLElement).closest('.message-actions') || clickedElement;
+    const clickedEl =
+      (event.target as HTMLElement).closest('.message-actions') ||
+      clickedElement;
     const rect = clickedEl.getBoundingClientRect();
 
-    const menu = document.querySelector(`.message-item-actions-menu[data-message-id="${messageId}"]`)! as HTMLElement;
+    const menu = document.querySelector(
+      `.message-item-actions-menu[data-message-id="${messageId}"]`
+    )! as HTMLElement;
     const chat = document.getElementById('chat');
     if (chat) {
       chat.appendChild(menu);
@@ -590,7 +645,9 @@ export class GroupChatComponent {
     menu.style.zIndex = '9999';
 
     setTimeout(() => {
-      const menuElement = document.querySelector(`.message-item-actions-menu[data-message-id="${messageId}"]`);
+      const menuElement = document.querySelector(
+        `.message-item-actions-menu[data-message-id="${messageId}"]`
+      );
       if (menuElement) {
         const rect = clickedElement.getBoundingClientRect();
         const viewportHeight = window.innerHeight;
@@ -614,23 +671,28 @@ export class GroupChatComponent {
 
   handleOutsideClick = (event: MouseEvent) => {
     const menuElement = document.querySelector('.group-item-actions-menu');
-    const messageMenuElement = document.querySelector('.message-item-actions-menu');
+    const messageMenuElement = document.querySelector(
+      '.message-item-actions-menu'
+    );
     if (menuElement && !menuElement.contains(event.target as Node)) {
       this.closeGroupActionMenu();
     }
-    if (messageMenuElement && !messageMenuElement.contains(event.target as Node)) {
+    if (
+      messageMenuElement &&
+      !messageMenuElement.contains(event.target as Node)
+    ) {
       setTimeout(() => {
         this.closeMessageActionMenu();
       }, 200);
     }
-  }
+  };
 
   handleEscKey = (event: KeyboardEvent) => {
     if (event.key === 'Escape') {
       this.closeGroupActionMenu();
       this.closeMessageActionMenu();
     }
-  }
+  };
 
   closeMessageActionMenu() {
     if (this.messageActionsClosing) return;
@@ -641,7 +703,9 @@ export class GroupChatComponent {
     if (this.isMobileDevice) {
       document.removeEventListener('touchstart', this.handleOutsideTouch);
     }
-    const menuElement = document.querySelector('.message-item-actions-menu-show');
+    const menuElement = document.querySelector(
+      '.message-item-actions-menu-show'
+    );
     if (menuElement) {
       this.renderer.addClass(menuElement, 'message-item-actions-menu-close');
     }
@@ -679,7 +743,7 @@ export class GroupChatComponent {
       textarea.scrollIntoView({
         behavior: 'smooth',
         block: 'nearest',
-        inline: 'nearest'
+        inline: 'nearest',
       });
     }, 500);
   }
@@ -701,7 +765,7 @@ export class GroupChatComponent {
         this.canDeleteMessagesOption = true;
       } else {
         if (this.selectedItems.length > 0) {
-          this.selectedItems.forEach(item => item.checked = false);
+          this.selectedItems.forEach((item) => (item.checked = false));
         }
         this.selectedItems = null;
       }
@@ -713,7 +777,9 @@ export class GroupChatComponent {
     if (!this.selectedItems) {
       this.selectedItems = [];
     }
-    const existingIndex = this.selectedItems.findIndex(item => item.id === message.id);
+    const existingIndex = this.selectedItems.findIndex(
+      (item) => item.id === message.id
+    );
     if (existingIndex !== -1) {
       message.checked = false;
       this.selectedItems.splice(existingIndex, 1);
@@ -730,7 +796,7 @@ export class GroupChatComponent {
   stopSelectingItems(event: any) {
     event.stopPropagation();
     if (this.selectedItems) {
-      this.selectedItems.forEach(item => item.checked = false);
+      this.selectedItems.forEach((item) => (item.checked = false));
       this.selectedItems = null;
     }
     this.showDeleteMessageConfirmation = false;
@@ -744,7 +810,9 @@ export class GroupChatComponent {
     this.navigatingToMessage = true;
 
     try {
-      const messageIndex = this.messages.findIndex(msg => msg.id === messageId);
+      const messageIndex = this.messages.findIndex(
+        (msg) => msg.id === messageId
+      );
 
       if (messageIndex !== -1) {
         this.highlightMessage(messageId);
@@ -752,7 +820,8 @@ export class GroupChatComponent {
         this.loadingMessages = true;
 
         try {
-          const { success, messageIndex } = await this.messagesService.loadMessageContext(messageId);
+          const { success, messageIndex } =
+            await this.messagesService.loadMessageContext(messageId);
 
           if (success && messageIndex >= 0) {
             setTimeout(() => {
@@ -766,11 +835,12 @@ export class GroupChatComponent {
             relativeTo: this.route,
             queryParams: { messageId: null },
             queryParamsHandling: 'merge',
-            replaceUrl: true
+            replaceUrl: true,
           });
-
         } catch (error: any) {
-          this.showFetchError('Error al cargar el mensaje referenciado: ' + error.message);
+          this.showFetchError(
+            'Error al cargar el mensaje referenciado: ' + error.message
+          );
         } finally {
           this.loadingMessages = false;
         }
@@ -788,7 +858,7 @@ export class GroupChatComponent {
       if (!messageElement) return;
       messageElement.scrollIntoView({
         behavior: 'smooth',
-        block: 'center'
+        block: 'center',
       });
       messageElement.classList.add('highlighted-message');
       setTimeout(() => {
@@ -805,21 +875,22 @@ export class GroupChatComponent {
         this.preventAutoScroll = false;
       }, 200);
     } catch (error) {
-      console.error("Error al resaltar mensaje:", error);
+      console.error('Error al resaltar mensaje:', error);
     }
   }
 
   private scrollToBottom(forceScroll: boolean = false): void {
-    if ((this.navigatingToMessage || this.preventAutoScroll) && !forceScroll) return;
+    if ((this.navigatingToMessage || this.preventAutoScroll) && !forceScroll)
+      return;
 
     try {
       const el = this.messagesContainer.nativeElement;
       el.scrollTo({
         top: el.scrollHeight,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     } catch (error) {
-      console.error("Error en scrollToBottom:", error);
+      console.error('Error en scrollToBottom:', error);
     }
   }
 
@@ -834,29 +905,46 @@ export class GroupChatComponent {
   }
 
   autoGrowTextarea() {
-    if (!this.messageTextarea?.nativeElement || !this.textMeasurerEl) return;
+    if (!this.messageTextarea?.nativeElement) return;
 
-    const chat = document.getElementById('chat');
     const textarea = this.messageTextarea.nativeElement;
-    const text = this.messageInput || '';
-    this.textMeasurerEl.innerHTML = text
-      .replace(/\n/g, '<br>')
-      .replace(/\s/g, '&nbsp;') || '<br>';
-    const textHeight = this.textMeasurerEl.offsetHeight;
+
+    textarea.style.height = 'auto';
+
+    const scrollHeight = textarea.scrollHeight;
+
     const minHeight = 45;
-    const maxHeight = 120;
-    const newHeight = Math.max(minHeight, Math.min(textHeight, maxHeight));
+    const maxHeight = this.selectedMessage ? 100 : 120;
+
+    const newHeight = Math.max(minHeight, Math.min(scrollHeight, maxHeight));
+
     textarea.style.height = newHeight + 'px';
+
+    if (scrollHeight > maxHeight) {
+      textarea.style.overflowY = 'auto';
+      textarea.style.paddingRight = '10px';
+    } else {
+      textarea.style.overflowY = 'hidden';
+      textarea.style.paddingRight = '15px';
+    }
+
     const messageInputContainer = textarea.closest('.message-input');
     if (messageInputContainer) {
-      const baseHeight = 60;
-      const extraHeight = newHeight - minHeight;
-      messageInputContainer.style.minHeight = (baseHeight + extraHeight) + 'px';
+      const baseHeight = this.selectedMessage ? 130 : 60;
+      const heightDifference = newHeight - minHeight;
+      const newContainerHeight = baseHeight + heightDifference;
+      const maxContainerHeight = this.selectedMessage ? 200 : 180;
+
+      (messageInputContainer as HTMLElement).style.minHeight =
+        Math.min(newContainerHeight, maxContainerHeight) + 'px';
     }
-    textarea.style.overflowY = textHeight > maxHeight ? 'auto' : 'hidden';
+
+    const chat = document.getElementById('chat');
     if (chat) {
       chat.scrollTop = 0;
     }
+
+    this.focusTextarea();
   }
 
   async sendMessage(event: any) {
@@ -882,18 +970,20 @@ export class GroupChatComponent {
       user: {
         uid: this.userUid,
         username: this.userName,
-        imageUrl: this.userImageUrl
+        imageUrl: this.userImageUrl,
       },
       datetime: new Date(),
       status: 'pending',
       reference: this.selectedMessage ? this.selectedMessage.id : null,
-      reference_message: this.selectedMessage ? {
-        id: this.selectedMessage.id,
-        type: this.selectedMessage.type,
-        content: this.selectedMessage.content,
-        user_user: this.selectedMessage.user
-      } : null
-    }
+      reference_message: this.selectedMessage
+        ? {
+            id: this.selectedMessage.id,
+            type: this.selectedMessage.type,
+            content: this.selectedMessage.content,
+            user_user: this.selectedMessage.user,
+          }
+        : null,
+    };
 
     setTimeout(() => {
       if (!this.messagesService.hasMoreRecentMessages) {
@@ -908,10 +998,13 @@ export class GroupChatComponent {
     this.selectedMessage = null;
 
     try {
-      const ok = await this.messagesService.sendMessage(formData, temporalMessage);
+      const ok = await this.messagesService.sendMessage(
+        formData,
+        temporalMessage
+      );
       if (!ok) {
         if (!this.messagesService.hasMoreRecentMessages) {
-          this.messages = this.messages.map(msg => {
+          this.messages = this.messages.map((msg) => {
             if (msg.id === tempId) {
               return { ...msg, status: 'error' };
             }
@@ -924,7 +1017,7 @@ export class GroupChatComponent {
         this.showFetchError('Hubo un error al enviar el mensaje.');
       } else {
         if (!this.messagesService.hasMoreRecentMessages) {
-          this.messages = this.messages.filter(msg => msg.id !== tempId);
+          this.messages = this.messages.filter((msg) => msg.id !== tempId);
           setTimeout(() => {
             this.scrollToBottom(true);
           }, 0);
@@ -932,7 +1025,7 @@ export class GroupChatComponent {
       }
     } catch (error: any) {
       if (!this.messagesService.hasMoreRecentMessages) {
-        this.messages = this.messages.map(msg => {
+        this.messages = this.messages.map((msg) => {
           if (msg.id === tempId) {
             return { ...msg, status: 'error' };
           }
@@ -942,7 +1035,9 @@ export class GroupChatComponent {
       this.messageInput = tempMessageInput;
       this.selectedMessage = tempSelectedMessage;
       this.autoGrowTextarea();
-      this.showFetchError('Hubo un error al enviar el mensaje: ' + error.message);
+      this.showFetchError(
+        'Hubo un error al enviar el mensaje: ' + error.message
+      );
     }
     this.loadingSendMessage = false;
   }
@@ -963,7 +1058,9 @@ export class GroupChatComponent {
       return;
     }
 
-    const isNotAuthor = this.selectedItems.some(item => item.user.uid !== this.userUid);
+    const isNotAuthor = this.selectedItems.some(
+      (item) => item.user.uid !== this.userUid
+    );
 
     if (isNotAuthor) {
       if (this.userAdmin) {
@@ -977,7 +1074,10 @@ export class GroupChatComponent {
     this.canDeleteMessagesOption = true;
   }
 
-  showDialogDeleteMessageConfirmation(event: any, oneMessage: any | null = null) {
+  showDialogDeleteMessageConfirmation(
+    event: any,
+    oneMessage: any | null = null
+  ) {
     event.preventDefault();
     if (this.userHasLeft) return;
     this.showDeleteMessageConfirmation = true;
@@ -989,32 +1089,38 @@ export class GroupChatComponent {
     let messagesToDelete: any[] = [];
     if (!this.selectedItems) {
       if (this.deleteOnlyOne) {
-        messagesToDelete = [{
-          id: this.deleteOnlyOne.id,
-          user: this.deleteOnlyOne.user.uid,
-          groups: this.groupId
-        }];
+        messagesToDelete = [
+          {
+            id: this.deleteOnlyOne.id,
+            user: this.deleteOnlyOne.user.uid,
+            groups: this.groupId,
+          },
+        ];
       } else {
         return;
       }
     } else {
-      messagesToDelete = this.selectedItems!
-        .filter(item => item.checked)
-        .map(item => ({
+      messagesToDelete = this.selectedItems!.filter((item) => item.checked).map(
+        (item) => ({
           id: item.id,
           user: item.user.uid,
-          groups: this.groupId
-        }));
-      this.selectedItems!.forEach(item => item.checked = false);
+          groups: this.groupId,
+        })
+      );
+      this.selectedItems!.forEach((item) => (item.checked = false));
       this.selectedItems = null;
     }
 
     this.showDeleteMessageConfirmation = false;
     try {
-      const response = await this.messagesService.deleteMessages(messagesToDelete);
+      const response = await this.messagesService.deleteMessages(
+        messagesToDelete
+      );
       if (!response.ok) {
         if (response.adminError) {
-          this.showFetchError('No posees permisos de administrador para eliminar mensajes de otros usuarios.');
+          this.showFetchError(
+            'No posees permisos de administrador para eliminar mensajes de otros usuarios.'
+          );
         } else {
           this.showFetchError('Hubo un error al eliminar los mensajes.');
         }
@@ -1033,16 +1139,19 @@ export class GroupChatComponent {
   async leaveGroup(event: any): Promise<void> {
     event.preventDefault();
     try {
-      const response = await fetch(`${apiUrl}api/grupos/leave/${this.groupSelected}`, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          userId: this.userUid,
-        })
-      });
+      const response = await fetch(
+        `${apiUrl}api/grupos/leave/${this.groupSelected}`,
+        {
+          method: 'PUT',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: this.userUid,
+          }),
+        }
+      );
 
       if (response.ok) {
         window.location.href = '/home/groups';
@@ -1050,7 +1159,6 @@ export class GroupChatComponent {
         const data = await response.json();
         console.error(data.mensaje);
       }
-
     } catch (error: any) {
       console.error(error.message);
     }

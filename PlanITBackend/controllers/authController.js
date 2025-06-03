@@ -6,7 +6,7 @@ const models = initModels(sequelize);
 const axios = require("axios");
 
 const FIREBASE_API_KEY = process.env.FIREBASE_API_KEY;
-const DOMAIN = process.env.DOMINIO || "http://localhost:4200";
+const DOMAIN = process.env.DOMINIO || "http://192.168.0.36:4200";
 const { OAuth2Client } = require('google-auth-library');
 
 const oAuth2Client = new OAuth2Client(

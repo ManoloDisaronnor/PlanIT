@@ -1,6 +1,6 @@
 # PlanIT
 
-![Version](https://img.shields.io/badge/version-beta1.0.0-purple)
+![Version](https://img.shields.io/badge/version-beta1.0.1-purple)
 
 ---
 
@@ -29,7 +29,7 @@ PlanIT es una página web pensada para facilitar la organización de eventos ent
   - Pestaña Tus eventos para ver los eventos que has ido creando.
   <!-- Comentario: Utilización de Google Maps para mejorar la experiencia de localización -->
 
-  ## Notas de la Versión Beta 1.0.0
+  ## Notas de la Versión Beta 1.0.1
 
   Esta versión marca la transición de alpha a beta, incorporando algunos arreglos esenciales:
 
@@ -43,10 +43,9 @@ PlanIT es una página web pensada para facilitar la organización de eventos ent
 
   ### Correcciones de Errores
   - Solucionada solicitud paginada en los grupos al mostrar el mismo numero de grupos que el limit.
-  - Modificado boton centrar en la ubicacion del evento. (Pendiente de testing)
-
-  ### Próximamente en PlanIT
-  - Correcion del chat y el input para escribir. Arreglar autogrow y estilo para el overflow en pantallas chicas
+  - Correcion del autogrow del textarea de los chats grupales en disposivos moviles.
+  - Modificado botón centrar en la ubicacion del evento.
+  
 
 ---
 
