@@ -24,12 +24,12 @@
     </div>
     <section class="group-information-items" *ngIf="!loadingGroupInfo">
         <div class="user-list">
-            <div class="user-item" *ngFor="let member of groupMembers" title="{{member.founder ? 'Fundador' : member.admin ? 'Administrador' : '' }}">
+            <div class="user-item" *ngFor="let member of groupMembers" title="{{member.founder === '1' ? 'Fundador' : member.admin ? 'Administrador' : '' }}">
                 <div class="user-info">
                     <div class="user-image">
                         <img src="{{member.user_user.imageUrl ? apiUrl + member.user_user.imageUrl : 'images/defaultProfilePicture.png'}}"
                             alt="Imagen de perfil">
-                        @if (member.founder) {
+                        @if (member.founder === '1') {
                             <div class="admin-indicator">
                                 <span class="material-icons admin-icon">self_improvement</span>
                             </div>
@@ -45,7 +45,7 @@
                 </div>
                 <div class="user-actions">
                     @if (!member.joined || member.joined === -1) {
-                        <div class="icon-container-del" (click)="showAlertDialogFunction($event, 'kick', member.user_user.uid)" title="Cancelar invitacion" *ngIf="userAdmin && member.user_user.uid !== this.userUid && !member.founder && member.joined !== -1">
+                        <div class="icon-container-del" (click)="showAlertDialogFunction($event, 'kick', member.user_user.uid)" title="Cancelar invitacion" *ngIf="userAdmin && member.user_user.uid !== this.userUid && member.founder === '0' && member.joined !== -1">
                             <span class="material-icons-outlined">close</span>
                         </div>
                         @if (member.joined === -1) {
@@ -53,15 +53,15 @@
                         } @else {
                             <span class="pending-user">Esperando respuesta</span>
                         }
-                    } @else if (!member.founder) {
-                        <div class="icon-container" (click)="showAlertDialogFunction($event, member.admin ? 'demote' : 'promote', member.user_user.uid)" title="{{ member.admin ? 'Descender a miembro' : 'Ascender a admin' }}" *ngIf="userAdmin && member.user_user.uid !== this.userUid && !member.founder">
+                    } @else if (member.founder === '0') {
+                        <div class="icon-container" (click)="showAlertDialogFunction($event, member.admin ? 'demote' : 'promote', member.user_user.uid)" title="{{ member.admin ? 'Descender a miembro' : 'Ascender a admin' }}" *ngIf="userAdmin && member.user_user.uid !== this.userUid && member.founder === '0'">
                             @if (member.admin) {
                                 <span class="material-icons promote-icon">arrow_circle_down</span>
                             } @else {
                                 <span class="material-icons promote-icon">arrow_circle_up</span>
                             }
                         </div>
-                        <div class="icon-container-del" (click)="showAlertDialogFunction($event, 'kick', member.user_user.uid)" title="Expulsar miembro" *ngIf="userAdmin && member.user_user.uid !== this.userUid && !member.founder">
+                        <div class="icon-container-del" (click)="showAlertDialogFunction($event, 'kick', member.user_user.uid)" title="Expulsar miembro" *ngIf="userAdmin && member.user_user.uid !== this.userUid && member.founder === '0'">
                             <span class="material-icons">logout</span>
                         </div>
                     } @else {

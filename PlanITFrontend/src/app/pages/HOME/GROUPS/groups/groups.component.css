@@ -281,6 +281,7 @@ input[type="text"]:focus {
 .group-image {
     margin-left: 0.5rem;
     min-width: 50px;
+    max-width: 50px;
     min-height: 50px;
     height: 50px;
     max-height: 50px;

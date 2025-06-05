@@ -181,6 +181,8 @@ class AuthController {
                 prompt: 'consent'
             });
 
+            console.log('Google Auth URL:', authorizeUrl);
+
             return res.json({ url: authorizeUrl });
         } catch (error) {
             console.error(error);

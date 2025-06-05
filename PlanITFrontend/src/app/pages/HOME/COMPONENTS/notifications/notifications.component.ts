@@ -31,6 +31,8 @@ export class NotificationsComponent implements OnInit, OnDestroy, AfterViewInit 
   unreadNotificationsCount: number = 0;
   scrollThreshold: number = 0.6;
 
+  loadingNotificationRead: number | null = null;
+
   // Propiedades para el deslizamiento
   private activeSwipeItem: HTMLElement | null = null;
   private startX: number = 0;
@@ -462,8 +464,11 @@ export class NotificationsComponent implements OnInit, OnDestroy, AfterViewInit 
 
   async markNotificationAsRead(notificationId: number, alreadyRead: boolean, event: Event): Promise<void> {
     event.stopPropagation();
+    if (this.loadingNotificationRead === notificationId) return;
     if (!alreadyRead) {
+      this.loadingNotificationRead = notificationId;
       await this.notificationService.markAsRead(notificationId);
+      this.loadingNotificationRead = null;
     }
   }
 
