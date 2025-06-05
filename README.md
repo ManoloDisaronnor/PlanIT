@@ -43,7 +43,7 @@ PlanIT es una página web pensada para facilitar la organización de eventos ent
 
 ## Instalación y Uso
 
-Este repositorio se utiliza únicamente para documentar los cambios y evolución del proyecto, por lo que no es necesaria la instalación local. PlanIT ya estará desplegado y accesible en línea. Para acceder a el, puedes usar la siguiente url ![PLANIT](https://planit.ddnsking.com)
+Este repositorio se utiliza únicamente para documentar los cambios y evolución del proyecto, por lo que no es necesaria la instalación local. PlanIT ya estará desplegado y accesible en línea. Para acceder a él, puedes usar la siguiente url: [PLANIT](https://planit.ddnsking.com)
 
 ---
 
