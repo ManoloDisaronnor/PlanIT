@@ -1,3 +1,27 @@
+/* Prevenir zoom automático en iOS para inputs y textareas */
+/* Esta configuración soluciona el problema de zoom automático en iOS cuando se hace focus en inputs */
+input,
+textarea,
+select {
+    font-size: 16px !important;
+    -webkit-text-size-adjust: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 0;
+}
+
+/* Asegurar que en dispositivos iOS no haya zoom automático */
+/* Detecta específicamente iOS usando @supports */
+@supports (-webkit-touch-callout: none) {
+    input,
+    textarea,
+    select {
+        font-size: 16px !important;
+        transform: scale(1);
+        -webkit-transform: scale(1);
+    }
+}
+
 *,
 .material-icons,
 .material-symbols-outlined {
@@ -172,6 +196,22 @@ body {
     border-radius: 50%;
     overflow: hidden;
     border: 2px solid #7c7cff;
+    /* Center image inside container */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Arreglo para círculos perfectos en iOS */
+@supports (-webkit-touch-callout: none) {
+    .event-founder-image {
+        /* iOS Safari perfect circle fix */
+        -webkit-mask-image: radial-gradient(circle at center, black 50%, transparent 50%);
+        mask-image: radial-gradient(circle at center, black 50%, transparent 50%);
+        /* Force hardware acceleration for iOS */
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+    }
 }
 
 .event-founder-image img {
@@ -205,6 +245,7 @@ body {
     color: #ffffffde;
     display: -webkit-box;
     -webkit-line-clamp: 4;
+    line-clamp: 4;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -399,6 +440,22 @@ body {
     aspect-ratio: 1/1;
     border-radius: 50%;
     overflow: hidden;
+    /* Center image inside container */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Arreglo para círculos perfectos en iOS */
+@supports (-webkit-touch-callout: none) {
+    .user-event-card-reduced-image {
+        /* iOS Safari perfect circle fix */
+        -webkit-mask-image: radial-gradient(circle at center, black 50%, transparent 50%);
+        mask-image: radial-gradient(circle at center, black 50%, transparent 50%);
+        /* Force hardware acceleration for iOS */
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+    }
 }
 
 .user-event-card-reduced-image img {
@@ -413,6 +470,9 @@ body {
     align-items: center;
     justify-content: space-between;
     margin-top: 0.5rem;
+    /* iOS fix: Force proper flex behavior */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
 }
 
 .user-event-card-reduced-info-founder-image {
@@ -420,6 +480,10 @@ body {
     aspect-ratio: 1/1;
     border-radius: 50%;
     overflow: hidden;
+    /* Center image inside container */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .user-event-card-reduced-info-founder-image img {
@@ -502,6 +566,11 @@ body {
     border: 1px solid #ffffff20;
     padding: 0.2rem 0.5rem;
     border-radius: 4px;
+    /* iOS fix: Ensure text visibility */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
 }
 
 .plan {

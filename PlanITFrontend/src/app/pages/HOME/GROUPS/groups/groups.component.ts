@@ -481,7 +481,12 @@ export class GroupsComponent implements AfterViewChecked {  /** Lista de grupos 
       const data = await response.json();
       if (response.ok) {
         this.notificationService.hideNotificationFromEntityGroup(data.datos.id);
-        this.getGroupList(true);
+        this.groupList = this.groupList.map(group => {
+          if (group.groups_group.id === groupId) {
+            group.joined = 1;
+          }
+          return group;
+        });
       } else {
         this.showInformation(data.mensaje, "error");
       }

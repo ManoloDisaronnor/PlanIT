@@ -1016,6 +1016,8 @@ export class GroupChatComponent {
         this.autoGrowTextarea();
         this.showFetchError('Hubo un error al enviar el mensaje.');
       } else {
+          const textarea = this.messageTextarea.nativeElement;
+          textarea.blur();
         if (!this.messagesService.hasMoreRecentMessages) {
           this.messages = this.messages.filter((msg) => msg.id !== tempId);
           setTimeout(() => {

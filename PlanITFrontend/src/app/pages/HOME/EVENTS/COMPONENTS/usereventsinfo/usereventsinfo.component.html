@@ -39,12 +39,12 @@
                                 @if (event.group_invited_to_events.length <= 3) {
                                     @for (group of event.group_invited_to_events; track group.groups_group.id) {
                                     <div class="user-event-card-reduced-group-item">
-                                        <img [src]="group.groups_group.imageUrl ? this.apiUrl + group.groups_group.imageUrl : 'images/defaultProfilePicture.png'" alt="Imagen grupo" />
+                                        <img [src]="group.groups_group.imageUrl ? this.apiUrl + group.groups_group.imageUrl : 'images/defaultGroup.png'" alt="Imagen grupo" />
                                     </div>
                                     }                                
                                 } @else {
                                 <div class="user-event-card-reduced-group-item">
-                                    <img [src]="event.group_invited_to_events[0].groups_group.imageUrl ? this.apiUrl + event.group_invited_to_events[0].groups_group.imageUrl : 'images/defaultProfilePicture.png'" alt="Imagen grupo" />
+                                    <img [src]="event.group_invited_to_events[0].groups_group.imageUrl ? this.apiUrl + event.group_invited_to_events[0].groups_group.imageUrl : 'images/defaultGroup.png'" alt="Imagen grupo" />
                                 </div>
                                 <div class="user-event-card-reduced-group-count">
                                     <span>+3</span>

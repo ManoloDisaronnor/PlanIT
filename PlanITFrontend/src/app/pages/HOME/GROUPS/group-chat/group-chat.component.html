@@ -83,7 +83,7 @@
                                 <div class="message-sender-info"
                                     [ngClass]="{ 'message-user-send' : message.user.uid === userUid }">
                                     <div class="sender-image">
-                                        <img [src]="message.user.imageUrl ? apiUrl + message.user.imageUrl : 'images/defaultUser.png'"
+                                        <img [src]="message.user.imageUrl ? apiUrl + message.user.imageUrl : 'images/defaultProfilePicture.png'"
                                             alt="ImagenUsuario" />
                                     </div>
                                     <span class="msg-username allow-copy allow-select">
@@ -100,7 +100,7 @@
                                         @if (!message.reference_deleted) {
                                         <div class="message-sender-info">
                                             <div class="sender-image">
-                                                <img [src]="message.reference_message.user_user.imageUrl ? apiUrl + message.reference_message.user_user.imageUrl : 'images/defaultUser.png'"
+                                                <img [src]="message.reference_message.user_user.imageUrl ? apiUrl + message.reference_message.user_user.imageUrl : 'images/defaultProfilePicture.png'"
                                                     alt="ImagenUsuario" />
                                             </div>
                                             <span class="msg-username">
@@ -220,7 +220,7 @@
                     <div class="message-reference-info">
                         <div class="message-sender-info">
                             <div class="sender-image">
-                                <img [src]="selectedMessage.user.imageUrl ? apiUrl + selectedMessage.user.imageUrl : 'images/defaultUser.png'"
+                                <img [src]="selectedMessage.user.imageUrl ? apiUrl + selectedMessage.user.imageUrl : 'images/defaultProfilePicture.png'"
                                     alt="ImagenUsuario" />
                             </div>
                             <span class="msg-username">

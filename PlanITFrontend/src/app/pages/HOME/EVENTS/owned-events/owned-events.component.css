@@ -6,30 +6,12 @@
     justify-content: flex-start;
 }
 .personal-info-container {
-    position: relative;
     width: 95%;
     margin-top: 2rem;
     margin-bottom: 2rem;
-    border-radius: 1rem;
-    position: relative;
-    background: linear-gradient(90deg, #da2b00aa, #fdc600aa);
-}
-
-.personal-info-container::after {
-    content: '';
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    bottom: 2px;
-    left: 2px;
     background-color: #0d0d1b;
-    border-radius: calc(1rem - 2px);
-    z-index: 0;
-}
-
-.personal-info-container > * {
-    position: relative;
-    z-index: 1;
+    border: 1px solid #da2b00aa;
+    border-radius: 1rem;
 }
 
 .created-events {

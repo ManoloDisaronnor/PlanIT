@@ -6,26 +6,9 @@
     justify-content: flex-start;
     gap: 1rem;
     position: relative;
-    overflow: hidden;
 }
 
-#user-event::after {
-    content: '';
-    border-radius: 1rem;
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 50%;
-    height: 100%;
-    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transform: skewX(-25deg);
-    animation: shine 2s ease-in-out forwards;
-}
-
-@keyframes shine {
-    0% { left: -100%; }
-    100% { left: 200%; }
-}
+/* Eliminamos todos los comentarios y código iOS específico */
 
 .user-info {
     width: 35%;
@@ -261,9 +244,7 @@
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
-    }
-
-    .user-image {
+    }    .user-image {
         width: 25%;
         min-width: 150px;
     }
@@ -334,8 +315,7 @@
     }
 }
 
-@media (max-width: 768px) {
-    .user-image {
+@media (max-width: 768px) {    .user-image {
         width: 20%;
         min-width: 100px;
     }
