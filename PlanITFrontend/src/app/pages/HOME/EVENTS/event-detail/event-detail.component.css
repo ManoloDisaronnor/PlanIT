@@ -597,6 +597,10 @@ input[type="checkbox"]:checked+.checkbox-custom {
     padding: 0.2rem 0.5rem;
     border-radius: 4px;
     animation: fadeIn 0.3s ease-in-out;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .image-date-taken {

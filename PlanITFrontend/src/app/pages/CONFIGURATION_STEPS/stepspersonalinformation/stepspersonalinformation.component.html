@@ -14,7 +14,7 @@
                 <div class="input-wrapper">
                     <div [ngClass]="{ 'input-container-error' : nameError}" class="input-container">
                         <input [ngClass]="{ 'error' : nameError}" type="text" placeholder="" formControlName="name"
-                            autocomplete="new-password">
+                            autocomplete="new-password" maxlength="50">
                         <label for="name">Nombre</label>
                         <span [ngClass]="{ 'errorborder' : nameError }" class="input-border"></span>
                     </div>
@@ -32,7 +32,7 @@
             <div class="form-group">
                 <div class="input-wrapper">
                     <div class="input-container">
-                        <input type="text" placeholder="" formControlName="surname" autocomplete="new-password">
+                        <input type="text" placeholder="" formControlName="surname" autocomplete="new-password" maxlength="100">
                         <label for="surname">Apellidos</label>
                         <span class="input-border"></span>
                     </div>

@@ -213,12 +213,11 @@
     </div>
 </div>
 
-<div class="event-detail-image-container" *ngIf="showFullScreenImage" (click)="closeFullScreenImage()">
-    <div class="fullscreen-image-wrapper" 
+<div class="event-detail-image-container" *ngIf="showFullScreenImage" (click)="closeFullScreenImage()">    <div class="fullscreen-image-wrapper" 
          (click)="$event.stopPropagation()"
          (mousedown)="onMouseDown($event)"
          (touchstart)="onTouchStart($event); onImageTouchStart($event)"
-         (touchmove)="onTouchMove($event)"
+         (touchmove)="onTouchMove($event); onImageTouchMove($event)"
          (touchend)="onTouchEnd($event); onImageTouchEnd($event)">
         <img 
             #fullscreenImage

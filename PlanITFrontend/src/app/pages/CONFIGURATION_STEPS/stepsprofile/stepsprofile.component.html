@@ -40,7 +40,7 @@
                 <div class="input-wrapper">
                     <div [ngClass]="{ 'input-container-error' : usernameError}" class="input-container">
                         <input [ngClass]="{ 'error' : usernameError}" type="text" placeholder=""
-                            formControlName="username" autocomplete="new-password">
+                            formControlName="username" autocomplete="new-password" maxlength="50">
                         <label for="username">Nombre de usuario</label>
                         <span [ngClass]="{ 'errorborder' : usernameError }" class="input-border"></span>
                     </div>
@@ -58,7 +58,7 @@
             <div class="form-group">
                 <div class="input-wrapper">
                     <div class="input-container">
-                        <textarea #aboutmeTextarea placeholder="" formControlName="aboutme"></textarea>
+                        <textarea #aboutmeTextarea placeholder="" formControlName="aboutme" maxlength="250"></textarea>
                         <label for="aboutme">Descripción sobre tí</label>
                         <span class="input-border"></span>
                     </div>

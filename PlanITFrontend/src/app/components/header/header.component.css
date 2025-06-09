@@ -127,13 +127,14 @@
 .header-user {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end;
     gap: 1rem;
     padding: 1rem;
     border-radius: 10px;
     background-color: transparent;
     transition: all 0.2s ease-in-out;
     cursor: pointer;
+    max-width: 400px;
 }
 
 .header-user:hover {
@@ -145,17 +146,29 @@
     flex-direction: column;
     align-items: flex-end;
     gap: 1rem;
+    max-width: calc(400px - 65px - 3rem);
+    text-align: right;
 }
 
 .fullname {
     font-size: 1.2rem;
     font-weight: 600;
+    width: 100%;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .username {
     font-size: 1rem;
     font-weight: 400;
+    width: 100%;
     color: #c4c0c1;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .profile-picture-container {
@@ -163,8 +176,8 @@
     height: 65px;
     border-radius: 50%;
     overflow: hidden;
-  }
-  
+}
+
 .profile-picture {
     width: 100%;
     height: 100%;
@@ -194,6 +207,7 @@ a {
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -275,49 +289,57 @@ a {
 
 .new-notification {
     animation: vibrate 10s ease-in-out infinite;
-  }
-  
-  @keyframes vibrate {
+}
+
+@keyframes vibrate {
     0% {
-      transform: rotate(0deg) scale(1);
+        transform: rotate(0deg) scale(1);
     }
+
     3% {
-      transform: rotate(5deg) scale(1.02);
+        transform: rotate(5deg) scale(1.02);
     }
+
     6% {
-      transform: rotate(-5deg) scale(1.02);
+        transform: rotate(-5deg) scale(1.02);
     }
+
     9% {
-      transform: rotate(5deg) scale(1.02);
+        transform: rotate(5deg) scale(1.02);
     }
+
     12% {
         transform: rotate(0deg) scale(1);
     }
+
     15% {
-      transform: translateY(-2px);
+        transform: translateY(-2px);
     }
+
     16% {
-      transform: translateY(0);
+        transform: translateY(0);
     }
-    16.1%, 100% {
-      transform: rotate(0deg) scale(1);
+
+    16.1%,
+    100% {
+        transform: rotate(0deg) scale(1);
     }
-  }
+}
 
 @media (max-width: 1200px) {
     .header-logo {
         font-size: 1rem;
         margin-left: 100px;
     }
-    
+
     .fullname {
         font-size: 1rem;
     }
-    
+
     .username {
         font-size: 0.8rem;
     }
-    
+
     .profile-picture-container {
         width: 55px;
         height: 55px;
@@ -344,19 +366,24 @@ a {
     .header-logo {
         font-size: 0.7rem;
     }
-    
+
     .header-user {
         padding: 0.5rem;
+        max-width: 300px;
+    }
+
+    .header-name {
+        max-width: calc(300px - 50px - 2rem);
     }
 
     .fullname {
         font-size: 0.9rem;
     }
-    
+
     .username {
         font-size: 0.7rem;
     }
-    
+
     .profile-picture-container {
         width: 50px;
         height: 50px;
@@ -389,7 +416,7 @@ a {
         font-size: 10px;
         height: 14px;
         width: 14px;
-      }
+    }
 }
 
 @media (max-width: 768px) {
@@ -400,9 +427,17 @@ a {
         height: 15px;
     }
 
+    .header-user {
+        max-width: 250px;
+    }
+
+    .header-name {
+        max-width: calc(250px - 50px - 2rem);
+    }
+
     .fullname {
-        text-align: left;
-        font-size: 1.3rem;
+        text-align: right;
+        font-size: 1rem;
     }
 
     .username {
@@ -446,6 +481,14 @@ a {
         justify-content: flex-end;
     }
 
+    .header-user {
+        max-width: 175px;
+    }
+
+    .header-name {
+        max-width: calc(175px - 40px - 2rem);
+    }
+
     .icon {
         font-size: 1.5rem;
         width: 22px;
@@ -461,8 +504,12 @@ a {
         padding: 0.3rem;
     }
 
-    .fullname{
-        font-size: 1.2rem;
+    .fullname {
+        font-size: 0.9rem;
+    }
+
+    .username {
+        font-size: 0.6rem;
     }
 
     .header-logo {
@@ -471,6 +518,11 @@ a {
 
     .user-menu {
         right: 125px;
+    }
+
+    .profile-picture-container {
+        width: 40px;
+        height: 40px;
     }
 
 }

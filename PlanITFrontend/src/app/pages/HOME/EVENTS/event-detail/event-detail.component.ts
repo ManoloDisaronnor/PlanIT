@@ -200,6 +200,33 @@ export class EventDetailComponent {
   /** Minimum distance threshold for swipe gesture recognition */
   private readonly swipeThreshold = 50;
 
+  /** Enhanced minimum distance threshold for confirmed swipe */
+  private readonly swipeConfirmThreshold = 80;
+  
+  /** Starting Y coordinate for touch gesture */
+  private touchStartY = 0;
+  
+  /** Current X coordinate during touch move */
+  private touchCurrentX = 0;
+  
+  /** Current Y coordinate during touch move */
+  private touchCurrentY = 0;
+  
+  /** Flag to indicate if touch is being tracked */
+  private isTouchTracking = false;
+  
+  /** Flag to indicate if user is actively swiping */
+  private isActivelySwiping = false;
+  
+  /** Preview image offset for smooth transition */
+  private previewOffset = 0;
+  
+  /** Next image for preview during swipe */
+  private previewNextImage: any = null;
+  
+  /** Previous image for preview during swipe */
+  private previewPreviousImage: any = null;
+
   /** Signal containing map of image states for loading management */
   imageStates = signal<Map<string, ImageState>>(new Map());
 
@@ -351,45 +378,68 @@ export class EventDetailComponent {
     this.currentImageIndex = this.getCurrentImageIndex();
     this.resetZoom();
     document.body.style.overflow = 'hidden';
-  }
-  /**
-   * Handles touch start events for swipe gesture recognition.
-   * Records the starting X coordinate for swipe detection.
+  }  /**
+   * Enhanced touch start handler for improved gesture recognition.
+   * Initializes tracking for both zoom and swipe gestures with better conflict prevention.
    * 
    * @param event Touch event containing touch information
    * @returns void
    */
   onImageTouchStart(event: TouchEvent): void {
     if (event.touches.length === 1) {
+      // Initialize touch tracking for swipe gestures
       this.touchStartX = event.touches[0].clientX;
+      this.touchStartY = event.touches[0].clientY;
+      this.touchCurrentX = this.touchStartX;
+      this.touchCurrentY = this.touchStartY;
+      this.isTouchTracking = true;
+      this.isActivelySwiping = false;
+      this.previewOffset = 0;
+      
+      // Reset preview images
+      this.previewNextImage = null;
+      this.previewPreviousImage = null;
     }
   }
-
   /**
-   * Handles touch end events for swipe gesture recognition.
-   * Records the ending X coordinate and processes swipe gesture.
+   * Enhanced touch end handler with confirmed swipe detection.
+   * Only processes gestures that meet the higher threshold and aren't zoom conflicts.
    * 
    * @param event Touch event containing touch information
    * @returns void
    */
   onImageTouchEnd(event: TouchEvent): void {
-    if (event.changedTouches.length === 1) {
+    if (event.changedTouches.length === 1 && this.isTouchTracking) {
       this.touchEndX = event.changedTouches[0].clientX;
-      this.handleSwipeGesture();
+      this.touchCurrentX = this.touchEndX;
+      
+      // Only process swipe if user was actively swiping and not zooming
+      if (this.isActivelySwiping && !this.isZooming && this.zoomLevel <= 1) {
+        this.handleConfirmedSwipeGesture();
+      }
+      
+      // Reset tracking state
+      this.isTouchTracking = false;
+      this.isActivelySwiping = false;
+      this.previewOffset = 0;
+      this.previewNextImage = null;
+      this.previewPreviousImage = null;
     }
   }
-
   /**
-   * Processes swipe gestures for image navigation.
-   * Navigates between images based on swipe direction and threshold.
+   * Processes confirmed swipe gestures with higher threshold for navigation.
+   * Uses enhanced threshold to prevent accidental navigation during zoom gestures.
    * 
    * @private
    * @returns void
    */
-  private handleSwipeGesture(): void {
+  private handleConfirmedSwipeGesture(): void {
     const deltaX = this.touchEndX - this.touchStartX;
+    const deltaY = Math.abs(this.touchCurrentY - this.touchStartY);
 
-    if (Math.abs(deltaX) > this.swipeThreshold) {
+    // Only process horizontal swipes that exceed the confirmed threshold
+    // and don't have significant vertical movement (which might indicate zoom)
+    if (Math.abs(deltaX) > this.swipeConfirmThreshold && deltaY < 50) {
       if (deltaX > 0 && this.hasPreviousImage()) {
         this.navigateToPreviousImage();
       } else if (deltaX < 0 && this.hasNextImage()) {
@@ -1335,5 +1385,71 @@ export class EventDetailComponent {
       }, 0);
     }
     this.loadingEventInfo = false;
+  }
+
+  /**
+   * Enhanced touch move handler for image gestures.
+   * Tracks movement to distinguish between swipe and zoom gestures,
+   * and provides preview effects during swiping.
+   * 
+   * @param event Touch event containing touch information
+   * @returns void
+   */
+  onImageTouchMove(event: TouchEvent): void {
+    if (!this.isTouchTracking || event.touches.length !== 1) {
+      return;
+    }
+
+    const currentX = event.touches[0].clientX;
+    const currentY = event.touches[0].clientY;
+    
+    // Update current position
+    this.touchCurrentX = currentX;
+    this.touchCurrentY = currentY;
+    
+    const deltaX = currentX - this.touchStartX;
+    const deltaY = Math.abs(currentY - this.touchStartY);
+    
+    // Determine if this is a horizontal swipe (not zoom or vertical scroll)
+    if (Math.abs(deltaX) > 10 && deltaY < 30 && !this.isZooming && this.zoomLevel <= 1) {
+      this.isActivelySwiping = true;
+      
+      // Calculate preview offset for smooth transition effect
+      this.previewOffset = deltaX * 0.3; // Dampen the movement for preview
+      
+      // Setup preview images based on swipe direction
+      if (deltaX > 0 && this.hasPreviousImage()) {
+        this.setupPreviousImagePreview();
+      } else if (deltaX < 0 && this.hasNextImage()) {
+        this.setupNextImagePreview();
+      }
+      
+      // Prevent default to avoid conflicts with zoom gestures
+      event.preventDefault();
+    }
+  }
+  /**
+   * Sets up preview for the previous image during swipe gesture.
+   * 
+   * @private
+   * @returns void
+   */
+  private setupPreviousImagePreview(): void {
+    const currentIndex = this.getCurrentImageIndex();
+    if (currentIndex > 0) {
+      this.previewPreviousImage = this.eventInfo.event_images[currentIndex - 1];
+    }
+  }
+  /**
+   * Sets up preview for the next image during swipe gesture.
+   * 
+   * @private
+   * @returns void
+   */
+  private setupNextImagePreview(): void {
+    const currentIndex = this.getCurrentImageIndex();
+    if (currentIndex < this.eventInfo.event_images.length - 1) {
+      this.previewNextImage = this.eventInfo.event_images[currentIndex + 1];
+    }
   }
 }
